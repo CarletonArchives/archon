@@ -396,7 +396,7 @@ function collectioncontent_ui_main()
 
       $objChangeCollectionPhrase = Phrase::getPhrase('changecollection', $_ARCHON->Package->ID, $_ARCHON->Module->ID, PHRASETYPE_ADMIN);
       $strChangeCollection = $objChangeCollectionPhrase ? $objChangeCollectionPhrase->getPhraseValue(ENCODE_HTML) : 'Change Collection';
-      
+
 
       $generalSection = $_ARCHON->AdministrativeInterface->getSection('general');
 
@@ -432,6 +432,8 @@ function collectioncontent_ui_main()
          /* <![CDATA[ */
 
          $(function(){
+           var lastChecked = 0;
+           var recentlyChecked = 0;
             $("#tree").dynatree({
                checkbox: true,
                autoFocus: false,
@@ -443,6 +445,35 @@ function collectioncontent_ui_main()
                   if( $(".contextMenu:visible").length > 0 ){
                      return false;
                   }
+
+                  /*
+                   * Mod: Shift + Click to select
+                   * by Caleb Braun <calebjbraun@gmail.com>
+                   * 8/11/16
+                  */
+                  var siblings = node.getParent().getChildren();
+                  for(var i=0; i<siblings.length; i++) {
+                    if (siblings[i] == node && !siblings[i].isSelected()) {
+                      recentlyChecked = i;
+                      break;
+                    }
+                  }
+
+                  if(event.shiftKey) {
+                    console.log(node);
+
+                    if (lastChecked > recentlyChecked) {
+                      for(var i=recentlyChecked+1; i<=lastChecked; i++) {
+                        siblings[i].select(true);
+                      }
+                    } else {
+                      for(var i=lastChecked; i<recentlyChecked; i++) {
+                        siblings[i].select(true);
+                      }
+                    }
+                 }
+                 lastChecked = recentlyChecked;
+                 // End Mod
                },
                onKeydown: function(node, event) {
                   // Eat keyboard events, when a menu is open
@@ -521,14 +552,14 @@ function collectioncontent_ui_main()
             onSelect: function(select, dtnode){
                if(select){
                   $('#tree_menu:hidden').show('blind');
-                                                                                                                  
-                  if(($("#tree").dynatree("getSelectedNodes").length > 1)){
+
+                  if(($("#tree").dynatree("getSelectedNodes").length == 2)){
                      $('#tree_menu .singular:visible').hide('slide');
                   }
                }else{
                   if($("#tree").dynatree("getSelectedNodes").length == 0){
                      $('#tree_menu').hide('blind');
-                  }else if(($("#tree").dynatree("getSelectedNodes").length == 1)){               
+                  }else if(($("#tree").dynatree("getSelectedNodes").length == 1)){
                      $('#tree_menu .singular:hidden').show('slide');
                   }
                }
@@ -600,17 +631,17 @@ function collectioncontent_ui_main()
             if(nodes.length != 1){
                return false;
             }
-                                                                              
+
             location.href = '?p=' + request_p + '&parentid=' + nodes[0].data.key;
          }
-                                                                                 
+
          function add_sibling(){
             var tree = $("#tree").dynatree("getTree");
             var nodes = tree.getSelectedNodes(true);
             if(nodes.length != 1){
                return false;
             }
-                                                                              
+
             if(nodes[0].parent.data.key != '_1'){
                location.href = '?p=' + request_p + '&parentid=' + nodes[0].parent.data.key;
             }else{
@@ -874,7 +905,7 @@ function collectioncontent_ui_main()
                   }
                   $('#SortOrderInput').val(parseInt(val));
                }else{
-                  if($('#SiblingContent').is(':hidden')){                    
+                  if($('#SiblingContent').is(':hidden')){
                      $('#SiblingContent').show('fold');
                   }else{
                      // fire change event to handle the sortorder direction
@@ -1090,9 +1121,10 @@ function collectioncontent_ui_main()
       <input style="min-width:300px" name="collectionid" id="CollectionInput" />
       <script type="text/javascript">
          /* <![CDATA[ */
-         $(function(){                                          
+         $(function(){
             $('#CollectionInput').autocomplete({
                source: function( request, response ) {
+                 console.log("wassup");
                   $.ajax({
                      url: "index.php",
                      dataType: "jsonp",
@@ -1114,7 +1146,7 @@ function collectioncontent_ui_main()
                   });
                },
                minLength: 2,
-               select: function( event, ui ) {                         
+               select: function( event, ui ) {
                   if(ui.item.id && ui.item.id != 0){
                      location.href = 'index.php?p='+request_p+'&collectionid=' + ui.item.id + '&displayrootcontent=true';
                   }
@@ -1279,12 +1311,9 @@ function collectioncontent_ui_exec()
       $_ARCHON->declareError("Unknown Command: {$_REQUEST['f']}");
    }
 
-   if($_ARCHON->Error)
-   {
+   if($_ARCHON->Error) {
       $msg = $_ARCHON->Error;
-   }
-   else
-   {
+   } else {
       $msg = 'CollectionContent Database Updated Successfully.';
    }
 
@@ -1292,13 +1321,15 @@ function collectioncontent_ui_exec()
    {
       $dispRootContent = ($objCollectionContent && $objCollectionContent->ParentID == 0) ? "&displayrootcontent=true" : "";
       $location = ($count > 1) ? "index.php?p=admin/collections/collectioncontent&collectionid={$objCollectionContent->CollectionID}&id={$objCollectionContent->ParentID}{$dispRootContent}" : NULL;
+      // For the index utility
+      $_REQUEST['itemidnum'] = $_REQUEST['id'];
+      include "packages/core/admin/indexutil.php";
    }
    elseif($_REQUEST['f'] == 'delete')
    {
       $dispRootContent = ($parentID == 0) ? "&displayrootcontent=true" : "";
       $location = ($count > 1 && !$sameParent) ? "index.php?p=admin/collections/collectioncontent&collectionid={$collectionID}{$dispRootContent}" : "index.php?p=admin/collections/collectioncontent&collectionid={$collectionID}&id={$parentID}{$dispRootContent}";
    }
-
 
    $_ARCHON->AdministrativeInterface->sendResponse($msg, $arrIDs, $_ARCHON->Error, false, $location);
 }
