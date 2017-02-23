@@ -42,10 +42,6 @@ function database_ui_initialize()
   {
     database_ui_dialog_index_search();
   }
-  elseif($_REQUEST['f'] == 'dialog_report')
-  {
-    database_ui_dialog_generate_report();
-  }
   elseif($_REQUEST['f'] == 'import')
   {
     list($APRCode, $ImportUtility) = explode('/', $_REQUEST['importutility']);
@@ -84,11 +80,6 @@ function database_ui_initialize()
   // Runs the index search
   elseif ($_REQUEST['f'] == 'indexitems') {
     require_once('indexutil.php');
-  }
-  // Generates a report
-  elseif ($_REQUEST['f'] == 'makereport') {
-    while (@ob_end_clean());
-    require('makereport.php');
   }
 }
 
@@ -133,26 +124,6 @@ function database_ui_dialog_index_search()
   // Starts the interface
   $_ARCHON->AdministrativeInterface->outputInterface();
 }
-
-//Dialog for generating reports.
-function database_ui_dialog_generate_report(){
-    global $_ARCHON;
-
-    $dialogSection = $_ARCHON->AdministrativeInterface->insertSection('dialogform', 'dialog');
-    $_ARCHON->AdministrativeInterface->OverrideSection = $dialogSection;
-    $dialogSection->setDialogArguments('form', NULL, 'admin/core/database', 'makereport');
-
-    $report = $_REQUEST['reportutility'];
-
-    $dialogSection->insertRow('name')->insertInformation('Name', $report);
-    $dialogSection->getRow('name')->insertHTML("<input type='hidden' class='reloadparam' name='title' value='{$_REQUEST['reportutility']}' />");
-    $dialogSection->insertRow('Description')->insertInformation('desc', "This will run the ".$report." on the previous 31 days, or as specified below.");
-    $dialogSection->insertRow('Days Prior')->insertTextField('date', 30, 100);
-  
-    $_ARCHON->AdministrativeInterface->outputInterface();
-}
-
-
 
 function database_ui_dialog_export()
 {
@@ -557,6 +528,21 @@ function database_ui_main()
   }
 
   $tableinformationsection = $_ARCHON->AdministrativeInterface->insertSection('tableinformation', 'custom');
+
+
+
+
+  //Start of Reports install button Mod.
+  if(file_exists("packages/core/admin/reports.php")){ //If the script is present
+    $query="SELECT * from tblCore_Modules WHERE Script='reports'"; //And the table isn't
+    $res =$_ARCHON->mdb2->query($query);
+	if (!PEAR::isError($res)) {
+      if(!$row=$res->fetchRow()){
+		$generalSection->insertRow('Mods')->insertHTML("<button type='button' class='adminformbutton' onclick='window.open(\"index.php?p=admin/core/reports&f=install\");'>Install Reports</button>");
+      } //Add an install button.
+	}
+  }
+  //End of Reports install button Mod.
   ob_start();
 
 
@@ -566,6 +552,15 @@ function database_ui_main()
   *
   */
   // Set up the select box
+
+  $indexInstall=-1;
+  foreach($_ARCHON->MemoryCache['Objects']['Configuration'] as $config){
+	if($config->Directive=='Enable Index Search'){
+      $indexInstall=$config->ID;
+    }
+  }
+  if($indexInstall!=-1){
+  if($_ARCHON->MemoryCache['Objects']['Configuration'][$indexInstall]->Value){
   $indexOpts = array ("All" => 'All', "Collection" => 'Collection', "Item" => 'Item');
   // Row is Index search, select is what goes in that row
   $indexSearch = $generalSection->insertRow('Index search')->insertSelect('indexChoices', $indexOpts, array());
@@ -677,67 +672,18 @@ function database_ui_main()
   // Adds the button to the row
   $button = ob_get_clean();
   $generalSection->getRow('Index search')->insertHTML($button);
+  $generalSection->getRow('Index search')->insertHTML($temp);
+  }
+  }
+  else{
+    $generalSection->insertRow('Mods')->insertHTML("<button type='button' class='adminformbutton' onclick='window.open(\"index.php?p=admin/core/indexutil&f=install&num=102\");'>Install IndexUtil</button>");
+
+  }
   // Index search mod END
 
   ob_start();
-  //Grabs the available reports from reports.csv in packages/core/admin, and puts them into the page
-  $reportOpts=array();
-  if(file_exists('packages/core/admin/reports.csv')){
-	$inputfile=fopen('packages/core/admin/reports.csv',"r");
-	while($stuff=fgetcsv($inputfile)){
-	  $reportOpts[$stuff[0]]=$stuff[0];
-	}
-    $makeReport = $generalSection->insertRow('Generate Report')->insertSelect('reportChoices', $reportOpts, array());
-    $makeReport->Watch=false;
-  }
   ?>
-  <a id="launchMakeReport" href="#"><?php echo($strLaunch); ?></a>
-  <script type="text/javascript">
-  /* <![CDATA[ */
-  $(function () {
-    $('#launchMakeReport').button({icons:{primary: 'ui-icon-newwin'}, disabled: ($('#reportChoicesInput').val() == "0")})
-    .click(function() {admin_ui_launch_make_report(); return false});
 
-    $('#reportChoicesInput').change(function(){
-      if($(this).val() != "0"){
-        $('#launchMakeReport').button('enable');
-      }else{
-        $('#launchMakeReport').button('disable');
-      }
-    })
-  });
-
-  function admin_ui_launch_make_report(){
-    var reportutility = $('#reportChoicesInput').val();
-    if(reportutility != "0"){
-      var dialog = $('#dialogmodal');
-      var orig_buttons = dialog.dialog('option', 'buttons');
-      dialog.dialog('option', 'buttons', {
-        Generate: function(){
-          $('#dialogloadingscreen').show();
-          $('#dialogmodal .relatedselect>*').attr('selected','selected');
-          location.href = 'index.php?' + $('#dialogform :input').fieldSerialize();
-          $('#dialogform .relatedselect>*').removeAttr('selected');
-          $('#dialogloadingscreen').hide();
-          $(this).dialog('close');
-        },
-        Cancel: function(){
-          $(this).dialog('close');
-          $(this).dialog('option','buttons', orig_buttons);
-        }
-      });
-    admin_ui_opendialog('core','database', 'report', {reportutility: reportutility});
-    }
-  }
-
-  /* ]]> */
-  </script>
-
-  <?php
-  $button = ob_get_clean();
-  $generalSection->getRow('Generate Report')->insertHTML($button);
-  //This ends the last little cleanup for report generation
-  ?>
   <script type="text/javascript">
   /* <![CDATA[ */
   $(function () {

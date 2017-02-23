@@ -19,7 +19,6 @@ abstract class DigitalLibrary_File
 
       return true;
    }
-
    public function loadFileInfoFromID()
    {
       global $_ARCHON;
@@ -80,7 +79,8 @@ abstract class DigitalLibrary_File
       static $prep = NULL;
       if(!isset($prep))
       {
-         $query = "SELECT ID, DefaultAccessLevel, DigitalContentID, Title, Filename, FileTypeID, Size, DisplayOrder FROM tblDigitalLibrary_Files WHERE ID = ?";
+         //query also selets 'DirectLink'
+         $query = "SELECT ID, DefaultAccessLevel, DigitalContentID, Title, Filename, FileTypeID, DirectLink, Size, DisplayOrder FROM tblDigitalLibrary_Files WHERE ID = ?";
          $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $prep->execute($this->ID);
@@ -142,11 +142,26 @@ abstract class DigitalLibrary_File
       $FileExtension = encoding_strtolower($arrMatch[1]);
       $this->FileTypeID = $_ARCHON->getFileTypeForExtension($FileExtension)->ID;
 
-      if(!$FileExtension || !$this->FileTypeID)
+      if(!$FileExtension) {
+          $_ARCHON -> declareError("Could not store File: $this->Filename has no extension.");
+          return false;  
+      }
+      
+      elseif(!$this -> FileTypeID)
       {
          $_ARCHON->declareError("Could not store File: File extension $FileExtension is not defined in the file types manager, and only defined file types may be added.");
-         return false;
+          return false;
       }
+      //If File has an undefined extension, create a new FileType entry in tblDigitalContent_FileTypes
+     /* elseif(!$this->FileTypeID) {
+         $objFileType = New FileType();
+         $objFileType -> FileType = $FileExtension;
+         $objFileType -> FileExtensions = '.' . $FileExtension;
+         $objFileType -> ContentType = "Other";
+         $objFileType -> MediaTypeID = 6;
+         $objFileType -> dbStore();
+         $this -> FileTypeID = $objFileType -> ID;
+      }*/
 
       if($this->TempFileName)
       {
@@ -155,11 +170,11 @@ abstract class DigitalLibrary_File
             $this->Size = filesize($this->TempFileName);
          }
       }
-      elseif(!$this->ID)
+      /*elseif(!$this->ID)
       {
          $_ARCHON->declareError("Could not add File: Local copy of the file not found.");
          return false;
-      }
+      }*/
 
       if($this->DigitalContentID == -1)
       {
@@ -179,19 +194,17 @@ abstract class DigitalLibrary_File
          $problemfields = array('Title', 'Filename');
          $requiredfields = array('Title', 'Filename');
       }
+      
       else
       {
          $_ARCHON->declareError("Could not store File: Invalid DigitalContentID");
          return false;
       }
-
       $ignoredfields = array('fpointer', 'filesize', 'fposition');
-
       if(!$_ARCHON->storeObject($this, MODULE_DIGITALLIBRARY, 'tblDigitalLibrary_Files', $checkquery, $checktypes, $checkvars, $checkqueryerror, $problemfields, $requiredfields, $ignoredfields))
       {
          return false;
       }
-
       // Time to store the actual file contents.
       if($this->TempFileName)
       {
@@ -286,6 +299,7 @@ abstract class DigitalLibrary_File
                unset($ThumbnailMedium);
                unset($ThumbnailSmall);
                unset($imgdata);
+                              
             }
 
 
@@ -319,6 +333,18 @@ abstract class DigitalLibrary_File
                }
             }
          }
+         //Store a DirectLink to the File
+         /*$url = $this -> getFileURL($this -> FilePreviewLong);
+         if (!$url) {
+             $url = $this -> getFileURL($this -> FilePreviewShort);
+         }
+         if ($url) {
+             $query = "UPDATE tblDigitalLibrary_Files SET DirectLink = $url WHERE ID = '{$this->ID}'";
+             if(PEAR::isError($affected))
+             {
+                trigger_error($affected->getMessage(), E_USER_ERROR);
+             }             
+         }*/
       }
 
       unset($FileData);
@@ -901,7 +927,12 @@ abstract class DigitalLibrary_File
          }
       }
 
-      if($_ARCHON->config->CacheFiles)
+      //Easily get fileURL of a stored server file
+      if($this -> DirectLink) {
+          return $this -> DirectLink;
+      }
+      
+      elseif($_ARCHON->config->CacheFiles)
       {
          $file_cache_path = 'packages/digitallibrary/files/' . $this->ID;
 
@@ -940,7 +971,7 @@ abstract class DigitalLibrary_File
 
       return $url;
    }
-
+   
    public function verifyDeletePermissions()
    {
       global $_ARCHON;
@@ -1133,6 +1164,10 @@ abstract class DigitalLibrary_File
     * @var integer
     */
    public $FileTypeID = 0;
+   /**
+    * @var string
+    */
+   public $DirectLink = '';   
    /**
     * @var integer
     */

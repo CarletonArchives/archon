@@ -11,7 +11,27 @@
 
 isset($_ARCHON) or die();
 
-
+if($_REQUEST['f']=='install'){
+	echo("Hi");
+$query="INSERT IGNORE INTO `tblCore_Phrases` (
+	`ID`, 
+	`PackageID`,
+	`ModuleID`,
+	`LanguageID`,
+	`PhraseName`,
+	`PhraseValue`,
+	`RegularExpression`,
+	`PhraseTypeID`
+)
+VALUES
+(NULL, 1, 11, 2081, 'itemidnum', 'Item ID Number', NULL, 5),
+(NULL, 1, 11, 2081, 'collidnum', 'Collection ID Number', NULL, 5),
+(NULL, 1, 11, 2081, 'indexallitems', 'Index all items', NULL, 5);";
+$res=$_ARCHON->mdb2->query($query);
+$query="INSERT IGNORE INTO `tblCore_Configuration` (`ID`, `PackageID`, `ModuleID`, `Directive`, `Value`, `InputType`, `PatternID`, `ReadOnly`, `Encrypted`, `ListDataSource`) VALUES (NULL, '1', '0', 'Enable Index Search', 0, 'radio', '3', '0', '0', NULL)";
+$res=$_ARCHON->mdb2->query($query);
+}
+else{
 $sessionStats = array("updates" => 0,
                       "inserts" => 0,
                       "queries" => 0,
@@ -34,7 +54,6 @@ if ($_REQUEST['p'] == 'admin/collections/collectioncontent') {
   echo "<?xml version='1.0' encoding='UTF-8'?>\n";
   echo "<archonresponse error='false'><message>Collection Content Database Updated Successfully</message></archonresponse>";
 }
-
 
 ob_start();
 
@@ -89,11 +108,11 @@ if (array_key_exists('itemidnum', $_REQUEST)) {
 } else {
   $sessionStats["indexType"] = 'all';
   $query = "SELECT ID FROM tblCollections_Collections";
-  $collectionIDs = runQuery($query, &$sessionStats);
+  $collectionIDs = runQuery($query, $sessionStats);
 
   // Loop through every collection, indexing them one at a time
   foreach ($collectionIDs as $collID) {
-    indexCollection($collID['ID'], &$sessionStats);
+    indexCollection($collID['ID'], $sessionStats);
   }
 
   if (!$sessionStats['errors']) {
@@ -102,20 +121,56 @@ if (array_key_exists('itemidnum', $_REQUEST)) {
 }
 
 generateStatusReport($sessionStats);
-
+}
 
 // Expands out date ranges to full four digit years
 function explodeDates($term) {
   // Finds dates like 'YYYY (+ or - 2 years)'
-  $circaPattern = "/(\d{4})\/?(\d{0,2})\s?I{0,2}\s?\(\s?\+ or \- (\d) year[s]?\)/";
+  $plusOrMinusPattern = "/(\d{4})\/?(\d{0,2})\s?I{0,2}\s?\(\s?\+ or \- (\d) year[s]?\)/";
   // Finds first date range in the index field
   $rangePattern = "/(\d{4})\s?[-\/]\s?(\d{2,})\b/";
+  // Finds ;-delimited date ranges with Circa in front
+  $circaPattern = "%Circa (\d{4}/?\d?\d?)(-(\d{4}/?\d?\d?))*;|$%";
+  // Grabs four digit numbers to remove duplicates
+  $numbersPattern = "%[,;] (\d{4})(?=(([,;])|^))%";
+  $noCommasPattern = "%, (?=[,;] )%";
+  $noCommasPattern2 = "%(?<=[,;] ), %";
+  $noSemiColonsPattern = "%; (?=; )%";
 
   // Changes something like 'YYY5 (+ or - 2 years)' to 'YYY3-YYY7'
-  if (preg_match($circaPattern, $term, $plusOrMinus)) {
+  if (preg_match($plusOrMinusPattern, $term, $plusOrMinus)) {
     $extraYear = $plusOrMinus[2] ? 1 : 0;
     $range = ($plusOrMinus[1] - intval($plusOrMinus[3])) . "-" . ($plusOrMinus[1] + intval($plusOrMinus[3]) + $extraYear);
-    $term = preg_replace($circaPattern, $range, $term);
+    $term = preg_replace($plusOrMinusPattern, $range, $term);
+  }
+  //Handles Circa
+  if (preg_match_all($circaPattern,$term,$circas,PREG_SET_ORDER)){
+	foreach ($circas as $circa){
+		//Tests for Circa YYYY-YYYY
+		if(count($circa) == 4){
+			$date= intval(substr($circa[3],0,4));
+			//Handle academic years
+			if(strlen($circa[3])==7){
+				$date=$date+1;
+			}
+			$replace = strval(intval(substr($circa[1],0,4))-5)."-".strval($date+5).";";
+		}
+		//Tests for Circa YYYY
+		if(count($circa)==2){
+			$date= intval(substr($circa[1],0,4));
+			if(strlen($circa[1])==7){
+				$date=$date+1;
+			}
+			$replace=strval(intval(substr($circa[1],0,4))-5)."-".strval($date+5).";";
+
+		}
+		//Replaces the term if needed
+		if(count($circa)==2 or count($circa)==4){
+			$search=$circa[0];
+			$term=str_replace($search,$replace,$term);
+		}
+	}
+
   }
 
   // Explode each date range
@@ -146,7 +201,23 @@ function explodeDates($term) {
     $dateRange .= "$endYear";
     $term = preg_replace($rangePattern, $dateRange, $term, 1);
   }
-
+  if(preg_match_all($numbersPattern,$term,$numbers,PREG_SET_ORDER)){
+	$counts=array_column($numbers,1);
+	$counts=array_count_values($counts);
+	foreach($numbers as $number){
+		while($counts[$number[1]]>1){
+			$start=strpos($term,$number[0]);
+			$start=$start+strlen($number[0]);
+			$tempString=substr($term,$start);
+			$replace=strpos($tempString,$number[1]);
+			$term=substr_replace($term,"",$replace+$start,4);
+			$counts[$number[1]]=$counts[$number[1]]-1;
+		}
+	}
+	$term=preg_replace($noCommasPattern,"",$term);
+    $term=preg_replace($noCommasPattern2,"",$term);
+	$term=preg_replace($noSemiColonsPattern,"",$term);
+  }
   return $term;
 }
 
@@ -229,6 +300,18 @@ function getIndexFieldValues($id, $userFields, &$sessionStats) {
 
   $rows = runQuery($query, $sessionStats);
   $indexFieldVals = array();
+  // ----- Rerun if result is too long ----- //
+  $rerun=false;
+  foreach($rows as $item){
+    if(strlen($item['IndexField'])>1000){
+      $rerun=true;
+    }
+  }
+  if($rerun){
+    runQuery("SET SESSION group_concat_max_len = 1000000;",$sessionStats);
+    $rows=runQuery($query, $sessionStats);
+    runQuery("SET SESSION group_concat_max_len = 1024;",$sessionStats);
+  }
 
   // Put results into an array
   foreach ($rows as $item) {
