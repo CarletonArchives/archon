@@ -89,6 +89,7 @@ if(!empty($objDigitalContent->Files))
          if($FullAccess)
          {
             echo("<a href='?p=digitallibrary/getfile&amp;id=$objFile->ID' $onclick>Download Original File</a><br/>");
+			echo("<a href ='?p=digitallibrary/zipout&id=".$objDigitalContent->ID."'>Download These Images and Metadata</a>");
          }
          else
          {

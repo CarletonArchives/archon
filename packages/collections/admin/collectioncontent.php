@@ -10,7 +10,6 @@
 isset($_ARCHON) or die();
 
 ob_implicit_flush();
-
 collectioncontent_ui_initialize();
 
 // Determine what to do based upon user input
@@ -1320,7 +1319,7 @@ function collectioncontent_ui_exec()
    if($_REQUEST['f'] == 'store')
    {
       $dispRootContent = ($objCollectionContent && $objCollectionContent->ParentID == 0) ? "&displayrootcontent=true" : "";
-      $location = ($count > 1) ? "index.php?p=admin/collections/collectioncontent&collectionid={$objCollectionContent->CollectionID}&id={$objCollectionContent->ParentID}{$dispRootContent}" : NULL;
+      $location = ($count > 1) ? "index.php?p=admin/collections/collectioncontent&collectionid={$objCollectionContent->CollectionID}&id={$objCollectionContent->ParentID}" : NULL;//{$dispRootContent}" : NULL;
       // For the index utility
       $_REQUEST['itemidnum'] = $_REQUEST['id'];
       include "packages/core/admin/indexutil.php";

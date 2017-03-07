@@ -121,6 +121,7 @@ if (array_key_exists('itemidnum', $_REQUEST)) {
 }
 
 generateStatusReport($sessionStats);
+ob_end_clean();
 }
 
 // Expands out date ranges to full four digit years
