@@ -153,6 +153,13 @@ function ck_archon_destroy(str_id)
    }
 }
 
+function ck_archon_destroy_all(str_id)
+{
+   $('.ckbutton').remove();
+   for (i in CKEDITOR.instances) {
+      ck_archon_destroy(i);
+   }
+}
 
 function ck_archon_updateall()
 {
