@@ -696,6 +696,7 @@ function admin_ui_submit(){
    $('#savecontrol').addClass('disabled');
    $('#savecontrol').addClass('submitting');
    ck_archon_updateall();
+   ck_archon_destroy_all();
    $('.relatedselect>*').attr('selected','selected');
    $('#mainform').submit();
    $('.relatedselect>*').removeAttr('selected');
