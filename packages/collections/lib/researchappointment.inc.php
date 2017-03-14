@@ -149,7 +149,7 @@ abstract class Collections_ResearchAppointment
     *
     * @param integer $CollectionID
     * @param integer $CollectionContentID[optional]
-    * 
+    *
     * @return boolean
     */
    public function dbRelateMaterials($CollectionID, $CollectionContentID = 0)
@@ -308,7 +308,7 @@ abstract class Collections_ResearchAppointment
     * Sets AppointmentMaterials retrieval time and user
     *
     * @param integer $CollectionID[optional]
-    * 
+    *
     * @return boolean
     */
    public function dbRetrieveMaterials($CollectionID = 0)
@@ -372,7 +372,7 @@ abstract class Collections_ResearchAppointment
     * Sets AppointmentMaterials return time and user
     *
     * @param integer $CollectionID[optional]
-    * 
+    *
     * @return boolean
     */
    public function dbReturnMaterials($CollectionID = 0)
@@ -509,7 +509,7 @@ abstract class Collections_ResearchAppointment
 
       $Repository = New Repository($RepositoryID);
       $Repository->dbLoad();
-      
+
       $MailFrom = $Repository->Email ? $Repository->Email : "noreply@" . $_SERVER['HTTP_HOST'];
 
       if($Repository->Email)
@@ -643,7 +643,7 @@ $Summary\n\n";
 
       if($Repository->Email)
       {
-         if(!mail(encoding_convert_encoding($Repository->Email, 'ISO-8859-1'), encoding_convert_encoding($Repository->Name, 'ISO-8859-1') . ": Research Request Received", encoding_convert_encoding($ArchivistMessage, 'ISO-8859-1'), "From: " . encoding_convert_encoding($this->Researcher->Email, 'ISO-8859-1')))
+         if(!mail(encoding_convert_encoding($Repository->Email, 'ISO-8859-1'), encoding_convert_encoding($Repository->Name, 'ISO-8859-1') . ": Research Request Received From {$this->Researcher->FirstName} {$this->Researcher->LastName}", encoding_convert_encoding($ArchivistMessage, 'ISO-8859-1'), "From: " . encoding_convert_encoding($this->Researcher->Email, 'ISO-8859-1')))
          {
             $_ARCHON->declareError("Could not send appointment emails: mail() reported an error for ArchivistMessage.");
             return false;
