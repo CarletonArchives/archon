@@ -53,9 +53,10 @@ if ($_REQUEST['p'] == 'admin/collections/collectioncontent') {
   header('Content-type: text/xml; charset=UTF-8');
   echo "<?xml version='1.0' encoding='UTF-8'?>\n";
   echo "<archonresponse error='false'><message>Collection Content Database Updated Successfully</message></archonresponse>";
-}
 
 ob_start();
+}
+
 
 /* ~~ Update an individual item ~~ */
 if (array_key_exists('itemidnum', $_REQUEST)) {
