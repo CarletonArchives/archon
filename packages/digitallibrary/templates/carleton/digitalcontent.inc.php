@@ -21,8 +21,19 @@
  *
  * @package Archon
  * @author Chris Rishel, Chris Prom
+ * TODO:
+ * Google Reader. Can't be tested until some site is online.
  */
 isset($_ARCHON) or die();
+function pdfViewer($file,$url) {
+    ?>
+    <div style="width:100%!important; height:400px!important; margin:auto; overflow:hidden;">
+    <iframe src="http://docs.google.com/gview?url=<?php echo $url; ?>&embedded=true" style="width:100%; height:100%;" frameborder="1"></iframe>
+    
+<!--    <a href = "http://docs.google.com/gview?url=<?php // echo $url; ?>&embedded=true"> View on Google Docs </a>    -->
+    </div>
+    <?php
+}
 
 
 echo("<h1 id='titleheader'>" . strip_tags($_ARCHON->PublicInterface->Title) . "</h1>\n");
@@ -66,7 +77,19 @@ if(!empty($objDigitalContent->Files))
       }
       else
       {
-         if(encoding_substr_count($objFile->FileType->FileExtensions, '.pdf') && file_exists("{$_ARCHON->PublicInterface->ImagePath}/pdficon_large.gif"))
+	$url=$objFile->getFileURL(DIGITALLIBRARY_FILE_PREVIEWLONG);
+         if($objFile->FileType->MediaType->MediaType == 'Document')
+         {
+           // $onclick = ($_ARCHON->config->GACode && $_ARCHON->config->GADigContentPrefix) ? "onclick='javascript: pageTracker._trackPageview(\"{$_ARCHON->config->GADigContentPrefix}/pdf/DigitalContentID={$objDigitalContent->ID}/fileID={$objFile->ID}\");'": "";
+//            Commented out original PDF display and added new pdfViewer 
+            $curURL = 'http'.(empty($_SERVER['HTTPS'])?'':'s').'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
+            $docURL = $url;
+            if (substr_compare($url, "index.php?",0,count("index.php?")) == 0){
+              $docURL = substr($curURL,0,strpos($curURL,"?p=digitallibrary")) . $url;
+            }
+            pdfViewer($objFile -> Filename, $docURL);
+         }
+         elseif(encoding_substr_count($objFile->FileType->FileExtensions, '.pdf') && file_exists("{$_ARCHON->PublicInterface->ImagePath}/pdficon_large.gif"))
          {
             $onclick = ($_ARCHON->config->GACode && $_ARCHON->config->GADigContentPrefix) ? "onclick='javascript: pageTracker._trackPageview(\"{$_ARCHON->config->GADigContentPrefix}/pdf/DigitalContentID={$objDigitalContent->ID}/fileID={$objFile->ID}\");'" : "";
             echo("<img src='{$_ARCHON->PublicInterface->ImagePath}/pdficon_large.gif' alt='PDF icon' /><br/>");
@@ -88,6 +111,10 @@ if(!empty($objDigitalContent->Files))
 
          if($FullAccess)
          {
+             if($objFile->FileType->MediaType->MediaType == 'Document')
+             {
+             echo("<a href = 'http://docs.google.com/gview?url=" .$url."&embedded=true'> View in Reader </a><br/><br/>");
+             }
             echo("<a href='?p=digitallibrary/getfile&amp;id=$objFile->ID' $onclick>Download Original File</a><br/>");
 			echo("<a href ='?p=digitallibrary/zipout&id=".$objDigitalContent->ID."'>Download These Images and Metadata</a>");
          }
