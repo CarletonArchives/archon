@@ -21,6 +21,7 @@
  *
  * @package Archon
  * @author Chris Rishel
+ * TODO: Add setting to control hidden userfields.
  */
 isset($_ARCHON) or die();
 
@@ -44,17 +45,27 @@ if($enabled)
       $count = 1;
 
       natcasesort($Content['UserFields']);
-
       foreach($Content['UserFields'] as $ID => $String)
       {
-         $strUserFields .= $String;
-
-         if($count != $last)
+         if (preg_match("/Previous Code|Additional Location Information|Confidential Note|UnitID|IndexField/", $String))
          {
-            $strUserFields .= "</dd>\n<dd class='faitemcontent'>\n";
+            if($_ARCHON->Security->userHasAdministrativeAccess())
+            {
+               $strUserFields .= $String;
+               $strUserFields .= "</dd>\n<dd class='faitemcontent'>\n";
+            }
          }
-         $count++;
+         else
+         {
+            $strUserFields .= $String;
+            if($count != $last)
+            {
+               $strUserFields .= "</dd>\n<dd class='faitemcontent'>\n";
+            }
+            $count++;
+         }
       }
+
       echo("<dd class='faitemcontent'>" . $strUserFields . "</dd>\n");
    }
 
