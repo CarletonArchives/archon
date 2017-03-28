@@ -22,6 +22,7 @@
 *
 * @package Archon
 * @author Chris Rishel, Chris Prom, Paul Sorensen
+* TODO: Only use thumbnail stuff if it actually exists.
 */
 isset($_ARCHON) or die();
 
@@ -482,7 +483,9 @@ if($objCollection->Scope || !empty($objCollection->Content) || ($objCollection->
     }
     if($objCollection->DigitalContent || $containsImages)
     {
+      if(file_exists("./themes/".$_ARCHON->PublicInterface->Theme."/collectionthumbnail.php")){
       include("./themes/carleton/collectionthumbnail.php");
+      }
       ?>
 
       <div class='ccardcontent'><span class='ccardlabel'><a href='#' onclick="toggleDisplay('digitalcontent'); return false;"><img id='digitalcontentImage' src='<?php echo($_ARCHON->PublicInterface->ImagePath); ?>/plus.gif' alt='expand icon' /> On-line Images/Records</a></span><br/>
