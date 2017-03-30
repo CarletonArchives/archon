@@ -84,7 +84,6 @@ function digitallibrary_ui_dialog_add()
    $dialogSection = $_ARCHON->AdministrativeInterface->insertSection('dialogform', 'dialog');
    $_ARCHON->AdministrativeInterface->OverrideSection = $dialogSection;
    $dialogSection->setDialogArguments('form', NULL, 'admin/digitallibrary/digitallibrary', 'store');
-
    $html = '';
 
    if($_REQUEST['collectionid'])
@@ -103,13 +102,13 @@ function digitallibrary_ui_dialog_add()
    $dialogSection->insertRow('identifier')->insertTextField('Identifier', 20, 255);
    $dialogSection->insertRow('date')->insertTextField('Date', 20, 50);
    $dialogSection->insertRow('common_contenturl')->insertTextField('ContentURL', 46, 255);
+   
    $dialogSection->getRow('common_contenturl')->insertCheckBox('HyperlinkURL');
    $objHyperlinkURLPhrase = Phrase::getPhrase('hyperlinkurl', $_ARCHON->Package->ID, $_ARCHON->Module->ID, PHRASETYPE_ADMIN);
    $strHyperlinkURL = $objHyperlinkURLPhrase ? $objHyperlinkURLPhrase->getPhraseValue(ENCODE_HTML) : 'URL is hyperlink';
 
    $dialogSection->getRow('common_contenturl')->insertHTML("<label id='HyperlinkURLLabel' for='HyperlinkURLCheckboxInput'>{$strHyperlinkURL}</label>");
    $dialogSection->getRow('title')->insertHTML($html);
-   
    $_ARCHON->AdministrativeInterface->outputInterface();
 }
 
@@ -397,6 +396,14 @@ function digitallibrary_ui_main()
    {
       $_ARCHON->AdministrativeInterface->insertHeaderControl(
               "$(this).attr('href', '?p=digitallibrary/digitallibrary'); $(this).attr('target', '_blank');", 'publicview', false);
+     //adds "Update All" button
+      $_ARCHON->AdministrativeInterface->insertHeaderControl(
+              "$(this).attr('href', '?p=admin/digitallibrary/updatecontentfiles'); $(this).attr('target', '_blank');", 'Update All', false);      
+     //adds "Convert Blobs" button
+      $_ARCHON->AdministrativeInterface->insertHeaderControl(
+              "$(this).attr('href', '?p=admin/digitallibrary/convertblobs'); $(this).attr('target', '_blank');", 'Convert Blobs', false); 
+              
+      
    }
 
    $fileSection = $_ARCHON->AdministrativeInterface->insertSection('files', 'multiple');
@@ -410,6 +417,8 @@ function digitallibrary_ui_main()
    $fileSection->insertHiddenField('DigitalContentID');
    $fileSection->insertHiddenField('Filename');
    $fileSection->insertHiddenField('FileTypeID');
+   //added DirectLink
+   $fileSection->insertHiddenField('DirectLink');
    $fileSection->insertHiddenField('Size');
 
 
@@ -443,10 +452,14 @@ function digitallibrary_ui_search()
 function digitallibrary_ui_exec()
 {
    global $_ARCHON;
+   //$error = "ASDF";
+   //$_ARCHON->declareError($error);
 
    @set_time_limit(0);
-
+   
    $objDigitalContent = New DigitalContent($_REQUEST);
+  // print_r($_REQUEST);
+   //while(True){continue;}
 
    $arrIDs = is_array($_REQUEST['ids']) ? $_REQUEST['ids'] : array('0');
 
@@ -503,7 +516,6 @@ function digitallibrary_ui_exec()
          if($stored && is_array($_REQUEST['files']) && !empty($_REQUEST['files']))
          {
             $aggregateError = "";
-
             foreach($_REQUEST['files'] as $FileID => $array)
             {
                $array['id'] = $FileID;
@@ -535,7 +547,13 @@ function digitallibrary_ui_exec()
                {
                   if($array['_fdelete'])
                   {
-                     $objFile->dbDelete();
+                     //Prevents deletion of contentURL files (they have size 0)
+                     if($objFile -> Size > 0) {
+                        $objFile->dbDelete();
+                     }
+                     else {
+                        $_ARCHON->declareError("Could not delete File: located on server");
+                     }
                   }
                   else
                   {
@@ -550,6 +568,9 @@ function digitallibrary_ui_exec()
          }
       }
    }
+   
+   //$objDigitalContent -> dbStoreContentURLFiles();
+   
    elseif($_REQUEST['f'] == 'uploadfile')
    {
       if($_FILES['filecontents']['name'])
@@ -566,8 +587,8 @@ function digitallibrary_ui_exec()
 
             $objFile->DefaultAccessLevel = DIGITALLIBRARY_ACCESSLEVEL_NONE;
             $objFile->DigitalContentID = -1;
-
             $objFile->dbStore();
+
          }
          else
          {
