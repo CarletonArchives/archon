@@ -20,36 +20,86 @@
  * for available properties and methods.
  *
  * @package Archon
- * @author Chris Rishel, Chris Prom
- * TODO:
- * Google Reader. Can't be tested until some site is online.
+ * @author Chris Rishel, Chris Prom, Caitlin Donahue
+ * TODO: Test Google Reader
+ * TODO: Test Media player
+ * TODO: Test Hi-Res-Request
  */
 isset($_ARCHON) or die();
+
+echo("<h1 id='titleheader'>" . strip_tags($_ARCHON->PublicInterface->Title) . "</h1>\n");
+//Create an array that stores the file name and url of all inages in diglib
+$image_array = array();
+if(!empty($objDigitalContent->Files))
+{
+    foreach($objDigitalContent -> Files as $objFile){
+    $PreviewAccess = $objFile->verifyLoadPermissions(DIGITALLIBRARY_FILE_PREVIEWSHORT);
+
+    $FullAccess = $objFile->verifyLoadPermissions(DIGITALLIBRARY_FILE_FULL);
+    if($PreviewAccess){
+        if($objFile->FileType->MediaType->MediaType == 'Image')
+         {
+            $temparray = array($objFile -> Filename, $objFile -> getFileURL());
+            $image_array[] = $temparray;
+         }
+         }
+    } 
+}
+
+//define functions for new media handlers
 function pdfViewer($file,$url) {
+
     ?>
     <div style="width:100%!important; height:400px!important; margin:auto; overflow:hidden;">
-    <iframe src="http://docs.google.com/gview?url=<?php echo $url; ?>&embedded=true" style="width:100%; height:100%;" frameborder="1"></iframe>
+    <iframe src="https://docs.google.com/gview?url=<?php echo $url; ?>&embedded=true" style="width:100%; height:100%;" frameborder="1"></iframe>
     
 <!--    <a href = "http://docs.google.com/gview?url=<?php // echo $url; ?>&embedded=true"> View on Google Docs </a>    -->
     </div>
     <?php
+
+}
+
+//using HTML5 for the video and audio player. Won't work with some older browsers.
+function videoViewer($file, $url){
+    echo "<video src='".$url."' controls width=100%>
+        Your browser does not support the video element.
+        </video>";
+}
+
+function audioViewer($file, $url){
+    echo "<audio controls style = 'width: 100%;'>
+        <source src='".$url."'>
+        Your browser does not support the audio element.
+        </audio>";
+}
+
+function imageViewer($file,$url, $index) {
+    global $image_array;
+    //make image link to javascript. needs index and image array as variables
+    echo("<a href ='javascript:lightbox(" . $index .", ".json_encode($image_array).");'>");
+    echo("<div class='digcontenttitlebox mdround' src = " . $url . ">");
+    echo("<img class='digcontentfile' src='".$url."' title='Click to open slideshow'>");
+    echo("</div></a>");
 }
 
 
-echo("<h1 id='titleheader'>" . strip_tags($_ARCHON->PublicInterface->Title) . "</h1>\n");
-
 if(!empty($objDigitalContent->Files))
 {
-   $firstFile = true;
 
+   $firstFile = true;
+   //Set the index to -1, will set first image as 0, and count up. used for lightbox functionality.
+   $index = -1;
    echo("<div id='digcontentwrapper'><div id='digcontentfiles' class='mdround'>\n");
-   foreach($objDigitalContent->Files as $objFile)
+   echo("Material presented here may only be samples from a larger set. Contact the <a href ='./index.php?p=core/index&f=contact'>Carleton Archives</a> to inquire about additional items.");
+   echo("<br/><br/><a href ='?p=digitallibrary/zipout&id=".$objDigitalContent->ID."'>Download These Images and Metadata</a><br/><br/>");
+   foreach($objDigitalContent -> Files as $objFile)
    {
+       
       if(!$firstFile)
       {
          echo("<hr/>");
       }
-
+      
       $firstFile = false;
 
       $PreviewAccess = $objFile->verifyLoadPermissions(DIGITALLIBRARY_FILE_PREVIEWSHORT);
@@ -77,7 +127,8 @@ if(!empty($objDigitalContent->Files))
       }
       else
       {
-	$url=$objFile->getFileURL(DIGITALLIBRARY_FILE_PREVIEWLONG);
+         $url = $objFile -> getFileURL();
+
          if($objFile->FileType->MediaType->MediaType == 'Document')
          {
            // $onclick = ($_ARCHON->config->GACode && $_ARCHON->config->GADigContentPrefix) ? "onclick='javascript: pageTracker._trackPageview(\"{$_ARCHON->config->GADigContentPrefix}/pdf/DigitalContentID={$objDigitalContent->ID}/fileID={$objFile->ID}\");'": "";
@@ -89,34 +140,38 @@ if(!empty($objDigitalContent->Files))
             }
             pdfViewer($objFile -> Filename, $docURL);
          }
-         elseif(encoding_substr_count($objFile->FileType->FileExtensions, '.pdf') && file_exists("{$_ARCHON->PublicInterface->ImagePath}/pdficon_large.gif"))
-         {
-            $onclick = ($_ARCHON->config->GACode && $_ARCHON->config->GADigContentPrefix) ? "onclick='javascript: pageTracker._trackPageview(\"{$_ARCHON->config->GADigContentPrefix}/pdf/DigitalContentID={$objDigitalContent->ID}/fileID={$objFile->ID}\");'" : "";
-            echo("<img src='{$_ARCHON->PublicInterface->ImagePath}/pdficon_large.gif' alt='PDF icon' /><br/>");
-         }
          elseif($objFile->FileType->MediaType->MediaType == 'Image')
          {
-            $onclick = ($_ARCHON->config->GACode && $_ARCHON->config->GADigContentPrefix) ? "onclick='javascript: pageTracker._trackPageview(\"{$_ARCHON->config->GADigContentPrefix}/image/DigitalContentID={$objDigitalContent->ID}/fileID={$objFile->ID}\");'" : "";
-            echo("<img class='digcontentfile' src='".$objFile->getFileURL(DIGITALLIBRARY_FILE_PREVIEWLONG)."' alt='{$objFile->getString('Title')}'/><br/>");
+            $index += 1;
+            //$onclick = ($_ARCHON->config->GACode && $_ARCHON->config->GADigContentPrefix) ? "onclick='javascript: pageTracker._trackPageview(\"{$_ARCHON->config->GADigContentPrefix}/image/DigitalContentID={$objDigitalContent->ID}/fileID={$objFile->ID}\");'": "";
+            imageViewer($objFile -> Filename, $url, $index);
          }
+         elseif($objFile->FileType->MediaType->MediaType == 'Audio') {
+             //mediaViewer($objFile -> Filename, $url, true);
+             audioViewer($objFile -> Filename, $url);
+         }
+         elseif($objFile->FileType->MediaType->MediaType == 'Video' || $objFile->FileType->MediaType->MediaType == 'Other') {
+             //mediaViewer($objFile -> Filename, $url, false);
+             videoViewer($objFile -> Filename, $url);
+         }         
          elseif($objFile->Filename)
          {
             preg_match("/.+?\/(.+)/u", $objFile->FileType->getString('ContentType'), $matches);
             $contenttype = $matches[1] ? $matches[1] : 'file';
-            $onclick = ($_ARCHON->config->GACode && $_ARCHON->config->GADigContentPrefix) ? "onclick='javascript: pageTracker._trackPageview(\"{$_ARCHON->config->GADigContentPrefix}/{$contenttype}/DigitalContentID={$objDigitalContent->ID}/fileID={$objFile->ID}\");'" : "";
+            $onclick = ($_ARCHON->config->GACode && $_ARCHON->config->GADigContentPrefix) ? "onclick='javascript: pageTracker._trackPageview(\"{$_ARCHON->config->GADigContentPrefix}/{$contenttype}/DigitalContentID={$objDigitalContent->ID}/fileID={$objFile->ID}\");'": "";
             echo("<script type='text/javascript'>embedFile($objFile->ID, '" . encode($objFile->FileType->MediaType->MediaType, ENCODE_JAVASCRIPT) . "', 'long');</script><br/>");
          }
 
-         echo("<span class='digcontentfiletitle'>" . $objFile->getString('Title') . " (" . $objFile->FileType->getString('FileType') . ", " . formatsize($objFile->Size) . ")<br/>");
+echo("<span class='digcontentfiletitle'>". $objFile->getString('Title') . " (" . $objFile->FileType->getString('FileType') . ", " . formatsize($objFile->Size) . ")<br/>");
+
 
          if($FullAccess)
          {
              if($objFile->FileType->MediaType->MediaType == 'Document')
              {
-             echo("<a href = 'http://docs.google.com/gview?url=" .$url."&embedded=true'> View in Reader </a><br/><br/>");
+              echo("<a href = 'http://docs.google.com/gview?url=" .$url."&embedded=true'> View in Reader </a><br/><br/>");
              }
-            echo("<a href='?p=digitallibrary/getfile&amp;id=$objFile->ID' $onclick>Download Original File</a><br/>");
-			echo("<a href ='?p=digitallibrary/zipout&id=".$objDigitalContent->ID."'>Download These Images and Metadata</a>");
+            echo("<a href='$url' download='" . $objFile->FileType->getString('Title') . "' title='" . $objFile->FileType->getString('Title') . "'>Download File</a><br/>");
          }
          else
          {
@@ -127,12 +182,10 @@ if(!empty($objDigitalContent->Files))
       }
 
 
-      if($objDigitalContent->Repository->ResearchFunctionality & RESEARCH_DIGITALLIB)
-      {
-         echo ("<br/><span class='digcontentrequest'><a href='?p=digitallibrary/request&amp;id=" . $_REQUEST['id'] . "&amp;fileid=" . $objFile->ID . "&amp;referer=" . urlencode($_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']) . "'>Request hi-res copy</a></span>");
-      }
+//      echo ("<br/><span class='digcontentrequest'><a href='?p=digitallibrary/request&amp;id=" . $_REQUEST['id'] . "&amp;fileid=" . $objFile->ID. "&amp;referer=" . urlencode($_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']) . "'>Request quality copy</a></span>");
 
       echo("<br/><br/></div>");
+
    }
    echo ("</div>\n");
 }
@@ -148,164 +201,151 @@ if($_ARCHON->Security->verifyPermissions(MODULE_DIGITALLIBRARY, READ) && !$objDi
 
 if($objDigitalContent->ContentURL && empty($objDigitalContent->Files))
 {
-?>&nbsp;  <!--forces IE to behave -->
+    if($_ARCHON->Security->userHasAdministrativeAccess())
+    {
+   ?>&nbsp;  <!--forces IE to behave -->
 
-   <div class='digcontentlabel'>Available:</div>
-   <div class='digcontentdata' style='font-weight:bold'>
+<!--This display is for digital library records with no files attached but instead links to other resources.  .-->
+<div class='digcontentlabel'>Content URL:</div>
+<div class='digcontentdata' style='font-weight:bold'><?php echo("<a href='{$objDigitalContent->getString('ContentURL')}'>{$objDigitalContent->getString('ContentURL')}</a>"); ?></div>
    <?php
-   if($objDigitalContent->HyperlinkURL)
-   {
-      echo("<a href='{$objDigitalContent->getString('ContentURL')}'>{$objDigitalContent->getString('ContentURL')}</a>");
-   }
-   else
-   {
-      echo($objDigitalContent->getString('ContentURL'));
-   }
-   ?>
-</div>
-<?php
+}
 }
 
 if($objDigitalContent->Title)
 {
-?>
+   ?>
 
-   <div class='digcontentlabel'>Title:</div>
-   <div class='digcontentdata'><?php echo($objDigitalContent->toString()); ?></div>
-<?php
+<div class='digcontentlabel'>Title:</div>
+<div class='digcontentdata'><?php echo($objDigitalContent->toString()); ?></div>
+   <?php
 }
 
 
 if($objDigitalContent->Date)
 {
-?>
-   <div class='digcontentlabel'>Date:</div>
-   <div class='digcontentdata'><?php echo($objDigitalContent->getString('Date')); ?></div>
-<?php
+   ?>
+<div class='digcontentlabel'>Date:</div>
+<div class='digcontentdata'><?php echo($objDigitalContent->getString('Date')); ?></div>
+   <?php
 }
 
 
 if($objDigitalContent->Scope)
 {
-?>
-   <div class='digcontentlabel'>Description:</div>
-   <div class='digcontentdata'><?php echo($objDigitalContent->getString('Scope')); ?></div>
+   ?>
+<div class='digcontentlabel'>Description:</div>
+<div class='digcontentdata'><?php echo($objDigitalContent->getString('Scope')); ?></div>
 
-<?php
+   <?php
 }
 
 if($objDigitalContent->PhysicalDescription)
 {
-?>
-   <div class='digcontentlabel'>Phys. Desc:</div>
-   <div class='digcontentdata'><?php echo($objDigitalContent->getString('PhysicalDescription')); ?></div>
-<?php
+   ?>
+<div class='digcontentlabel'>Phys. Desc:</div>
+<div class='digcontentdata'><?php echo($objDigitalContent->getString('PhysicalDescription')); ?></div>
+   <?php
 }
 
 if($objDigitalContent->Identifier)
 {
-?>
-   <div class='digcontentlabel'>ID:</div>
-   <div class='digcontentdata'><?php echo($objDigitalContent->getString('Identifier')); ?></div>
-<?php
+   ?>
+<div class='digcontentlabel'>ID:</div>
+<div class='digcontentdata'><?php echo($objDigitalContent->getString('Identifier')); ?></div>
+   <?php
 }
 
 if($objDigitalContent->Collection->Repository)
 {
-?>
-   <div class='digcontentlabel'>Repository:</div>
-   <div class='digcontentdata'><?php echo($objDigitalContent->Collection->Repository); ?></div>
-<?php
+   ?>
+<div class='digcontentlabel'>Repository:</div>
+<div class='digcontentdata'><?php echo($objDigitalContent->Collection->Repository); ?></div>
+   <?php
 }
 
 
 if($objDigitalContent->Collection)
 {
-?>
+   ?>
 
-   <div class='digcontentlabel'>Found in:</div>
-   <div class='digcontentdata'><?php
-   echo($objDigitalContent->Collection->toString(LINK_TOTAL));
-   if($objDigitalContent->CollectionContent)
-   {
-      echo($_ARCHON->PublicInterface->Delimiter . $objDigitalContent->CollectionContent->toString(LINK_EACH, true, true, true, true, $_ARCHON->PublicInterface->Delimiter));
-   }
-?>
+<div class='digcontentlabel'>Found in:</div>
+<div class='digcontentdata'><?php echo($objDigitalContent->Collection->toString(LINK_TOTAL));
+      if($objDigitalContent->CollectionContent)
+      {
+         echo($_ARCHON->PublicInterface->Delimiter . $objDigitalContent->CollectionContent->toString(LINK_EACH, true, true, true, true, $_ARCHON->PublicInterface->Delimiter));
+      }
+      ?>
 </div>
-<?php
+   <?php
 }
 
 if($objDigitalContent->Creators && defined('PACKAGE_CREATORS'))
 {
-?>
-   <div class='digcontentlabel'>Creators:</div>
-   <div class='digcontentdata'><?php echo($_ARCHON->createStringFromCreatorArray($objDigitalContent->Creators, '<br/>', LINK_TOTAL)); ?></div>
-<?php
+   ?>
+<div class='digcontentlabel'>Creators:</div>
+<div class='digcontentdata'><?php echo($_ARCHON->createStringFromCreatorArray($objDigitalContent->Creators, '<br/>', LINK_TOTAL)); ?></div>
+   <?php
 }
 
 if($objDigitalContent->Subjects && defined('PACKAGE_SUBJECTS'))
 {
-?>
-   <div class='digcontentlabel'>Subjects:</div>
-   <div class='digcontentdata'><?php echo($_ARCHON->createStringFromSubjectArray($objDigitalContent->Subjects, '<br/>', LINK_TOTAL)); ?></div>
-<?php
+   ?>
+<div class='digcontentlabel'>Subjects:</div>
+<div class='digcontentdata'><?php echo($_ARCHON->createStringFromSubjectArray($objDigitalContent->Subjects, '<br/>', LINK_TOTAL)); ?></div>
+   <?php
 }
 
 if($objDigitalContent->Publisher)
 {
-?>
-   <div class='digcontentlabel'>Publisher:</div>
-   <div class='digcontentdata'><?php echo($objDigitalContent->getString('Publisher')); ?></div>
-<?php
+   ?>
+<div class='digcontentlabel'>Publisher:</div>
+<div class='digcontentdata'><?php echo($objDigitalContent->getString('Publisher')); ?></div>
+   <?php
 }
 
 if($objDigitalContent->Contributor)
 {
-?>
-   <div class='digcontentlabel'>Contributor:</div>
-   <div class='digcontentdata'><?php echo($objDigitalContent->getString('Contributor')); ?></div>
-<?php
+   ?>
+<div class='digcontentlabel'>Contributor:</div>
+<div class='digcontentdata'><?php echo($objDigitalContent->getString('Contributor')); ?></div>
+   <?php
 }
 
 if($objDigitalContent->RightsStatement)
 {
-?>
-   <div class='digcontentlabel'>Rights:</div>
-   <div class='digcontentdata'><?php echo($objDigitalContent->getString('RightsStatement')); ?></div>
-<?php
+   ?>
+<div class='digcontentlabel'>Rights:</div>
+<div class='digcontentdata'><?php echo($objDigitalContent->getString('RightsStatement')); ?></div>
+   <?php
 }
 
 
 if($objDigitalContent->Languages)
 {
-?>
-   <div class='digcontentlabel'>Languages:</div>
-   <div class='digcontentdata'><?php echo($_ARCHON->createStringFromLanguageArray($objDigitalContent->Languages, '&nbsp;', LINK_TOTAL)); ?></div>
-<?php
+   ?>
+<div class='digcontentlabel'>Languages:</div>
+<div class='digcontentdata'><?php echo($_ARCHON->createStringFromLanguageArray($objDigitalContent->Languages, '&nbsp;', LINK_TOTAL)); ?></div>
+   <?php
 }
 else
 {
-?>
-   <!--No languages are listed for this digital content.-->
-<?php
+   ?>
+<!--No languages are listed for this digital content.-->
+   <?php
 }
 
 if($objDigitalContent->ContentURL && !empty($objDigitalContent->Files))
 {
-?>
-   <div class='digcontentlabel'>See Also:</div>
-   <div class='digcontentdata'><?php
-   if($objDigitalContent->HyperlinkURL)
-   {
-      echo("<a href='{$objDigitalContent->getString('ContentURL')}'>{$objDigitalContent->getString('ContentURL')}</a>");
-   }
-   else
-   {
-      echo($objDigitalContent->getString('ContentURL'));
-   }
-?>
-</div>
-<?php
+    if($_ARCHON->Security->userHasAdministrativeAccess())
+    {
+   ?>&nbsp;  <!--forces IE to behave -->
+
+<!--This display is for a digital library record that has files attached. -->
+<div class='digcontentlabel'>Content URL:</div>
+<div class='digcontentdata' style='font-weight:bold'><?php echo("<a href='{$objDigitalContent->getString('ContentURL')}'>{$objDigitalContent->getString('ContentURL')}</a>"); ?></div>
+   <?php
+}
 }
 
 echo('</div>');

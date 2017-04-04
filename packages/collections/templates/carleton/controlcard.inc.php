@@ -485,7 +485,7 @@ if($objCollection->Scope || !empty($objCollection->Content) || ($objCollection->
     if($objCollection->DigitalContent || $containsImages)
     {
       if(file_exists("./themes/".$_ARCHON->PublicInterface->Theme."/collectionthumbnail.php")){
-      include("./themes/carleton/collectionthumbnail.php");
+      include("./themes/".$_ARCHON->PublicInterface->Theme."/collectionthumbnail.php");
       }
       ?>
 

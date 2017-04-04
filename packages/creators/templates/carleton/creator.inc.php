@@ -5,6 +5,7 @@
  * @package Archon
  * @subpackage creators
  * @author Chris Rishel
+ * TODO: Creator Link Patch
  */
 
 isset($_ARCHON) or die();

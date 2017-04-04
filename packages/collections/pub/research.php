@@ -4,6 +4,8 @@
  *
  * @package Archon
  * @author Chris Rishel
+ *
+ * TODO: Test research stuff.
  */
 isset($_ARCHON) or die();
 

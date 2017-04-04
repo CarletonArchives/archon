@@ -22,17 +22,24 @@
  * @package Archon
  * @author Chris Rishel
  * TODO: Add setting to control hidden userfields.
+ * TODO: LINK_TOTAL vs. LINK_NONE
+ * TODO: Deal with DigitalContentLink in collections/lib/collection.inc.php
  */
 isset($_ARCHON) or die();
 
 
 if($enabled)
 {
-   ?>
-
-<dt class='faitem'><a name="id<?php echo($Content['ID']); ?>"></a><?php echo($Content['String']); ?></dt>
-
-   <?php
+    if ($Content["DigitalContentLink"]) {
+        ?>
+        <dt class='faitem'><a name="id<?php echo($Content['ID']); ?>"></a><?php echo("<a href = " . $Content['DigitalContentLink'].">" . $Content['String'] . "</a>"); ?></dt>
+        <?php
+    }
+    else {
+        ?>
+        <dt class='faitem'><a name="id<?php echo($Content['ID']); ?>"></a><?php echo($Content['String']); ?></dt>
+         <?php
+    } 
    if($Content['Description'])
    {
       echo("<dd class='faitemcontent'>" . $Content['Description'] . "</dd>\n");
@@ -72,14 +79,14 @@ if($enabled)
    if(!empty($Content['Subjects']))
    {
       echo("<dd class='faitemcontent'><dl><dt>Subject/Index Terms:</dt><dd>\n");
-      echo($_ARCHON->createStringFromSubjectArray($Content['Subjects'], "</dd>\n<dd>\n", LINK_NONE));
+      echo($_ARCHON->createStringFromSubjectArray($Content['Subjects'], "</dd>\n<dd>\n", LINK_TOTAL));
       echo("</dd></dl></dd>\n");
    }
 
    if(!empty($Content['Creators']))
    {
       echo("<dd class='faitemcontent'><dl><dt>Creators:</dt><dd>\n");
-      echo($_ARCHON->createStringFromCreatorArray($Content['Creators'], "</dd>\n<dd>\n", LINK_NONE));
+      echo($_ARCHON->createStringFromCreatorArray($Content['Creators'], "</dd>\n<dd>\n", LINK_TOTAL));
       echo("</dd></dl></dd>\n");
    }
 

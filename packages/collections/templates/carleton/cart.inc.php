@@ -20,17 +20,17 @@ echo("<h1 id='titleheader'>" . strip_tags($_ARCHON->PublicInterface->Title) . "<
 $_ARCHON->Security->Session->ResearchCart->getCart();
 if(!$_ARCHON->Security->Session->ResearchCart->getCartCount())
 {
-   echo("<div id='researchcart' class='mdround center'><strong>Your research materials cart is currently empty.</strong>");
+   echo("<div id='researchcart' class='mdround center'><strong>Your research materials list is currently empty.</strong>");
    if($_ARCHON->Security->isAuthenticated())
    {
       echo("<strong> You may wish to add something to it before setting up an appointment.</strong><br/>");
-      echo("<span style='font-size: x-small;'>Add materials by searching the collections and clicking the icons next to item names.<br/>Preparing a cart helps us to have your materials ready for you when you arrive for an appointment.</span>");
+      echo("<span style='font-size: x-small;'>Add materials by searching the collections and clicking the icons next to item names.<br/>Preparing a list helps us to have your materials ready for you when you arrive for an appointment.</span>");
    }
    echo("<br/><br/></div>");
 }
 else
 {
-   echo("<div class='listitemhead bold'>Your cart holds:</div>");
+   echo("<div class='listitemhead bold'>Your list holds:</div>");
 }
 
 research_displaycart();
