@@ -6,20 +6,13 @@
  * @subpackage creators
  * @author Chris Rishel
  * TODO: Creator Link Patch
+ * TODO: What the heck is up with mdb2 queries?
  */
 
 isset($_ARCHON) or die();
 
-
-$objBiogHistPhrase = Phrase::getPhrase('search_bioghist', PACKAGE_CREATORS, 0, PHRASETYPE_PUBLIC);
-$strBiogHist = $objBiogHistPhrase ? $objBiogHistPhrase->getPhraseValue(ENCODE_HTML) : 'Biographical/Historical Note';
-$objSearchForCreatorPhrase = Phrase::getPhrase('search_searchforcreator', PACKAGE_CREATORS, 0, PHRASETYPE_PUBLIC);
-$strSearchForCreator = $objSearchForCreatorPhrase ? $objSearchForCreatorPhrase->getPhraseValue(ENCODE_HTML) : 'Searching for Creator: $1';
-
-
 echo("<h1>" . $_ARCHON->PublicInterface->Title. "</h1>\n");
 echo("<div id='CreatorNote' class='bground'>");
-
 if ($objCreator->Name)
 {      
    echo ("<div class='CreatorEntry'><span class='bold'>Name:</span> ". $objCreator->toString())."</div>";
@@ -83,22 +76,61 @@ if ($objCreator->Collections || $objCreator->Books || $objCreator->DigitalConten
    echo ("<hr><br/>");
 }
 
-
-if ($objCreator->Collections)
-{
-   ?>
-<div class='CreatorEntry'><span class='bold'><a href='#' onclick="toggleDisplay('LinkedCollections'); return false;"><img id='LinkedCollectionsImage' src='<?php echo($_ARCHON->PublicInterface->ImagePath); ?>/plus.gif' alt='expand icon' /> Records or Manuscript Collections Created by <?php echo($objCreator->Name)?></a></span><br/>
-   <div class='CreatorEntryShowList' style='display:none' id='LinkedCollectionsResults'><br/>
-         <?php
-         foreach ($objCreator->Collections as $objCollection)
-         {
-            echo ("&nbsp;&nbsp;".$objCollection->toString(LINK_EACH). "<br/>");
-         }
-         ?>
-   </div>
-</div>
-   <?php
-}
+$objBiogHistPhrase = Phrase::getPhrase('search_bioghist', PACKAGE_CREATORS, 0, PHRASETYPE_PUBLIC);
+$strBiogHist = $objBiogHistPhrase ? $objBiogHistPhrase->getPhraseValue(ENCODE_HTML) : 'Biographical/Historical Note';
+$objSearchForCreatorPhrase = Phrase::getPhrase('search_searchforcreator', PACKAGE_CREATORS, 0, PHRASETYPE_PUBLIC);
+$strSearchForCreator = $objSearchForCreatorPhrase ? $objSearchForCreatorPhrase->getPhraseValue(ENCODE_HTML) : 'Searching for Creator: $1';
+include_once('./packages/creators/templates/carleton/creatorSubjectContent.php');
+if ($ret)
+    {
+    $objPlainRecordsAndMansPhrase = Phrase::getPhrase('search_plainrecordsandmans', PACKAGE_COLLECTIONS, 0, PHRASETYPE_PUBLIC);
+    $strPlainRecordsAndMans = $objPlainRecordsAndMansPhrase ? $objPlainRecordsAndMansPhrase->getPhraseValue(ENCODE_HTML) : 'Records and Manuscripts';
+    $objMatchesPhrase = Phrase::getPhrase('search_matches', PACKAGE_COLLECTIONS, 0, PHRASETYPE_PUBLIC);
+    $strMatches = $objMatchesPhrase ? $objMatchesPhrase->getPhraseValue(ENCODE_HTML) : 'Matches';
+    $objInBoxListPhrase = Phrase::getPhrase('search_inboxlist', PACKAGE_COLLECTIONS, 0, PHRASETYPE_PUBLIC);
+    $strInBoxList = $objInBoxListPhrase ? $objInBoxListPhrase->getPhraseValue(ENCODE_HTML) : 'Results Found Within Box List';
+    ?>
+    <div class='CreatorEntry'><span class='bold'><a href='#' onclick="toggleDisplay('LinkedCollections'); return false;"><img id='LinkedCollectionsImage' src='<?php echo($_ARCHON->PublicInterface->ImagePath); ?>/plus.gif' alt='expand icon' /> Records or Manuscript Collections Created by <?php echo($objCreator->Name)?></a></span><br/>
+       <div class='CreatorEntryShowList' style='display:none' id='LinkedCollectionsResults'><br/>
+    <?php
+        foreach ($ret as $arrCollections => $content)
+        {
+            $arrCollections = new Collection($arrCollections);
+            echo ("&nbsp;&nbsp;".$arrCollections->toString(LINK_EACH). "<br/>");
+            if (key_exists('0', $content))
+            {
+            }
+            else
+            {
+            $objPlainRecordsAndMansPhrase = Phrase::getPhrase('search_plainrecordsandmans', PACKAGE_COLLECTIONS, 0, PHRASETYPE_PUBLIC);
+            $strPlainRecordsAndMans = $objPlainRecordsAndMansPhrase ? $objPlainRecordsAndMansPhrase->getPhraseValue(ENCODE_HTML) : 'Records and Manuscripts';
+            $objMatchesPhrase = Phrase::getPhrase('search_matches', PACKAGE_COLLECTIONS, 0, PHRASETYPE_PUBLIC);
+            $strMatches = $objMatchesPhrase ? $objMatchesPhrase->getPhraseValue(ENCODE_HTML) : 'Matches';
+            $objInBoxListPhrase = Phrase::getPhrase('search_inboxlist', PACKAGE_COLLECTIONS, 0, PHRASETYPE_PUBLIC);
+            $strInBoxList = $objInBoxListPhrase ? $objInBoxListPhrase->getPhraseValue(ENCODE_HTML) : 'Results Found Within Box List';
+            $objItemsPhrase = Phrase::getPhrase('search_items', PACKAGE_COLLECTIONS, 0, PHRASETYPE_PUBLIC);
+            $strItems = $objItemsPhrase ? $objItemsPhrase->getPhraseValue(ENCODE_HTML) : 'Series, Boxes, Folders or Items';
+            $objMatchesPhrase = Phrase::getPhrase('search_matches', PACKAGE_COLLECTIONS, 0, PHRASETYPE_PUBLIC);
+            $strMatches = $objMatchesPhrase ? $objMatchesPhrase->getPhraseValue(ENCODE_HTML) : 'Matches';
+            echo("<dd><div class='InnerContentTitleAndResults'>\n");
+            echo("<span class='InnerContentResultsToggle'>");
+            echo("<a href='#' onclick='toggleDisplay(\"CollectionContent{$objCollection->ID}\"); return false;'>");
+            echo("<img id='CollectionContent{$objCollection->ID}Image' src='{$_ARCHON->PublicInterface->ImagePath}/plus.gif' alt='expand/collapse' />");
+            echo(" $strInBoxList</a></span>\n<dl id='CollectionContent{$objCollection->ID}Results' class='InnerCollectionContentResults' style='display: none;'>");
+                foreach ($content as $objCollection)
+                {
+//            Makes a new collection content object using the CollectionContent class.
+                    $objCollection=new CollectionContent($objCollection['ID']);
+//                    This method in the CollectionContent class created above generates a linked collection content record with all 
+//                    parents of that record formatted and displayed.
+                        echo $objCollection->toString(LINK_EACH, true, true, true, true, $_ARCHON->PublicInterface->Delimiter);
+                        echo "</a><br />";
+                }
+            echo "</div></dd>";                 
+            }     
+        }?></div> 
+    </div> <?php
+    }
 if ($objCreator->Accessions)
 {
    ?>

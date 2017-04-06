@@ -11,35 +11,28 @@
  * array level, and relivant content ID's as keys nested in the appropriate collection.  
  * 
  * The resulting array is used in the packages/creators/templates/[template name] folder to create the expanding/collapsing menues
- * in the authority record display. 
+ * in the authority record display.
+ * TODO: Test function collectioncontentSubjects
 */
-
+isset($_ARCHON) or die();
 if ($objCreator->ID)
 {
 //Calls up array with collection and collection content information    
     $CreatorID=$objCreator->ID;
-    $ret=collectioncontentcreators($CreatorID);
+    $ret=collectioncontentcreators($CreatorID, $_ARCHON);
 }
 
 elseif ($Type=='Subject')
 {
     $SubjectID=$ID;
-    $ret=collectioncontentSubjects($SubjectID);
+    $ret=collectioncontentSubjects($SubjectID, $_ARCHON);
 }
                            
 
-function collectioncontentcreators($CreatorID)
+function collectioncontentcreators($CreatorID, $_ARCHON)
 {
     echo $searchtype;
-	$mysql_link = mysql_connect("localhost", "readuser", "readonly");
-	if (!$mysql_link)
-	{
-		die('Could not connect: ' . mysql_error());
-	}
-	mysql_select_db("archon", $mysql_link) or die("Could not select database");
-
-    $contentresult = mysql_query(
-            "SELECT tblCollections_Content.*,
+	$query="SELECT tblCollections_Content.*,
             tblCollections_Collections.Title AS collectiontitle,
             tblCollections_Collections.ID AS collectionID2,
             tblCollections_CollectionContentCreatorIndex.CollectionContentID
@@ -50,38 +43,37 @@ function collectioncontentcreators($CreatorID)
             tblCollections_CollectionContentCreatorIndex.CollectionContentID=tblCollections_Content.ID
             Where tblCollections_CollectionContentCreatorIndex.CreatorID= '".$CreatorID."'
             order by collectiontitle, Title
-            ");
-        
-    $colllist = mysql_query(
-            "SELECT tblCollections_Collections.ID as CollectionID,
+            ";
+	$res=$_ARCHON->mdb2->query($query);
+	if(PEAR::isError($res)){
+		die('Could not connect: ' . mysql_error());
+	}
+	$query2="SELECT tblCollections_Collections.ID as CollectionID,
              tblCollections_Collections.Title as collectiontitle
+
              FROM
              tblCollections_Collections
              INNER JOIN tblCollections_CollectionCreatorIndex
              ON
              tblCollections_CollectionCreatorIndex.CollectionID=tblCollections_Collections.ID
              WHERE tblCollections_CollectionCreatorIndex.CreatorID= '".$CreatorID."'
-            ");
-
-        if ($colllist)
-        {
-         while($row = mysql_fetch_object($colllist))
-         {
-             $collectionarray[$row->CollectionID][] = $row;
-//             $collectionarray[$row->CollectionID]['CollectionID'] = $row->CollectionID;
-         }
-        }
-    
-	if($contentresult)
-	{ 
-            	$creatorcontent = array();
-		while($row = mysql_fetch_object($contentresult))                    
-                {
-                    $creatorcontent[$row->CollectionID][$row->ID]=$row;
-//                    $creatorcontent[$row->CollectionID]['CollectionID'] = $row->CollectionID;
-                }
+            ";
+	$res2=$_ARCHON->mdb2->query($query2);
+	if(PEAR::isError($res2)){
+		die('Could not connect: ' . mysql_error());
 	}
-   
+
+       if($res2){
+               while($row=$res2->fetchRow()){
+                      $collectionarray[$row['CollectionID']][]=$row;
+               }
+       }
+       if($res){
+       $creatorcontent=array();
+              while($row=$res->fetchRow()){
+                     $creatorcontent[$row['CollectionID']][$row['ID']]=$row;
+              }
+       } 
        if ($creatorcontent and $collectionarray)
        {
               $creatorcontent=$creatorcontent + $collectionarray;
@@ -97,14 +89,36 @@ function collectioncontentcreators($CreatorID)
            $creatorcontent=$collectionarray;
        }
 
-       return $creatorcontent;  
-        
-mysql_close($mysql_link);            
+       return $creatorcontent;
 }
 
-function collectioncontentSubjects($SubjectID)
+function collectioncontentSubjects($SubjectID,$_ARCHON)
 {
     echo $searchtype;
+    $contentresult=$_ARCHON->mdb2->query("SELECT tblCollections_Content.*,
+            tblCollections_Collections.Title AS collectiontitle,
+            tblCollections_Collections.ClassificationID,
+            tblCollections_Collections.ID AS collectionID2,
+            tblCollections_CollectionContentSubjectIndex.CollectionContentID
+            from tblCollections_Content
+            INNER JOIN tblCollections_Collections ON
+            tblCollections_Collections.ID=tblCollections_Content.CollectionID
+            INNER JOIN tblCollections_CollectionContentSubjectIndex ON
+            tblCollections_CollectionContentSubjectIndex.CollectionContentID=tblCollections_Content.ID
+            Where tblCollections_CollectionContentSubjectIndex.SubjectID= '".$SubjectID."'
+            order by collectiontitle, Title
+            ");
+    $colllist = $_ARCHON->mdb2->query("SELECT tblCollections_Collections.ID as CollectionID,
+             tblCollections_Collections.ClassificationID,
+             tblCollections_Collections.Title as collectiontitle
+             FROM
+             tblCollections_Collections
+             INNER JOIN tblCollections_CollectionSubjectIndex
+             ON
+             tblCollections_CollectionSubjectIndex.CollectionID=tblCollections_Collections.ID
+             WHERE tblCollections_CollectionSubjectIndex.SubjectorID= '".$SubjectID."'
+            ");
+/*
 	$mysql_link = mysql_connect("localhost", "readuser", "readonly");
 	if (!$mysql_link)
 	{
@@ -138,14 +152,20 @@ function collectioncontentSubjects($SubjectID)
              tblCollections_CollectionSubjectIndex.CollectionID=tblCollections_Collections.ID
              WHERE tblCollections_CollectionSubjectIndex.SubjectorID= '".$SubjectID."'
             ");
-
+*/
+	if(PEAR::isError($contentresult)){
+		die('Could not connect: ' . mysql_error());
+	}
+	if(PEAR::isError($collist)){
+		die('Could not connect: ' . mysql_error());
+	}
         if ($colllist)
         {
          while($row = mysql_fetch_object($colllist))
          {
-             $collectionarray[$row->CollectionID][] = $row;
-             $collectionarray[$row->CollectionID]['CollectionID'][]=$row->CollectionID;
-             $collectionarray[$row->CollectionID]['ClassificationID'][]=$row->ClassificationID;
+             $collectionarray[$row['CollectionID']][] = $row;
+             $collectionarray[$row['CollectionID']]['CollectionID'][]=$row['CollectionID'];
+             $collectionarray[$row['CollectionID']]['ClassificationID'][]=$row['ClassificationID'];
 //             $collectionarray[$row->CollectionID]['CollectionID'] = $row->CollectionID;
          }
         }
@@ -153,11 +173,11 @@ function collectioncontentSubjects($SubjectID)
 	if($contentresult)
 	{ 
             	$Subjectcontent = array();
-		while($row = mysql_fetch_object($contentresult))                    
+		while($row = $contentresult->fetchRow())                    
                 {
-                    $Subjectcontent[$row->CollectionID][$row->ID]=$row;
-                    $Subjectcontent[$row->CollectionID]['CollectionID']=$row->CollectionID;
-                    $Subjectcontent[$row->CollectionID]['ClassificationID']=$row->ClassificationID;
+                    $Subjectcontent[$row['CollectionID']][$row->ID]=$row;
+                    $Subjectcontent[$row['CollectionID']]['CollectionID']=$row['CollectionID'];
+                    $Subjectcontent[$row['CollectionID']]['ClassificationID']=$row['ClassificationID'];
 //                    $Subjectcontent[$row->CollectionID]['CollectionID'] = $row->CollectionID;
                 }
 	}
@@ -179,7 +199,7 @@ function collectioncontentSubjects($SubjectID)
 
        return $Subjectcontent;  
         
-mysql_close($mysql_link);            
+//mysql_close($mysql_link);            
 }
 
 
