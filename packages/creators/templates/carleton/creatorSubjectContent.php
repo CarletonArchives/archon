@@ -175,7 +175,7 @@ function collectioncontentSubjects($SubjectID,$_ARCHON)
             	$Subjectcontent = array();
 		while($row = $contentresult->fetchRow())                    
                 {
-                    $Subjectcontent[$row['CollectionID']][$row->ID]=$row;
+                    $Subjectcontent[$row['CollectionID']][$row['ID']]=$row;
                     $Subjectcontent[$row['CollectionID']]['CollectionID']=$row['CollectionID'];
                     $Subjectcontent[$row['CollectionID']]['ClassificationID']=$row['ClassificationID'];
 //                    $Subjectcontent[$row->CollectionID]['CollectionID'] = $row->CollectionID;

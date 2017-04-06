@@ -5,8 +5,6 @@
  * @package Archon
  * @subpackage creators
  * @author Chris Rishel
- * TODO: Creator Link Patch
- * TODO: What the heck is up with mdb2 queries?
  */
 
 isset($_ARCHON) or die();
