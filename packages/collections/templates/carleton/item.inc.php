@@ -21,13 +21,26 @@
  *
  * @package Archon
  * @author Chris Rishel
- * TODO: Add setting to control hidden userfields.
  * TODO: LINK_TOTAL vs. LINK_NONE
  * TODO: Deal with DigitalContentLink in collections/lib/collection.inc.php
  */
 isset($_ARCHON) or die();
+$hide=false;
+$search="/Previous Code|Additional Location Information|Confidential Note|UnitID|IndexField/";
+foreach($_ARCHON->memorycache['Objects']['Configuration'] as $key=>$val){
+    if($val=="Hidden Userfields"){
+        $hide=$_ARCHON->memorycache['Objects']['Configuration'][$key];
+    }
+}
+if($hide){
+    $hide=$hide->Value;
 
-
+    $search="/".str_replace(";","|",str_replace("|","\|",$hide))."/";
+}
+else{
+    $query="INSERT IGNORE INTO `tblCore_Configuration` (`ID`, `PackageID`, `ModuleID`, `Directive`, `Value`, `InputType`, `PatternID`, `ReadOnly`, `Encrypted`, `ListDataSource`) VALUES (NULL, '3', '0', 'Hidden Userfields', 'Previous Code;Additional Location Information;Confidential Note;UnitID;IndexField', 'textfield', '1', '0', '0', NULL)";
+    $ret=$_ARCHON->mdb2->query($query);
+}
 if($enabled)
 {
     if ($Content["DigitalContentLink"]) {
@@ -54,7 +67,7 @@ if($enabled)
       natcasesort($Content['UserFields']);
       foreach($Content['UserFields'] as $ID => $String)
       {
-         if (preg_match("/Previous Code|Additional Location Information|Confidential Note|UnitID|IndexField/", $String))
+         if (preg_match($search, $String))
          {
             if($_ARCHON->Security->userHasAdministrativeAccess())
             {
