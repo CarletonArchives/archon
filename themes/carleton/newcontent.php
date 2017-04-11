@@ -1,5 +1,4 @@
 <?php
-//TODO: use this dateadded insertion function for reports, csv.
 isset($_ARCHON) or die();
 
 $query='SELECT tblCollections_Collections.ID,

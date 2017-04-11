@@ -11,7 +11,6 @@
  * NOTE: If you do not have a dateadded field in tblcollections_content (which is something that we added) there are two lines that you need to modify/remove 
  * These lines are marked in the comments
  * TODO: Replace mysql_query's with $_ARCHON->mdb2->query(). They work, but....
- * TODO: Force creation of dateadded field if it doesn't exist
  */
 
 isset($_ARCHON) or die();
