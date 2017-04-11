@@ -13,8 +13,6 @@ $query="SELECT * from tblCore_Modules WHERE Script='reports'";
     if (!PEAR::isError($res)) {
       if(!$row=$res->fetchRow()){
         $queries=array(
-		//Query for dateadded. Will be implemented into installer.
-		//ALTER TABLE `tblSubjects_Subjects` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `Identifier`;
         "INSERT IGNORE INTO `tblCore_Phrases` (`ID`, `PackageID`, `ModuleID`, `LanguageID`, `PhraseName`, `PhraseValue`, `RegularExpression`, `PhraseTypeID`) VALUES (NULL, '1', '101', '2081', 'module_name', 'Reports', NULL, '5')",
         "INSERT IGNORE INTO `tblCore_Modules` (`ID`, `PackageID`, `Script`) VALUES ('101', '1', 'reports')"
         );
@@ -28,6 +26,20 @@ $query="SELECT * from tblCore_Modules WHERE Script='reports'";
               $res=$_ARCHON->mdb2->query($query);
             }
             die();
+          }
+        }
+        $queries=array("ALTER TABLE `tblSubjects_Subjects` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
+"ALTER TABLE `tblCollections_Content` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
+"ALTER TABLE `tblAccessions_Accessions` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
+"ALTER TABLE `tblCollections_Collections` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
+"ALTER TABLE `tblDigitalLibrary_DigitalContent` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
+"ALTER TABLE `tblDigitalLibrary_Files` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP");
+        foreach($queries as $run){
+          $res2=$_ARCHON->mdb2->query($run);
+          if(PEAR::isError($res2)){
+            if($res2->getcode()!=-5){
+              die('Adding dateadded column failed: '.$res2->getMessage().$res2->getcode());
+            }
           }
         }
       }

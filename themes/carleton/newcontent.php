@@ -1,5 +1,5 @@
 <?php
-
+//TODO: use this dateadded insertion function for reports, csv.
 isset($_ARCHON) or die();
 
 $query='SELECT tblCollections_Collections.ID,
@@ -21,9 +21,27 @@ and tblCollections_Content.Enabled != 0
 and tblCollections_Collections.Enabled != 0
 ORDER BY dateadded DESC LIMIT 5';
 $res=$_ARCHON->mdb2->query($query);
-
-if(PEAR::isError($res)){
-    die('Could not connect: ' . mysql_error());
+while(PEAR::isError($res)){
+    if($res->getcode()==-19){
+        $queries=array("ALTER TABLE `tblSubjects_Subjects` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
+"ALTER TABLE `tblCollections_Content` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
+"ALTER TABLE `tblAccessions_Accessions` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
+"ALTER TABLE `tblCollections_Collections` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
+"ALTER TABLE `tblDigitalLibrary_DigitalContent` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
+"ALTER TABLE `tblDigitalLibrary_Files` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP");
+	foreach($queries as $run){
+            $res2=$_ARCHON->mdb2->query($run);
+            if(PEAR::isError($res2)){
+                if($res2->getcode()!=-5){
+                    die('Adding dateadded column failed: '.$res2->getMessage().$res2->getcode());
+                }
+            }
+        }
+	$res=$_ARCHON->mdb2->query($query);
+    }
+    if(PEAR::isError($res)){
+        die('Could not connect: ' . $res->getcode(). $res->getMessage());
+    }
 }
 
 $newcontent=$res->fetchAll();
