@@ -10,6 +10,8 @@
  * There is also information passed to this page from packages->colections->templates->csv->collection.inc.php via a $_SESSION item
  * NOTE: If you do not have a dateadded field in tblcollections_content (which is something that we added) there are two lines that you need to modify/remove 
  * These lines are marked in the comments
+ * TODO: Replace mysql_query's with $_ARCHON->mdb2->query(). They work, but....
+ * TODO: Force creation of dateadded field if it doesn't exist
  */
 
 isset($_ARCHON) or die();
@@ -29,7 +31,26 @@ if($hiddenInfoQuery)
     $hiddenInfoArray = mysql_fetch_array($hiddenInfoQuery);		
 }
 else {
+$queries=array("ALTER TABLE `tblSubjects_Subjects` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
+"ALTER TABLE `tblCollections_Content` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
+"ALTER TABLE `tblAccessions_Accessions` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
+"ALTER TABLE `tblCollections_Collections` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
+"ALTER TABLE `tblDigitalLibrary_DigitalContent` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
+"ALTER TABLE `tblDigitalLibrary_Files` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP");
+	foreach($queries as $run){
+            $res=$_ARCHON->mdb2->query($run);
+            if(PEAR::isError($res)){
+                if($res->getcode()!=-5){
+                    $hiddenInfoArray = array('ERROR','ERROR','ERROR','ERROR','ERROR');
+                }
+            }
+        }
+    $hiddenInfoQuery = mysql_query('SELECT LevelContainerID, RootContentID, ContainsContent, SortOrder, dateadded FROM tblCollections_Content WHERE ID = '.$Content['ID']);
+    if($hiddenInfoQuery){
+    }
+    else{
     $hiddenInfoArray = array('ERROR','ERROR','ERROR','ERROR','ERROR');
+    }
 }
 
 //Query that gets all of the information relating to IDs for items that share a RootContentID with the current item.
