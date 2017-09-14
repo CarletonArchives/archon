@@ -25,7 +25,7 @@ abstract class DigitalLibrary_FileType
             $filePrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_MANIP);
         }
         $affected = $filePrep->execute($ID);
-        if (PEAR::isError($affected)) {
+        if (pear_isError($affected)) {
             trigger_error($affected->getMessage(), E_USER_ERROR);
         }
 

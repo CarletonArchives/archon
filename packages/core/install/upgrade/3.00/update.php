@@ -47,7 +47,7 @@ ArchonInstaller::updateDBProgressTable('', "Add usergroups to tblCore_UserUsergr
 
 $query = "SELECT ID,UsergroupID FROM tblCore_Users";
 $result = $_ARCHON->mdb2->query($query);
-if (PEAR::isError($result))
+if (pear_isError($result))
 {
    trigger_error($result->getMessage(), E_USER_ERROR);
 }
@@ -70,7 +70,7 @@ ArchonInstaller::updateDBProgressTable('', "Add repositories to tblCore_UserRepo
 
    $query = "SELECT ID,RepositoryID FROM tblCore_Users";
    $result = $_ARCHON->mdb2->query($query);
-   if (PEAR::isError($result))
+   if (pear_isError($result))
    {
       trigger_error($result->getMessage(), E_USER_ERROR);
    }
@@ -113,7 +113,7 @@ ArchonInstaller::updateDBProgressTable('', "Add researchers to tblCore_Users ");
 
    $query = "SELECT * FROM tblResearch_Researchers";
    $result = $_ARCHON->mdb2->query($query);
-   if (PEAR::isError($result))
+   if (pear_isError($result))
    {
       trigger_error($result->getMessage(), E_USER_ERROR);
    }
@@ -131,7 +131,7 @@ ArchonInstaller::updateDBProgressTable('', "Add researchers to tblCore_Users ");
 
       $query = "SELECT ID FROM tblCore_Users WHERE Login = '".$login."'";
       $idresult = $_ARCHON->mdb2->query($query);
-      if (PEAR::isError($idresult))
+      if (pear_isError($idresult))
       {
          trigger_error($idresult->getMessage(), E_USER_ERROR);
       }
@@ -155,7 +155,7 @@ ArchonInstaller::updateDBProgressTable('', "Add researchers to tblCore_Users ");
             $arrUserProfileFields['StateProvinceID'] = $stateID;
             $query = "SELECT CountryID FROM tblCore_StateProvinces WHERE ID = ". $stateID;
             $countryresult = $_ARCHON->mdb2->query($query);
-            if (PEAR::isError($countryresult))
+            if (pear_isError($countryresult))
             {
                trigger_error($countryresult->getMessage(), E_USER_ERROR);
             }
@@ -184,7 +184,7 @@ ArchonInstaller::updateDBProgressTable('', "Add researchers to tblCore_Users ");
             {
                $query = "SELECT ID FROM tblCore_UserProfileFields WHERE UserProfileField = '".$FieldName."'";
                $upfresult = $_ARCHON->mdb2->query($query);
-               if (PEAR::isError($upfresult))
+               if (pear_isError($upfresult))
                {
                   trigger_error($upfresult->getMessage(), E_USER_ERROR);
                }

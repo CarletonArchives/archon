@@ -14,6 +14,10 @@ class Archon extends ArchonObject
 {
    public function __construct()
    {
+      isset($this->Includes) or
+         $this->Includes = array();
+      isset($this->Includes[get_class($this)]) or
+         $this->Includes[get_class($this)] = new stdClass();
       $this->Includes[get_class($this)]->Constructed = true;
 
       $this->StartTime = microtime(true);
@@ -56,6 +60,8 @@ class Archon extends ArchonObject
       {
          foreach($arrMethods as $Method)
          {
+            isset($this->Mixins[$ClassName]->Methods[$Method]) or
+               $this->Mixins[$ClassName]->Methods[$Method] = new stdClass();
             if(empty($this->Mixins[$ClassName]->Methods[$Method]->Classes))
             {
                $this->Mixins[$ClassName]->Methods[$Method]->Classes = array($MixinClassName);
@@ -154,6 +160,8 @@ class Archon extends ArchonObject
       }
 
       $ID = count($this->Includes[$ClassName]->FilesAndMixinClassNames);
+      isset($this->Includes[$ClassName]->FilesAndMixinClassNames[$ID]) or
+         $this->Includes[$ClassName]->FilesAndMixinClassNames[$ID] = new stdClass();
       $this->Includes[$ClassName]->FilesAndMixinClassNames[$ID]->FileName = $FileName;
       $this->Includes[$ClassName]->FilesAndMixinClassNames[$ID]->FileDirectory = getcwd();
    }

@@ -1366,6 +1366,10 @@ position:relative;
 width:80%;
 }
 
+.digcontentdata p {
+margin-top: 0px;
+}
+
 .digcontentrequest {
 font-size:80%;
 font-weight:700;

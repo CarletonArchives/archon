@@ -8,7 +8,7 @@ ArchonInstaller::updateDBProgressTable('', "Insert data into tblCollections_Rese
 $query = "SELECT ID FROM tblCollections_ResearcherTypes";
 
 $result = $_ARCHON->mdb2->query($query);
-if (PEAR::isError($result))
+if (pear_isError($result))
 {
    trigger_error($result->getMessage(), E_USER_ERROR);
 }
@@ -40,7 +40,7 @@ ArchonInstaller::updateDBProgressTable('', "Insert data into tblCollections_Rese
 $query = "SELECT ID FROM tblCollections_ResearchAppointmentPurposes";
 
 $result = $_ARCHON->mdb2->query($query);
-if (PEAR::isError($result))
+if (pear_isError($result))
 {
    trigger_error($result->getMessage(), E_USER_ERROR);
 }

@@ -68,7 +68,7 @@ function packages_ui_main()
    $strInstall = $objInstallPhrase ? $objInstallPhrase->getPhraseValue(ENCODE_HTML) : 'Install';
 
    $objAreYouSureUninstallPhrase = Phrase::getPhrase('areyousureuninstall', $_ARCHON->Package->ID, $_ARCHON->Module->ID, PHRASETYPE_ADMIN);
-   $strAreYouSureUninstall = $objAreYouSureUninstallPhrase ? $objAreYouSureUninstallPhrase->getPhraseValue(ENCODE_JAVASCRIPTTHENHTML) : 'This will irreversibly delete ALL DATA associated with the $1 package!  Are you sure you want to do this? (You should backup your data in the database manager first.)';
+   $strAreYouSureUninstall = $objAreYouSureUninstallPhrase ? $objAreYouSureUninstallPhrase->getPhraseValue(ENCODE_JAVASCRIPTTHENHTML) : 'This will irreversibly delete ALL DATA associated with the $1 package!  Are you sure you want to do this? (You should backup your data first.)';
    $objAreYouSureUpgradePhrase = Phrase::getPhrase('areyousureupgrade', $_ARCHON->Package->ID, $_ARCHON->Module->ID, PHRASETYPE_ADMIN);
    $strAreYouSureUpgrade = $objAreYouSureUpgradePhrase ? $objAreYouSureUpgradePhrase->getPhraseValue(ENCODE_JAVASCRIPTTHENHTML) : 'This will update the database to use a newer version of the $1 package.  Are you sure you want to do this? (You should backup your data in the database manager first.)';
    $objAreYouSureInstallPhrase = Phrase::getPhrase('areyousureinstall', $_ARCHON->Package->ID, $_ARCHON->Module->ID, PHRASETYPE_ADMIN);
@@ -110,38 +110,66 @@ function packages_ui_main()
    ob_start();
    ?>
 <script type="text/javascript">
-   <!--
    function packages_ui_main_js_uninstall(aprcode)
    {
-      $('#fInput').val('uninstall');
-      $('#aprcodeInput').val(aprcode);
-      $('#mainform').submit();
+      $.ajax({
+        url: 'index.php',
+        data: {
+          p: 'admin/core/packages',
+          f: 'uninstall',
+          aprcode: aprcode          
+        },
+        type: 'POST',
+        success: function(data) {
+          $('#response_dialog').html(data);
+        }
+      });
    }
 
    function packages_ui_main_js_install(aprcode)
    {
-      $('#fInput').val('install');
-      $('#aprcodeInput').val(aprcode);
-      $('#mainform').submit();
+     $.ajax({
+       url: 'index.php',
+       data: {
+         p: 'admin/core/packages',
+         f: 'install',
+         aprcode: aprcode          
+       },
+       type: 'POST',
+       success: function(data) {
+         $('#response_dialog').html(data);
+       }
+     });
+ 
    }
 
    function packages_ui_main_js_upgrade(aprcode)
    {
       $('#fInput').val('upgrade');
       $('#aprcodeInput').val(aprcode);
-      $('#mainform').submit();
+      admin_ui_submit();   
    }
 
    $(function() {
       $('#installedpackagestable :radio').change(function () {
-         $('#fInput').val('updatepackages');
-         $('#mainform').submit();
+        var data = 'p=admin/core/packages&f=updatepackages&' + $('#installedpackagestable input:checked').serialize();
+         $.ajax({
+           url: 'index.php',
+           data: data,
+           type: 'POST',
+           success: function(data) {
+             $('#response_dialog').html(data);
+           }
+         });
+         // $('#fInput').val('updatepackages');
+         //          admin_ui_submit();
       });
    });
-   -->
 </script>
-   <?php
-   ?>
+<div class="hidden">
+<div id="response_dialog">
+</div>
+</div>
 <input type="hidden" name="aprcode" id="aprcodeInput" value="" />
 <table id="installedpackagestable">
    <tr>

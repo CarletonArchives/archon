@@ -137,7 +137,7 @@ abstract class Core_LiveSession2x
 
         $prep = $_ARCHON->mdb2->prepare('DELETE FROM tblCore_Sessions WHERE Hash = ?', 'text', MDB2_PREPARE_MANIP);
         $affected = $prep->execute(session_id());
-        if (PEAR::isError($affected)) {
+        if (pear_isError($affected)) {
             trigger_error($affected->getMessage(), E_USER_ERROR);
         }
         $prep->free();
@@ -249,7 +249,7 @@ abstract class Core_LiveSession2x
 
         $prep = $_ARCHON->mdb2->prepare('SELECT * FROM tblCore_Sessions WHERE Hash = ?', array('text'), MDB2_PREPARE_RESULT);
         $result = $prep->execute(session_id());
-        if (PEAR::isError($result)) {
+        if (pear_isError($result)) {
             trigger_error($result->getMessage(), E_USER_ERROR);
         }
         $row = $result->fetchRow();
@@ -298,7 +298,7 @@ abstract class Core_LiveSession2x
 
         $prep = $_ARCHON->mdb2->prepare('UPDATE tblCore_Sessions SET Expires = ? WHERE ID = ?', array('integer', 'integer'), MDB2_PREPARE_MANIP);
         $affected = $prep->execute(array($this->Expires, $this->ID));
-        if (PEAR::isError($affected)) {
+        if (pear_isError($affected)) {
             trigger_error($affected->getMessage(), E_USER_ERROR);
         }
         $prep->free();

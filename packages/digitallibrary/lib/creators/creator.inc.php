@@ -22,7 +22,7 @@ abstract class DigitalLibrary_Creator
       static $indexPrep = NULL;
       $indexPrep = $indexPrep ? $indexPrep : $_ARCHON->mdb2->prepare('DELETE FROM tblDigitalLibrary_DigitalContentCreatorIndex WHERE CreatorID = ?', 'integer', MDB2_PREPARE_MANIP);
       $affected = $indexPrep->execute($ID);
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -63,7 +63,7 @@ abstract class DigitalLibrary_Creator
          $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $prep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }

@@ -39,7 +39,7 @@ abstract class Core_User2x
          $query = "UPDATE tblCore_Users SET Pending = 0, PendingHash = NULL WHERE ID = ?";
          $prep = $_ARCHON->mdb2->prepare($query, array('integer'), MDB2_PREPARE_MANIP);
          $affected = $prep->execute(array($this->ID));
-         if (PEAR::isError($affected))
+         if (pear_isError($affected))
          {
             trigger_error($affected->getMessage(), E_USER_ERROR);
          }
@@ -110,7 +110,7 @@ abstract class Core_User2x
       {
          $query = "SELECT Value FROM tblCore_Configuration WHERE Directive = 'SA Password'";
          $result = $_ARCHON->mdb2->query($query);
-         if (PEAR::isError($result))
+         if (pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -168,7 +168,7 @@ abstract class Core_User2x
 
       $prep = $_ARCHON->mdb2->prepare("SELECT * FROM tblCore_UserHomeWidgetsIndex WHERE UserID = ? ORDER BY DisplayOrder", 'integer', MDB2_PREPARE_RESULT);
       $result = $prep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -218,7 +218,7 @@ abstract class Core_User2x
          $prep = $_ARCHON->mdb2->prepare("SELECT * FROM tblCore_UserPermissions WHERE UserID = ?", 'integer', MDB2_PREPARE_RESULT);
          $result = $prep->execute($this->ID);
       }
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -261,7 +261,7 @@ abstract class Core_User2x
       $query = "SELECT tblCore_UserProfileFields.*, tblCore_UserUserProfileFieldIndex.Value FROM tblCore_UserProfileFields JOIN tblCore_UserUserProfileFieldIndex ON tblCore_UserProfileFields.ID = tblCore_UserUserProfileFieldIndex.UserProfileFieldID WHERE tblCore_UserUserProfileFieldIndex.UserID = ? ORDER BY tblCore_UserProfileFields.PackageID, tblCore_UserProfileFields.UserProfileField;";
       $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       $result = $prep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -335,7 +335,7 @@ abstract class Core_User2x
          $prep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer'), MDB2_PREPARE_MANIP);
       }
       $affected = $prep->execute(array($LanguageID, $this->ID));
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -438,7 +438,7 @@ abstract class Core_User2x
          $prep = $_ARCHON->mdb2->prepare($query, array('text', 'integer'), MDB2_PREPARE_MANIP);
       }
       $affected = $prep->execute(array($Note, $this->ID));
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -519,7 +519,7 @@ abstract class Core_User2x
          $prep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer', 'integer'), MDB2_PREPARE_MANIP);
       }
       $affected = $prep->execute(array($this->ID, $ModuleID, $Permissions));
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -598,7 +598,7 @@ abstract class Core_User2x
          }
          $affected = $insertPrep->execute(array($this->ID, $UserProfileFieldID, $Value));
 
-         if(PEAR::isError($affected))
+         if(pear_isError($affected))
          {
             trigger_error($affected->getMessage(), E_USER_ERROR);
 
@@ -747,7 +747,7 @@ abstract class Core_User2x
          $prep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer'), MDB2_PREPARE_MANIP);
       }
       $affected = $prep->execute(array($this->ID, $ModuleID));
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }

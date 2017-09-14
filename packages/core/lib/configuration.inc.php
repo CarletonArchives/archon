@@ -116,7 +116,7 @@ abstract class Core_Configuration
 	        $checkPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
         }
         $result = $checkPrep->execute($this->ID);
-        if (PEAR::isError($result)) {
+        if (pear_isError($result)) {
             trigger_error($result->getMessage(), E_USER_ERROR);
         }
         
@@ -208,7 +208,7 @@ abstract class Core_Configuration
         
         $affected = $prep->execute(array($dbValue, $this->Encrypted, $this->ID));
         
-        if(PEAR::isError($affected))
+        if(pear_isError($affected))
         {
             trigger_error($affected->getMessage(), E_USER_ERROR);
         }

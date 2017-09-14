@@ -100,7 +100,7 @@ abstract class Core_Usergroup
 
         $prep = $_ARCHON->mdb2->prepare("SELECT * FROM tblCore_UsergroupPermissions WHERE UsergroupID = ?", 'integer', MDB2_PREPARE_RESULT);
         $result = $prep->execute($this->ID);
-        if (PEAR::isError($result)) {
+        if (pear_isError($result)) {
            trigger_error($result->getMessage(), E_USER_ERROR);
         }
         
@@ -145,7 +145,7 @@ abstract class Core_Usergroup
         $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
         $result = $prep->execute($this->ID);
         
-        if(PEAR::isError($result))
+        if(pear_isError($result))
         {
             trigger_error($result->getMessage(), E_USER_ERROR);
         }
@@ -248,7 +248,7 @@ abstract class Core_Usergroup
 	        $prep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer', 'integer'), MDB2_PREPARE_MANIP);
         }
         $affected = $prep->execute(array($this->ID, $ModuleID, $Permissions));
-        if (PEAR::isError($affected)) {
+        if (pear_isError($affected)) {
             trigger_error($affected->getMessage(), E_USER_ERROR);
         }
 

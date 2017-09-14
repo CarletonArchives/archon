@@ -54,14 +54,14 @@ abstract class DigitalLibrary_Collection
                 ORDER BY Title";
 
          $digitalContentPrep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer', 'integer', 'integer'), MDB2_PREPARE_RESULT);
-         if (PEAR::isError($digitalContentPrep))
+         if (pear_isError($digitalContentPrep))
          {
             echo($query);
             trigger_error($digitalContentPrep->getMessage(), E_USER_ERROR);
          }
       }
       $result = $digitalContentPrep->execute(array($this->ID, $RootCollectionContentID, $RootCollectionContentID, $RootCollectionContentID));
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }

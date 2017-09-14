@@ -52,7 +52,7 @@ else
    //TODO: Clean up this section
    $query = "SELECT DBVersion FROM tblCore_Packages WHERE APRCode = 'core'";
    $result = $_ARCHON->mdb2->query($query);
-   if (PEAR::isError($result))
+   if (pear_isError($result))
    {
       trigger_error($result->getMessage(), E_USER_ERROR);
    }
@@ -63,7 +63,7 @@ else
    {
       $query = "SELECT Value FROM tblArchon_Configuration WHERE Directive = 'Database Structure Version'";
       $result2 = $_ARCHON->mdb2->query($query);
-      if (PEAR::isError($result2))
+      if (pear_isError($result2))
       {
          trigger_error($result2->getMessage(), E_USER_ERROR);
       }

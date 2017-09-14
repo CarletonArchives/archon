@@ -24,7 +24,7 @@ abstract class Collections_Creator
       static $indexPrep = NULL;
       $indexPrep = $indexPrep ? $indexPrep : $_ARCHON->mdb2->prepare('DELETE FROM tblCollections_CollectionCreatorIndex WHERE CreatorID = ?', 'integer', MDB2_PREPARE_MANIP);
       $affected = $indexPrep->execute($ID);
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -32,7 +32,7 @@ abstract class Collections_Creator
       static $classificationsPrep = NULL;
       $classificationsPrep = $classificationsPrep ? $classificationsPrep : $_ARCHON->mdb2->prepare('UPDATE tblCollections_Classifications SET CreatorID = 0 WHERE CreatorID = ?', 'integer', MDB2_PREPARE_MANIP);
       $affected = $classificationsPrep->execute($ID);
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -42,7 +42,7 @@ abstract class Collections_Creator
       static $indexPrep = NULL;
       $indexPrep = $indexPrep ? $indexPrep : $_ARCHON->mdb2->prepare('DELETE FROM tblCollections_BookCreatorIndex WHERE CreatorID = ?', 'integer', MDB2_PREPARE_MANIP);
       $affected = $indexPrep->execute($ID);
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -53,7 +53,7 @@ abstract class Collections_Creator
       static $collIDPrep = NULL;
       $collIDPrep = $collIDPrep ? $collIDPrep : $_ARCHON->mdb2->prepare('SELECT CollectionID FROM tblCollections_CollectionCreatorIndex WHERE CreatorID = ?', 'integer', MDB2_PREPARE_RESULT);
       $result = $collIDPrep->execute($ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -72,7 +72,7 @@ abstract class Collections_Creator
          $contentIDPrep = $contentIDPrep ? $contentIDPrep : $_ARCHON->mdb2->prepare('SELECT tblCollections_Content.CollectionID FROM tblCollections_CollectionContentCreatorIndex JOIN tblCollections_Content ON tblCollections_CollectionContentCreatorIndex.CollectionContentID = tblCollections_Content.ID WHERE CreatorID = ?', 'integer', MDB2_PREPARE_RESULT);
          $result = $contentIDPrep->execute($ID);
 
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -116,7 +116,7 @@ abstract class Collections_Creator
       static $collIDPrep = NULL;
       $collIDPrep = $collIDPrep ? $collIDPrep : $_ARCHON->mdb2->prepare('SELECT CollectionID FROM tblCollections_CollectionCreatorIndex WHERE CreatorID = ?', 'integer', MDB2_PREPARE_RESULT);
       $result = $collIDPrep->execute($ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -135,7 +135,7 @@ abstract class Collections_Creator
          $contentIDPrep = $contentIDPrep ? $contentIDPrep : $_ARCHON->mdb2->prepare('SELECT tblCollections_Content.CollectionID FROM tblCollections_CollectionContentCreatorIndex JOIN tblCollections_Content ON tblCollections_CollectionContentCreatorIndex.CollectionContentID = tblCollections_Content.ID WHERE CreatorID = ?', 'integer', MDB2_PREPARE_RESULT);
          $result = $contentIDPrep->execute($ID);
 
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -190,7 +190,7 @@ abstract class Collections_Creator
          $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $prep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -236,7 +236,7 @@ abstract class Collections_Creator
          $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $prep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }

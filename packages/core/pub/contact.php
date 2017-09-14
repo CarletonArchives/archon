@@ -18,6 +18,11 @@ contact_initialize();
 
 function contact_initialize()
 {
+	if(!isset($_REQUEST['f']))
+	{
+		$_REQUEST['f'] = 'email';
+	}
+
     if($_REQUEST['f'] == 'email')
     {
         contact_email();
@@ -97,26 +102,72 @@ function contact_email()
     }
     $strPhone = $_REQUEST['fromphone'] ? encode($_REQUEST['fromphone'], ENCODE_HTML) : $strPhone;
     //$strPhone = encode($strPhone, ENCODE_HTML);
-	?>
-    <form action="index.php" accept-charset="UTF-8" method="post">
-	<div>
-	<input type="hidden" name="f" value="sendemail" />
-	<input type="hidden" name="p" value="core/contact" />
-	<input type="hidden" name="referer" value="<?php echo($in_referer); ?>" />
-        <input type="hidden" name="query_string" value="<?php echo($_SERVER['QUERY_STRING']); ?>" />
-        <input type="hidden" name="RepositoryID" value="<?php echo($repositoryid); ?>" />
-        
-	</div>
 
-	<?php
+	$strPageTitle = strip_tags($_ARCHON->PublicInterface->Title);
+
+	$query_string = htmlspecialchars($_SERVER['QUERY_STRING'], ENT_COMPAT, "UTF-8");
+
+	print "<form action=\"index.php\" accept-charset=\"UTF-8\" method=\"post\">\n";
+
+	$form = "<input type=\"hidden\" name=\"f\" value=\"sendemail\" />\n";
+	$form .= "<input type=\"hidden\" name=\"p\" value=\"core/contact\" />\n";
+	$form .= "<input type=\"hidden\" name=\"referer\" value=\"$in_referer\" />\n";
+	$form .= "<input type=\"hidden\" name=\"query_string\" value=\"$query_string\" />\n";
+	$form .= "<input type=\"hidden\" name=\"RepositoryID\" value=\"$repositoryid\" />\n";
+
+	$strRequiredMarker = "<span style=\"color:red\">*</span>";
+
+	$inputs = array();
+
+	$inputs[] = array(
+		'strInputLabel' => "<label for=\"name\">$strFromName:</label>",
+		'strInputElement' => "<input type=\"text\" name=\"FromName\" id=\"name\" size=\"30\" value=\"$strName\" />",
+		'strRequired' => '',
+		'template' => 'FieldGeneral',
+	);
+
+	$inputs[] = array(
+		'strInputLabel' => "<label for=\"email\">$strFromAddress:</label>",
+		'strInputElement' => "<input type=\"text\" name=\"FromAddress\" id=\"email\" size=\"25\" value=\"$strFrom\" />",
+		'strRequired' => $strRequiredMarker,
+		'template' => 'FieldGeneral',
+	);
+
+	$inputs[] = array(
+		'strInputLabel' => "<label for=\"phone\">$strFromPhone:</label>\n",
+		'strInputElement' => "<input type=\"text\" name=\"FromPhone\" id=\"phone\" size=\"20\" value=\"$strPhone\" />",
+		'strRequired' => '',
+		'template' => 'FieldGeneral',
+	);
+
+	$strEncodedSubject = encode($_REQUEST['subject'], ENCODE_HTML);
+	$inputs[] = array(
+		'strInputLabel' => "<label for=\"subject\">$strSubject:</label>",
+		'strInputElement' => "<input type=\"text\" name=\"subject\" id=\"subject\" size=\"40\" value=\"$strEncodedSubject\" />",
+		'strRequired' => '',
+		'template' => 'FieldGeneral',
+	);
+
+	$strEncodedMessage = encode($_REQUEST['message'], ENCODE_HTML);
+	$inputs[] = array(
+		'strInputLabel' => "<label for=\"message\">$strMessage:</label>",
+		'strInputElement' => "<textarea name=\"message\" id=\"message\" cols=\"38\" rows=\"5\">$strEncodedMessage</textarea>",
+		'strRequired' => $strRequiredMarker,
+		'template' => 'FieldTextArea',
+	);
+
+	foreach($inputs as $input)
+	{
+		$template = array_pop($input);
+		$form .= $_ARCHON->PublicInterface->executeTemplate('core', $template, $input);
+	}
+
     if(!$_ARCHON->Error)
     {
         eval($_ARCHON->PublicInterface->Templates['core']['Email']);
     }
-	?>
-	</form>
-    <?php
 
+	print "</form>\n";
     include('footer.inc.php');
 }
 

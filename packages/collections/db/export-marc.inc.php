@@ -30,7 +30,7 @@ if($_REQUEST['f'] == 'export-' . $UtilityCode)
    $arrCollections = $_ARCHON->searchCollections('', SEARCH_COLLECTIONS, 0, 0, 0, $repositoryID, $classificationID, 0, NULL, NULL, NULL, 0);
 
    $foldername = "archon_{$repositoryID}_{$classificationID}_marc";
-   $dirname = sys_get_temp_dir()."/".$foldername;
+   $dirname = realpath(sys_get_temp_dir())."/".$foldername;
 
    if(file_exists($dirname))
    {
@@ -54,12 +54,13 @@ if($_REQUEST['f'] == 'export-' . $UtilityCode)
 
 
 
-   foreach($arrCollections as $objCollection)
+   foreach((array)$arrCollections as $objCollection)
    {
       $filename = formatFileName($objCollection->getString('SortTitle',0,false,false));
 
       $handle = fopen($dirname."/".$filename.".mrc", "w");
-
+      
+      $objCollection->dbLoad();
       $objCollection->dbLoadRelatedObjects();
 
       ob_start();
@@ -373,6 +374,8 @@ if($_REQUEST['f'] == 'export-' . $UtilityCode)
                   $objMARCRecord->append_fields($field);
                }
             }
+            
+            array_shift($fields);
          }
       }
 
@@ -393,7 +396,7 @@ if($_REQUEST['f'] == 'export-' . $UtilityCode)
 
 
 
-   chdir(sys_get_temp_dir());
+   chdir(realpath(sys_get_temp_dir()));
 
    $tmp_zip = tempnam ("tmp", "tempname") . ".zip";
 
@@ -405,7 +408,8 @@ if($_REQUEST['f'] == 'export-' . $UtilityCode)
 
    // deliver the zip file
    $fp = fopen("$tmp_zip","r");
-   echo fpassthru($fp);
+   if (is_resource($fp))
+      echo fpassthru($fp);
 
    // clean up the tmp zip file
    exec("rm $tmp_zip");

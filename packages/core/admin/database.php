@@ -39,7 +39,8 @@ function database_ui_initialize()
          $_REQUEST['f'] = "import-$ImportUtility";
 
          // Remove output buffers for database scripts.
-         while (@ob_end_flush());
+         while (ob_get_level() > 0)
+            ob_end_flush();
 
          require("packages/$APRCode/db/import-$ImportUtility.inc.php");
 
@@ -60,7 +61,8 @@ function database_ui_initialize()
          $_REQUEST['f'] = "export-$ExportUtility";
 
          // Remove output buffers for database scripts.
-         while (@ob_end_clean());
+         while (ob_get_level() > 0)
+            ob_end_clean();
 
          require("packages/$APRCode/db/export-$ExportUtility.inc.php");
       }
@@ -570,7 +572,7 @@ function database_ui_main()
                if(CONFIG_CORE_MODIFICATION_LOG_ENABLED)
                {
                   $result = $prep->execute($tblName);
-                  if (PEAR::isError($result))
+                  if (pear_isError($result))
                   {
                      trigger_error($result->getMessage(), E_USER_ERROR);
                   }

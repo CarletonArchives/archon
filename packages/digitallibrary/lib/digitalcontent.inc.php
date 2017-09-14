@@ -37,7 +37,7 @@ abstract class DigitalLibrary_DigitalContent
          $checkPrep = $_ARCHON->mdb2->prepare($checkquery, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $checkPrep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -59,7 +59,7 @@ abstract class DigitalLibrary_DigitalContent
          $filePrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_MANIP);
       }
       $affected = $filePrep->execute($ID);
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -73,7 +73,7 @@ abstract class DigitalLibrary_DigitalContent
             $creatorPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_MANIP);
          }
          $affected = $creatorPrep->execute($ID);
-         if(PEAR::isError($affected))
+         if(pear_isError($affected))
          {
             trigger_error($affected->getMessage(), E_USER_ERROR);
          }
@@ -86,7 +86,7 @@ abstract class DigitalLibrary_DigitalContent
          $languagePrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_MANIP);
       }
       $affected = $languagePrep->execute($ID);
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -100,7 +100,7 @@ abstract class DigitalLibrary_DigitalContent
             $subjectPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_MANIP);
          }
          $affected = $subjectPrep->execute($ID);
-         if(PEAR::isError($affected))
+         if(pear_isError($affected))
          {
             trigger_error($affected->getMessage(), E_USER_ERROR);
          }
@@ -175,7 +175,7 @@ abstract class DigitalLibrary_DigitalContent
       $query = "SELECT tblCreators_Creators.*, tblDigitalLibrary_DigitalContentCreatorIndex.PrimaryCreator FROM tblCreators_Creators JOIN tblDigitalLibrary_DigitalContentCreatorIndex ON tblCreators_Creators.ID = tblDigitalLibrary_DigitalContentCreatorIndex.CreatorID WHERE tblDigitalLibrary_DigitalContentCreatorIndex.DigitalContentID = ? ORDER BY tblDigitalLibrary_DigitalContentCreatorIndex.PrimaryCreator DESC, tblCreators_Creators.Name";
       $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       $result = $prep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -248,7 +248,7 @@ abstract class DigitalLibrary_DigitalContent
          $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $prep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -310,7 +310,7 @@ abstract class DigitalLibrary_DigitalContent
       $query = "SELECT LanguageID FROM tblDigitalLibrary_DigitalContentLanguageIndex WHERE DigitalContentID = ?";
       $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       $result = $prep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -431,7 +431,7 @@ abstract class DigitalLibrary_DigitalContent
       $query = "SELECT tblSubjects_Subjects.* FROM tblSubjects_Subjects JOIN tblDigitalLibrary_DigitalContentSubjectIndex ON tblSubjects_Subjects.ID = tblDigitalLibrary_DigitalContentSubjectIndex.SubjectID WHERE tblDigitalLibrary_DigitalContentSubjectIndex.DigitalContentID = ?";
       $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       $result = $prep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -641,13 +641,13 @@ abstract class DigitalLibrary_DigitalContent
       if(!isset($prep))
       {
          $prep = $_ARCHON->mdb2->prepare("SELECT Browsable FROM tblDigitalLibrary_DigitalContent WHERE ID = ?", 'integer', MDB2_PREPARE_RESULT);
-         if(PEAR::isError($prep))
+         if(pear_isError($prep))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
       }
       $result = $prep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }

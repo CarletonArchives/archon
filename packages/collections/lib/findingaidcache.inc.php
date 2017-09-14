@@ -14,7 +14,7 @@ class FindingAidCache extends AObject
 
       $query = "SELECT Dirty,FindingAidText FROM tblCollections_FindingAidCache WHERE CollectionID = $CollectionID AND TemplateSet = '$TemplateSet' AND ReadPermissions = " . intval($ReadPermissions) . " AND RootContentID = $RootContentID";
       $result = $_ARCHON->mdb2->query($query);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          echo($query);
          trigger_error($result->getMessage(), E_USER_ERROR);
@@ -44,7 +44,7 @@ class FindingAidCache extends AObject
 
       $query = "SELECT ID FROM tblCollections_FindingAidCache WHERE CollectionID = $CollectionID AND TemplateSet = '$TemplateSet' AND ReadPermissions = " . intval($ReadPermissions) . " AND RootContentID = $RootContentID";
       $result = $_ARCHON->mdb2->query($query);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          echo($query);
          trigger_error($result->getMessage(), E_USER_ERROR);
@@ -53,14 +53,14 @@ class FindingAidCache extends AObject
       {
          $query = "INSERT INTO tblCollections_FindingAidCache (CollectionID, TemplateSet, ReadPermissions, Dirty, RootContentID, FindingAidText) Values (?, ?, ?, ?, ?, ?)";
          $prep = $_ARCHON->mdb2->prepare($query, array('integer', 'text', 'integer', 'integer', 'integer', 'text'), MDB2_PREPARE_MANIP);
-         if(PEAR::isError($prep))
+         if(pear_isError($prep))
          {
             trigger_error($prep->getMessage(), E_USER_ERROR);
             return false;
          }
 
          $affected = $prep->execute(array($CollectionID, $TemplateSet, $ReadPermissions, 0, $RootContentID, $Text));
-         if(PEAR::isError($affected))
+         if(pear_isError($affected))
          {
             trigger_error($affected->getMessage(), E_USER_ERROR);
             return false;
@@ -72,14 +72,14 @@ class FindingAidCache extends AObject
       {
          $query = "UPDATE tblCollections_FindingAidCache SET FindingAidText = ?, Dirty = 0 WHERE CollectionID = ? AND TemplateSet = ? AND ReadPermissions = ? AND RootContentID = ?";
          $prep = $_ARCHON->mdb2->prepare($query, array('text', 'integer', 'text', 'integer', 'integer'), MDB2_PREPARE_MANIP);
-         if(PEAR::isError($prep))
+         if(pear_isError($prep))
          {
             trigger_error($prep->getMessage(), E_USER_ERROR);
             return false;
          }
 
          $affected = $prep->execute(array($Text, $CollectionID, $TemplateSet, $ReadPermissions, $RootContentID));
-         if(PEAR::isError($affected))
+         if(pear_isError($affected))
          {
             trigger_error($affected->getMessage(), E_USER_ERROR);
             return false;
@@ -105,14 +105,14 @@ class FindingAidCache extends AObject
 
       $query = "UPDATE tblCollections_FindingAidCache SET Dirty = ? WHERE CollectionID IN (" . implode(', ', $question_marks) . ")";
       $prep = $_ARCHON->mdb2->prepare($query, $types, MDB2_PREPARE_MANIP);
-      if(PEAR::isError($prep))
+      if(pear_isError($prep))
       {
          trigger_error($prep->getMessage(), E_USER_ERROR);
          return false;
       }
 
       $affected = $prep->execute(array_merge(array(1), $CollectionIDs));
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
          return false;
@@ -127,14 +127,14 @@ class FindingAidCache extends AObject
 
       $query = "DELETE FROM tblCollections_FindingAidCache WHERE CollectionID = ?";
       $prep = $_ARCHON->mdb2->prepare($query, array('integer'), MDB2_PREPARE_MANIP);
-      if(PEAR::isError($prep))
+      if(pear_isError($prep))
       {
          trigger_error($prep->getMessage(), E_USER_ERROR);
          return false;
       }
 
       $affected = $prep->execute(array($CollectionID));
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
          return false;

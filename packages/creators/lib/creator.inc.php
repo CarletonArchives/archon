@@ -252,7 +252,7 @@ abstract class Creators_Creator
       $query = "SELECT tblCreators_CreatorCreatorIndex.* FROM tblCreators_CreatorCreatorIndex JOIN tblCreators_Creators ON tblCreators_Creators.ID = tblCreators_CreatorCreatorIndex.RelatedCreatorID WHERE tblCreators_CreatorCreatorIndex.CreatorID = ? ORDER BY tblCreators_Creators.Name";
       $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       $result = $prep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -301,7 +301,7 @@ abstract class Creators_Creator
 //            $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
 //         }
 //         $result = $prep->execute($this->ID);
-//         if (PEAR::isError($result))
+//         if (pear_isError($result))
 //         {
 //            trigger_error($result->getMessage(), E_USER_ERROR);
 //         }

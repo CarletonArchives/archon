@@ -118,6 +118,8 @@ abstract class Core_AdministrativeInterface
 
    public function insertHeaderControl($OnClick, $ImageOrPhraseName, $Disabled = false, $UIButtonClass = NULL)
    {
+      isset($HeaderControl) or
+         $HeaderControl = new stdClass();
       $HeaderControl->OnClick = $OnClick;
       $HeaderControl->ImageOrPhraseName = $ImageOrPhraseName;
       $HeaderControl->UIButtonClass = $UIButtonClass;
@@ -138,9 +140,15 @@ abstract class Core_AdministrativeInterface
 
    public function insertSearchOption($FieldNames, $DataTraversalSources = NULL, $LabelPhraseName = '', $ChildrenSources = NULL, $ClassNames = NULL, $DefaultValues = 0)
    {
+      global $_ARCHON;
+
       $FieldNames = is_array($FieldNames) ? $FieldNames : array($FieldNames);
       $FieldName = end($FieldNames);
 
+      isset($this->SearchOptions) or
+         $this->SearchOptions = array();
+      isset($this->SearchOptions[$FieldName]) or
+         $this->SearchOptions[$FieldName] = new stdClass();
       $this->SearchOptions[$FieldName]->FieldNames = $FieldNames;
       $this->SearchOptions[$FieldName]->DataTraversalSources = is_array($DataTraversalSources) ? $DataTraversalSources : array($DataTraversalSources);
       $this->SearchOptions[$FieldName]->ChildrenSources = is_array($ChildrenSources) ? $ChildrenSources : array($ChildrenSources);
@@ -206,6 +214,8 @@ abstract class Core_AdministrativeInterface
 
       if($this->OverrideSection || $this->OverrideRow || $this->OverrideField)
       {
+         isset($this->Header) or
+            $this->Header = new stdClass();
          $this->Header->NoControls = true;
       }
 

@@ -366,13 +366,13 @@ function research_displaycart()
 
             $arrCartOutput[$objCollection->RepositoryID] .= "<dl>\n";
             $arrCartOutput[$objCollection->RepositoryID] .= "<dt>" . $objCollection->toString(LINK_TOTAL)
-                    . "<a class='removefromcart' href='#' onclick='removeFromCart({collectionid:" . $objCollection->ID . ",collectioncontentid:0}); return false;'>remove</a></dt>\n";
+                    . "<a class='removefromcart' href='#' onclick='removeFromCart({collectionid:" . $objCollection->ID . ",collectioncontentid:0}); return false;'><img class='cart' src='{$_ARCHON->PublicInterface->ImagePath}/removefromcart.gif' title='Remove from cart' alt='$strRemove'/></a></dt>\n";
          }
 
          if($objContent)
          {
             $arrCartOutput[$objCollection->RepositoryID] .= "<dd>" . $objContent->toString(LINK_EACH, true, true, true, true, $_ARCHON->PublicInterface->Delimiter)
-                    . "<a class='removefromcart' href='#' onclick='removeFromCart({collectionid:" . $objCollection->ID . ",collectioncontentid:" . $objContent->ID . " }); return false;'>remove</a></dd>\n";
+                    . "<a class='removefromcart' href='#' onclick='removeFromCart({collectionid:" . $objCollection->ID . ",collectioncontentid:" . $objContent->ID . " }); return false;'><img class='cart' src='{$_ARCHON->PublicInterface->ImagePath}/removefromcart.gif' title='Remove from cart' alt='$strRemove'/></a></dt>\n";
          }
 
          $arrPreviousCollectionIDs[$objCollection->RepositoryID] = $CollectionID;
@@ -500,6 +500,7 @@ function research_exec()
                foreach($arrCart->Collections as $CollectionID => $arrObjs)
                {
                   foreach($arrObjs->Content as $CollectionContentID => $obj)
+                  {
                      if($obj instanceof Collection)
                      {
                         $objCollection = $obj;
@@ -510,10 +511,11 @@ function research_exec()
                         $objCollection = $obj->Collection;
                         $objContent = $obj;
                      }
-                  if($objCollection->RepositoryID == $_REQUEST['repositoryid'])
-                  {
-                     $objAppointment->dbRelateMaterials($CollectionID, $CollectionContentID);
-                     $_ARCHON->Security->Session->ResearchCart->deleteFromCart($CollectionID, $CollectionContentID);
+                     if($objCollection->RepositoryID == $_REQUEST['repositoryid'])
+                     {
+                       $objAppointment->dbRelateMaterials($CollectionID, $CollectionContentID);
+                       $_ARCHON->Security->Session->ResearchCart->deleteFromCart($CollectionID, $CollectionContentID);
+                     }
                   }
                }
             }
@@ -537,11 +539,17 @@ function research_exec()
    elseif($_REQUEST['f'] == 'sendemails')
    {
       $arrDetails = $_ARCHON->Security->Session->ResearchCart->getCartDetailsArray();
-      foreach($arrDetails as $RepositoryID => $details)
+      if(!empty($arrDetails))
       {
-         $_ARCHON->sendEmail($_REQUEST['fromaddress'], $_REQUEST['message'], $_REQUEST['referer'], $_REQUEST['fromname'], $_REQUEST['subject'], $_REQUEST['fromphone'], $_REQUEST['details'] . '\n\n' . $details, $_REQUEST['detailsfunction'], $_REQUEST['detailsparams'], $RepositoryID);
+      	foreach($arrDetails as $RepositoryID => $details)
+      	{
+         	$_ARCHON->sendEmail($_REQUEST['fromaddress'], $_REQUEST['message'], $_REQUEST['referer'], $_REQUEST['fromname'], $_REQUEST['subject'], $_REQUEST['fromphone'], $_REQUEST['details'] . '\n\n' . $details, $_REQUEST['detailsfunction'], $_REQUEST['detailsparams'], $RepositoryID);
+      	}
       }
-
+      else
+      {
+      $_ARCHON->sendEmail($_REQUEST['fromaddress'], $_REQUEST['message'], $_REQUEST['referer'], $_REQUEST['fromname'], $_REQUEST['subject'], $_REQUEST['fromphone'], $_REQUEST['details'], $_REQUEST['detailsfunction'], $_REQUEST['detailsparams']);
+      }
       if(!$_ARCHON->Error)
       {
          $msg = "Thank you! Your e-mail has been sent.";

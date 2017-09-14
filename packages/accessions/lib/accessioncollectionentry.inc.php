@@ -87,7 +87,7 @@ abstract class Accessions_AccessionCollectionEntry
          $primaryPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $primaryPrep->execute($this->AccessionID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -200,7 +200,7 @@ abstract class Accessions_AccessionCollectionEntry
             $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
          }
          $result = $prep->execute($this->ID);
-         if (PEAR::isError($result))
+         if (pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }

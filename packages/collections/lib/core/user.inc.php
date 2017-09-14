@@ -53,7 +53,7 @@ abstract class Collections_User
          $collectionPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $collectionPrep->execute($CollectionID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -77,7 +77,7 @@ abstract class Collections_User
             $contentPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
          }
          $result = $contentPrep->execute($CollectionContentID);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -99,7 +99,7 @@ abstract class Collections_User
          $deletePrep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer', 'integer'), MDB2_PREPARE_MANIP);
       }
       $affected = $deletePrep->execute(array($this->ID, $CollectionID, $CollectionContentID));
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -111,7 +111,7 @@ abstract class Collections_User
          $insertPrep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer', 'integer'), MDB2_PREPARE_MANIP);
       }
       $affected = $insertPrep->execute(array($this->ID, $CollectionID, $CollectionContentID));
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -123,7 +123,7 @@ abstract class Collections_User
          $checkPrep = $_ARCHON->mdb2->prepare($checkquery, array('integer', 'integer', 'integer'), MDB2_PREPARE_RESULT);
       }
       $result = $checkPrep->execute(array($this->ID, $CollectionID, $CollectionContentID));
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -206,7 +206,7 @@ abstract class Collections_User
          $deletePreps[$query] = $_ARCHON->mdb2->prepare($query, $types, MDB2_PREPARE_MANIP);
       }
       $affected = $deletePreps[$query]->execute($vars);
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -231,7 +231,7 @@ abstract class Collections_User
       }
 
       $result = $checkPreps[$checkquery]->execute($checkvars);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -292,7 +292,7 @@ abstract class Collections_User
          $deletePrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_MANIP);
       }
       $affected = $deletePrep->execute($this->ID);
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -304,7 +304,7 @@ abstract class Collections_User
          $checkPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $checkPrep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -346,7 +346,7 @@ abstract class Collections_User
 
       $prep = $_ARCHON->mdb2->prepare("SELECT * FROM tblCollections_ResearchCarts WHERE ResearcherID = ?", 'integer', MDB2_PREPARE_RESULT);
       $result = $prep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }

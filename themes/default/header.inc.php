@@ -17,6 +17,10 @@ if($_ARCHON->Script == 'packages/collections/pub/findingaid.php')
    return;
 }
 
+isset($_ARCHON->PublicInterface) or
+   $_ARCHON->PublicInterface = new stdClass();
+isset($_ARCHON->PublicInterface->Header) or
+   $_ARCHON->PublicInterface->Header = new stdClass();
 $_ARCHON->PublicInterface->Header->OnLoad .= "externalLinks();";
 
 if($_ARCHON->Error)
@@ -44,7 +48,7 @@ if(defined('PACKAGE_COLLECTIONS'))
 
    if($_ARCHON->QueryString && $_ARCHON->Script == 'packages/core/pub/search.php')
    {
-      $_ARCHON->PublicInterface->addNavigation("Search Results For \"" . $_ARCHON->getString(QueryString) . "\"", "?p=core/search&amp;q=" . $_ARCHON->QueryStringURL, true);
+      $_ARCHON->PublicInterface->addNavigation("Search Results For \"" . $_ARCHON->QueryString . "\"", "?p=core/search&amp;q=" . $_ARCHON->QueryStringURL, true);
    }
 }
 else

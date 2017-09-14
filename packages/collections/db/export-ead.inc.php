@@ -100,7 +100,7 @@ if($_REQUEST['f'] == 'export-' . $UtilityCode)
    $arrCollections = $_ARCHON->searchCollections('', SEARCH_COLLECTIONS, 0, 0, 0, $repositoryID, $classificationID, 0, NULL, NULL, NULL, 0);
 
    $foldername = "archon_{$repositoryID}_{$classificationID}_ead";
-   $dirname = sys_get_temp_dir()."/".$foldername;
+   $dirname = realpath(sys_get_temp_dir())."/".$foldername;
 
    if(file_exists($dirname))
    {
@@ -129,7 +129,7 @@ if($_REQUEST['f'] == 'export-' . $UtilityCode)
 
 
 
-   foreach($arrCollections as $objCollection)
+   foreach((array)$arrCollections as $objCollection)
    {
       $_REQUEST['id'] = $objCollection->ID;
       $_REQUEST['output'] = formatFileName($objCollection->getString('SortTitle',0,false,false));
@@ -231,7 +231,7 @@ if($_REQUEST['f'] == 'export-' . $UtilityCode)
 
 
 
-   chdir(sys_get_temp_dir());
+   chdir(realpath(sys_get_temp_dir()));
 
    $tmp_zip = tempnam ("tmp", "tempname") . ".zip";
 
@@ -239,11 +239,12 @@ if($_REQUEST['f'] == 'export-' . $UtilityCode)
 
 
    $filesize = filesize($tmp_zip);
-   header("Content-Length: $filesize");
+   // header("Content-Length: $filesize");
 
    // deliver the zip file
    $fp = fopen("$tmp_zip","r");
-   echo fpassthru($fp);
+   if (is_resource($fp))
+      echo fpassthru($fp);
 
    // clean up the tmp zip file
    exec("rm $tmp_zip");

@@ -159,7 +159,7 @@ abstract class Accessions_AccessionLocationEntry
         if(isset($this->Extent))
         {
             $String .= $Delimiter;
-            $String .= $this->getString('Extent') . ($this->ExtentUnit ? ' ' . $this->ExtentUnit->getString('ExtentUnit') : '');
+            $String .= $this->getString('Extent') . ($this->ExtentUnit ? ' ' . $this->ExtentUnit->toString() : '');
         }
         else if($AlwaysDelimit)
         {
@@ -211,7 +211,7 @@ abstract class Accessions_AccessionLocationEntry
             $prep = $_ARCHON->mdb2->prepare($checkquery, 'integer', MDB2_PREPARE_RESULT);
         }
         $result = $prep->execute($this->ID);
-        if (PEAR::isError($result)) {
+        if (pear_isError($result)) {
             trigger_error($result->getMessage(), E_USER_ERROR);
         }
         

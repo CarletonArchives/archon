@@ -16,7 +16,7 @@ abstract class Collections_MaterialType
       $collIDPrep = $collIDPrep ? $collIDPrep : $_ARCHON->mdb2->prepare('SELECT ID FROM tblCollections_Collections WHERE MaterialTypeID = ?', 'integer', MDB2_PREPARE_RESULT);
 
       $result = $collIDPrep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -87,7 +87,7 @@ abstract class Collections_MaterialType
       $collIDPrep = $collIDPrep ? $collIDPrep : $_ARCHON->mdb2->prepare('SELECT ID FROM tblCollections_Collections WHERE MaterialTypeID = ?', 'integer', MDB2_PREPARE_RESULT);
 
       $result = $collIDPrep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }

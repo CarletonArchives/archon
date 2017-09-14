@@ -28,7 +28,7 @@ if($_REQUEST['f'] == 'export-' . $UtilityCode)
    $arrCreators = $_ARCHON->getCreatorsForRepository($repositoryID);
 
    $foldername = "archon_{$repositoryID}_eac";
-   $dirname = sys_get_temp_dir()."/".$foldername;
+   $dirname = realpath(sys_get_temp_dir())."/".$foldername;
 
    if(file_exists($dirname))
    {
@@ -57,7 +57,7 @@ if($_REQUEST['f'] == 'export-' . $UtilityCode)
 
 
 
-   foreach($arrCreators as $objCreator)
+   foreach((array)$arrCreators as $objCreator)
    {
       $_REQUEST['id'] = $objCreator->ID;
       $_REQUEST['output'] = formatFileName($objCreator->getString('Name',0,false,false));
@@ -152,7 +152,7 @@ if($_REQUEST['f'] == 'export-' . $UtilityCode)
    
 
 
-   chdir(sys_get_temp_dir());
+   chdir(realpath(sys_get_temp_dir()));
 
    $tmp_zip = tempnam ("tmp", "tempname") . ".zip";
 
@@ -164,7 +164,8 @@ if($_REQUEST['f'] == 'export-' . $UtilityCode)
 
    // deliver the zip file
    $fp = fopen("$tmp_zip","r");
-   echo fpassthru($fp);
+   if (is_resource($fp))
+      echo fpassthru($fp);
 
    // clean up the tmp zip file
    exec("rm $tmp_zip");

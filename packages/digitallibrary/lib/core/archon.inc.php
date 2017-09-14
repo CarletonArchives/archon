@@ -45,7 +45,7 @@ abstract class DigitalLibrary_Archon
 
          $query = "SELECT ID FROM tblDigitalLibrary_DigitalContent WHERE (Title LIKE '0%' OR Title LIKE '1%' OR Title LIKE '2%' OR Title LIKE '3%' OR Title LIKE '4%' OR Title LIKE '5%' OR Title LIKE '6%' OR Title LIKE '7%' OR Title LIKE '8%' OR Title LIKE '9%') $ConditionsAND";
          $result = $this->mdb2->query($query);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -60,7 +60,7 @@ abstract class DigitalLibrary_Archon
             $char = chr($i);
 
             $result = $prep->execute("$char%");
-            if(PEAR::isError($result))
+            if(pear_isError($result))
             {
                trigger_error($result->getMessage(), E_USER_ERROR);
             }
@@ -88,7 +88,7 @@ abstract class DigitalLibrary_Archon
          }
 
          $result = $this->mdb2->query($query);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -304,7 +304,7 @@ abstract class DigitalLibrary_Archon
 
       $query = "SELECT ID,Filename FROM tblDigitalLibrary_Files WHERE DigitalContentID = -1 ORDER BY Filename";
       $result = $this->mdb2->query($query);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -323,7 +323,7 @@ abstract class DigitalLibrary_Archon
 
       $query = "SELECT ID,Filename,DigitalContentID FROM tblDigitalLibrary_Files WHERE DigitalContentID > 0 ORDER BY Filename";
       $result = $this->mdb2->query($query);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -342,7 +342,7 @@ abstract class DigitalLibrary_Archon
 
       $query = "SELECT ID,DefaultAccessLevel,DigitalContentID,Title,Filename,FileTypeID,Size,DisplayOrder FROM tblDigitalLibrary_Files WHERE DigitalContentID > 0 ORDER BY Filename";
       $result = $this->mdb2->query($query);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -463,7 +463,7 @@ ORDER BY tblDigitalLibrary_DigitalContent.Title";
          }
       }
       $result = $this->mdb2->query($query);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -492,7 +492,7 @@ ORDER BY tblDigitalLibrary_DigitalContent.Title";
       $query = "SELECT * FROM tblDigitalLibrary_FileTypes WHERE FileExtensions LIKE '%.{$this->mdb2->escape($Extension, true)}%'";
       $this->mdb2->setLimit(1);
       $result = $this->mdb2->query($query);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -525,7 +525,7 @@ ORDER BY tblDigitalLibrary_DigitalContent.Title";
       $this->mdb2->setLimit(1);
       $prep = $this->mdb2->prepare("SELECT ID FROM tblDigitalLibrary_MediaTypes WHERE MediaType LIKE ?", 'text', MDB2_PREPARE_RESULT);
       $result = $prep->execute($String);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -788,6 +788,8 @@ ORDER BY tblDigitalLibrary_DigitalContent.Title";
             $wherevars = array();
          }
 
+         isset($prepQuery) or
+            $prepQuery = new stdClass();
          $prepQuery->query = "SELECT DISTINCT tblDigitalLibrary_DigitalContent.ID,tblDigitalLibrary_DigitalContent.Title,tblDigitalLibrary_DigitalContent.ContentURL,tblDigitalLibrary_DigitalContent.Identifier FROM tblDigitalLibrary_DigitalContent $wherequery ORDER BY tblDigitalLibrary_DigitalContent.Title";
          $prepQuery->types = $wheretypes;
          $prepQuery->vars = $wherevars;
@@ -848,13 +850,13 @@ ORDER BY tblDigitalLibrary_DigitalContent.Title";
             {
                call_user_func_array(array($this->mdb2, 'setLimit'), $limitparams);
                $prep = $this->mdb2->prepare($prepQuery->query, $prepQuery->types, MDB2_PREPARE_RESULT);
-               if(PEAR::isError($prep))
+               if(pear_isError($prep))
                {
                   echo($prepQuery->query);
                   trigger_error($prep->getMessage(), E_USER_ERROR);
                }
                $result = $prep->execute($prepQuery->vars);
-               if(PEAR::isError($result))
+               if(pear_isError($result))
                {
                   trigger_error($result->getMessage(), E_USER_ERROR);
                }
@@ -1024,13 +1026,13 @@ ORDER BY tblDigitalLibrary_DigitalContent.Title";
 
       call_user_func_array(array($this->mdb2, 'setLimit'), $limitparams);
       $prep = $this->mdb2->prepare($query, $wheretypes, MDB2_PREPARE_RESULT);
-      if(PEAR::isError($prep))
+      if(pear_isError($prep))
       {
          echo($query);
          trigger_error($prep->getMessage(), E_USER_ERROR);
       }
       $result = $prep->execute($wherevars);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }

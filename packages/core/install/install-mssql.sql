@@ -436,7 +436,6 @@ INSERT INTO tblCore_UserProfileFields (ID, PackageID, UserProfileFieldCategoryID
 INSERT INTO tblCore_UserProfileFields (ID, PackageID, UserProfileFieldCategoryID, DisplayOrder, UserProfileField, DefaultValue, Required, UserEditable, InputType, PatternID, Size, MaxLength, ListDataSource) VALUES (6, '1', '1', '6', 'ZIPPlusFour', NULL, '0', '1', 'textfield', '2', '4', '4', NULL);
 INSERT INTO tblCore_UserProfileFields (ID, PackageID, UserProfileFieldCategoryID, DisplayOrder, UserProfileField, DefaultValue, Required, UserEditable, InputType, PatternID, Size, MaxLength, ListDataSource) VALUES (7, '1', '1', '7', 'Phone', NULL, '1', '1', 'textfield', '5', '15', '25', NULL);
 INSERT INTO tblCore_UserProfileFields (ID, PackageID, UserProfileFieldCategoryID, DisplayOrder, UserProfileField, DefaultValue, Required, UserEditable, InputType, PatternID, Size, MaxLength, ListDataSource) VALUES (8, '1', '1', '8', 'PhoneExtension', NULL, '0', '1', 'textfield', '2', '5', '10', NULL);
-INSERT INTO tblCore_UserProfileFields (ID, PackageID, UserProfileFieldCategoryID, DisplayOrder, UserProfileField, DefaultValue, Required, UserEditable, InputType, PatternID, Size, MaxLength, ListDataSource) VALUES (9, '1', '2', '1', 'ReceiveUpdates', '1', '1', '1', 'radio', '0', '0', '0', NULL);
 SET IDENTITY_INSERT tblCore_UserProfileFields OFF;
 
 

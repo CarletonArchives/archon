@@ -181,7 +181,7 @@ abstract class AVSAP_Archon
 
       $result = $this->mdb2->query($query);
 
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          echo $query;
          trigger_error($result->getMessage(), E_USER_ERROR);

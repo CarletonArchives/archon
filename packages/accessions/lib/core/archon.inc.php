@@ -211,7 +211,7 @@ abstract class Accessions_Archon
                call_user_func_array(array($this->mdb2, 'setLimit'), $limitparams);
                $prep = $this->mdb2->prepare($prepQuery->query, $prepQuery->types, MDB2_PREPARE_RESULT);
                $result = $prep->execute($prepQuery->vars);
-               if(PEAR::isError($result))
+               if(pear_isError($result))
                {
                   trigger_error($result->getMessage(), E_USER_ERROR);
                }
@@ -242,7 +242,218 @@ abstract class Accessions_Archon
       return $this->searchTable($SearchQuery, 'tblAccessions_ProcessingPriorities', 'ProcessingPriority', 'ProcessingPriority', 'DisplayOrder, ProcessingPriority', NULL, array(), array(), NULL, array(), array(), $Limit, $Offset);
    }
 
+   /**
+    * Retrieves an array of Accession objects that begin with
+    * the character specified by $Char
+    *
+    * @param string $Char
+    * @param integer $RepositoryID[optional]
+    * @return Collection[]
+    */
+   public function getAccessionsForChar($Char, $RepositoryID = 0, $Fields = array())
+   {
+      if(!$this->Security->verifyPermissions(MODULE_ACCESSIONS, READ))
+      {
+         $ExcludeDisabledAccessions = true;
+      }
+
+      if(!$Char)
+      {
+         $this->declareError("Could not get Accessions: Character not defined.");
+         return false;
+      }
+
+      $arrAccessions = array();
+
+      $andTypes = array();
+      $andVars = array();
+      if($ExcludeDisabledAccessions)
+      {
+         $andquery = " AND Enabled = '1'";
+      }
+
+      if(!is_array($RepositoryID) && is_natural($RepositoryID) && $RepositoryID > 0)
+      {
+         $andquery .= " AND (tblAccessions_Accessions.RepositoryID = ?)";
+         array_push($andTypes, 'integer');
+         array_push($andVars, $RepositoryID);
+      }
+      elseif($RepositoryID && is_array($RepositoryID) && !empty($RepositoryID))
+      {
+         $andquery .= " AND RepositoryID IN (";
+         $andquery .= implode(', ', array_fill(0, count($RepositoryID), '?'));
+         $andquery .= ")";
+
+         $andTypes = array_merge($andTypes, array_fill(0, count($RepositoryID), 'integer'));
+         $andVars = array_merge($andVars, $RepositoryID);
+      }
+
+
+//      if($RepositoryID && is_natural($RepositoryID))
+//      {
+//         $andquery .= " AND RepositoryID = ?";
+//         array_push($andTypes, 'integer');
+//         array_push($andVars, $RepositoryID);
+//      }
+
+      if(!empty($Fields) && is_array($Fields))
+      {
+         $tmpAccession = new Accession();
+         $badFields = array_diff($Fields, array_keys(get_object_vars($tmpAccession)));
+         if(!empty($badFields))
+         {
+            $this->declareError("Could not load Accessions: Field(s) '" . implode(',', $badFields) . "' do not exist in Class Accession.");
+            return false;
+         }
+
+         $selectFields = implode(',', $Fields);
+      }
+
+
+      $selectFields = ($selectFields) ? $selectFields : '*';
+
+      if($Char == '#')
+      {
+         $query = "SELECT {$selectFields} FROM tblAccessions_Accessions WHERE (Title LIKE '0%' OR Title LIKE '1%' OR Title LIKE '2%' OR Title LIKE '3%' OR Title LIKE '4%' OR Title LIKE '5%' OR Title LIKE '6%' OR Title LIKE '7%' OR Title LIKE '8%' OR Title LIKE '9%') $andquery ORDER BY Title";
+      }
+      else
+      {
+         $query = "SELECT {$selectFields} FROM tblAccessions_Accessions WHERE Title LIKE '{$this->mdb2->escape($Char, true)}%' $andquery ORDER BY Title";
+      }
+
+      $prep = $this->mdb2->prepare($query, $andTypes, MDB2_PREPARE_RESULT);
+      $result = $prep->execute($andVars);
+      if(pear_isError($result))
+      {
+         trigger_error($result->getMessage(), E_USER_ERROR);
+      }
+
+      while($row = $result->fetchRow())
+      {
+         $arrAccessions[$row['ID']] = New Accession($row);
+      }
+      $result->free();
+      $prep->free();
+
+      return $arrAccessions;
+   }
+
+   /**
+    * Returns the number of Accessions in the database
+    *
+    * If $Alphabetical is set to true, an array will be returned with keys of
+    * a-z, #, and * each holding the count for Accession Title starting
+    * with that character.  # represents all collections starting with a number,
+    * and * holds the total count of all collections.
+    *
+    * @param boolean $Alphabetical[optional]
+    * @param boolean $ExcludeDisabledAccessions[optional]
+    * @param integer $RepositoryID[optional]
+    * @return integer|Array
+    */
+   public function countAccessions($Alphabetical = false, $ExcludeDisabledAccessions = false, $RepositoryID = 0)
+   {
+      if(!$this->Security->verifyPermissions(MODULE_ACCESSIONS, READ))
+      {
+         $ExcludeDisabledAccessions = true;
+      }
+
+      if($ExcludeDisabledAccessions)
+      {
+         $Conditions = "Enabled = '1'";
+      }
+
+      if($RepositoryID && !is_array($RepositoryID) && is_natural($RepositoryID))
+      {
+         $Conditions .= $Conditions ? " AND RepositoryID = ?" : "RepositoryID = ?";
+         $ConditionsTypes = array('integer');
+         $ConditionsVars = array($RepositoryID);
+      }
+      elseif($RepositoryID && is_array($RepositoryID) && !empty($RepositoryID))
+      {
+         $Conditions .= $Conditions ? " AND RepositoryID IN (" : "RepositoryID IN (";
+         $Conditions .= implode(', ', array_fill(0, count($RepositoryID), '?'));
+         $Conditions .= ")";
+
+         $ConditionsTypes = array_fill(0, count($RepositoryID), 'integer');
+         $ConditionsVars = $RepositoryID;
+      }
+      else
+      {
+         $ConditionsTypes = array();
+         $ConditionsVars = array();
+      }
+
+      if($Alphabetical)
+      {
+         if($Conditions)
+         {
+            $Conditions = 'AND ' . $Conditions;
+         }
+
+         $arrIndex = array();
+         $sum = 0;
+
+         $prep = $this->mdb2->prepare("SELECT ID FROM tblAccessions_Accessions WHERE (Title LIKE '0%' OR Title LIKE '1%' OR Title LIKE '2%' OR Title LIKE '3%' OR Title LIKE '4%' OR Title LIKE '5%' OR Title LIKE '6%' OR Title LIKE '7%' OR Title LIKE '8%' OR Title LIKE '9%') $Conditions", $ConditionTypes, MDB2_PREPARE_RESULT);
+         $result = $prep->execute($ConditionsVars);
+         if(pear_isError($result))
+         {
+            trigger_error($result->getMessage(), E_USER_ERROR);
+         }
+
+         $arrIndex['#'] = $result->numRows();
+         $sum += $arrIndex['#'];
+
+         $result->free();
+         $prep->free();
+
+         $prep = $this->mdb2->prepare("SELECT ID FROM tblAccessions_Accessions WHERE Title LIKE ? $Conditions", array_merge(array('text'), $ConditionsTypes), MDB2_PREPARE_RESULT);
+         for($i = 65; $i < 91; $i++)
+         {
+            $char = chr($i);
+
+            $result = $prep->execute(array_merge(array("$char%"), $ConditionsVars));
+            if(pear_isError($result))
+            {
+               trigger_error($result->getMessage(), E_USER_ERROR);
+            }
+
+            $arrIndex[$char] = $result->numRows();
+            $arrIndex[encoding_strtolower($char)] = & $arrIndex[$char];
+            $sum += $arrIndex[$char];
+
+            $result->free();
+         }
+         $prep->free();
+
+         $arrIndex['*'] = $sum;
+
+         return $arrIndex;
+      }
+      else
+      {
+         if($Conditions)
+         {
+            $Conditions = 'WHERE ' . $Conditions;
+         }
+
+         $prep = $this->mdb2->prepare("SELECT ID FROM tblAccessions_Accessions $Conditions", $ConditionsTypes, MDB2_PREPARE_RESULT);
+         $result = $prep->execute($ConditionsVars);
+         if(pear_isError($result))
+         {
+            trigger_error($result->getMessage(), E_USER_ERROR);
+         }
+
+         $returnVal = $result->numRows();
+         $result->free();
+         $prep->free();
+
+         return $returnVal;
+      }
+   }
+
 }
+
 
 $_ARCHON->mixClasses('Archon', 'Accessions_Archon');
 ?>

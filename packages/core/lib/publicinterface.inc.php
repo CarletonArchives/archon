@@ -16,6 +16,8 @@ abstract class Core_PublicInterface
             return false;
         }
 
+        isset($objNavigation) or
+           $objNavigation = new stdClass();
         $objNavigation->Title = $Title;
         $objNavigation->URL = $URL;
 
@@ -73,14 +75,14 @@ abstract class Core_PublicInterface
        {
        ?>
 <script type="text/javascript">
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
-try{
-var pageTracker = _gat._getTracker("<?php echo($_ARCHON->config->GACode); ?>");
-pageTracker._trackPageview();
-} catch(err) {}
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', '<?php echo($_ARCHON->config->GACode); ?>']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
 </script>
        <?php
        }
@@ -125,6 +127,28 @@ pageTracker._trackPageview();
         $this->TemplateSet = $TemplateSet;
         $this->Templates = $_ARCHON->loadTemplates($this->TemplateSet);
     }
+
+   /**
+    * Executes a template.
+    *
+    * @param string $package Package whose template set contains the template file.
+    * @param string $template The name of the template, as registered in the template directory's index.php.
+    * @param array $vars An associative array of variable names, which will be extracted and supplied to the template for printout.
+    */
+	public function executeTemplate($package, $template, $vars)
+	{
+		global $_ARCHON;
+		extract($vars, EXTR_SKIP);
+
+		ob_start();
+		eval($this->Templates[$package][$template]);
+		$result = ob_get_contents();
+		ob_end_clean();
+
+		return $result;
+	}
+
+
 
     /**
      * Indicates if toString and getString functions should escape values before returning their string

@@ -41,39 +41,54 @@ $strPassword = $objPasswordPhrase ? $objPasswordPhrase->getPhraseValue(ENCODE_HT
 $objRememberMePhrase = Phrase::getPhrase('login_rememberme', PACKAGE_CORE, 0, $PublicPhrasePhraseInputTypeID);
 $strRememberMe = $objRememberMePhrase ? $objRememberMePhrase->getPhraseValue(ENCODE_HTML) : 'Remember Me';
 
-?>
-<h1 id="titleheader"><?php echo(strip_tags($_ARCHON->PublicInterface->Title)); ?></h1>
-<center>
-<input type="button" value="Register an Account" onClick="location.href='?p=core/register&amp;go=<?php echo($go); ?>';">
-<br />
-<br />
-OR
-<br />
-<br />
-</center>
-<form action="index.php" accept-charset="UTF-8" method="post">
-<div class='researchformbox bground'>
-<input type="hidden" name="p" value="<?php echo($_REQUEST['p']); ?>" />
-  <div class="userformpair">
-    <div class="userformlabel"><label for="ArchonLoginField"><?php echo($strLogin); ?>:</label></div>
-    <div class="userforminput"><input type="text" id="ArchonLoginField" name="ArchonLogin" value="<?php echo($_REQUEST['login']); ?>" maxlength="50" /></div>
-  </div>
-  <div class="userformpair">
-    <div class="userformlabel"><label for="ArchonPasswordField"><?php echo($strPassword); ?>:</label></div>
-    <div class="userforminput"><input type="password" id="ArchonPasswordField" name="ArchonPassword" /></div>
-  </div>
-  
-  <div class="userformpair">
-    <div class="userformlabel"><label for="RememberMeField"><?php echo($strRememberMe); ?>:</label></div>
-    <div class="userforminput"><input type=checkbox name="RememberMe" value="1"></div>
-  </div>
-  <div id="userformsubmit">
-    <input type="submit" value="<?php echo($strLogin); ?>" class="button" />
-  </div>
-<br/>
-<p class="center"><a href="?p=core/privacy"><?php echo($strPrivacyNote); ?></a></p>
-</div>
-</form>
-<?php
+$strPageTitle = strip_tags($strLoginTitle);
+
+$strSubmitButton = "<input type=\"submit\" value=\"$strLogin\" class=\"button\" />";
+
+$vars = array();
+
+// Why is the value for this button not internationalized?
+$registerButton = "<input type=\"button\" value=\"Register an Account\" onclick=\"location.href='?p=core/register&amp;go=$go';\" />\n";
+
+
+
+$inputs[] = array(
+	'strInputLabel' => "<label for=\"ArchonLoginFieldA\">$strLogin:</label>",
+	'strInputElement' => "<input type=\"text\" id=\"ArchonLoginFieldA\" name=\"ArchonLogin\" value=\"$_REQUEST[login]\" maxlength=\"50\" />",
+	'strRequired' => '',
+	'template' => 'FieldGeneral',
+);
+
+$inputs[] = array(
+	'strInputLabel' => "<label for=\"ArchonPasswordFieldA\">$strPassword:</label>",
+	'strInputElement' => "<input type=\"password\" id=\"ArchonPasswordFieldA\" name=\"ArchonPassword\" />",
+	'strRequired' => '',
+	'template' => 'FieldGeneral',
+);
+
+$inputs[] = array(
+	'strInputLabel' => "<label for=\"RememberMeFieldA\">$strRememberMe:</label>",
+	'strInputElement' => "<input type=\"checkbox\" name=\"RememberMe\" id=\"RememberMeFieldA\" value=\"1\" />",
+	'strRequired' => '',
+	'template' => 'FieldGeneral',
+);
+
+$form = "<input type=\"hidden\" name=\"p\" value=\"$_REQUEST[p]\" />\n";
+
+foreach($inputs as $input)
+{
+	$template = array_pop($input);
+	$form .= $_ARCHON->PublicInterface->executeTemplate('core', $template, $input);
+}
+
+
+echo("<form action=\"index.php\" accept-charset=\"UTF-8\" method=\"post\">\n");
+
+if(!$_ARCHON->Error)
+{
+	eval($_ARCHON->PublicInterface->Templates['core']['Login']);
+}
+
+print "</form>\n";
 require_once("footer.inc.php");
 ?>

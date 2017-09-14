@@ -14,12 +14,18 @@ echo("<h1 id='titleheader'>" . strip_tags($_ARCHON->PublicInterface->Title) . "<
 $arrClassifications = $_ARCHON->getChildClassifications($objClassification->ID);
 $arrCollections = $_ARCHON->getCollectionsForClassification($objClassification->ID, true);
 
+//echo ("<pre>");
+//var_dump ($objClassification->Creator);
+//echo ("</pre>");
+
 
 if ($objClassification->Description)
 {
    echo("<div id='classificationdesc' class='mdround'>$objClassification->Description</div>"); 
     
 }
+
+
 
 if(!empty($arrClassifications))
 {
@@ -46,7 +52,8 @@ if(!empty($arrClassifications))
         echo($objChildClassification->toString(LINK_TOTAL, false, true) . "</div>\n");
     }
     echo('</div>');
-}
+    
+    }
 
 
 if(!empty($arrCollections))
@@ -54,8 +61,23 @@ if(!empty($arrCollections))
 	$objRecordsFiledUnderPhrase = Phrase::getPhrase('classifications_recordsfiledunder', PACKAGE_COLLECTIONS, 0, PHRASETYPE_PUBLIC);
     $strRecordsFiledUnder = $objRecordsFiledUnderPhrase ? $objRecordsFiledUnderPhrase->getPhraseValue(ENCODE_HTML) : 'Records filed under "$1"';
     $strRecordsFiledUnder = str_replace('$1', $objClassification->toString(LINK_NONE, false, true, false, false), $strRecordsFiledUnder);
+    
 
-	echo("<br/><div class='listitemhead bold'>$strRecordsFiledUnder</div><br/><br/>");
+	echo("<br/><div class='listitemhead bold'>$strRecordsFiledUnder");
+
+    if(!empty($objClassification->Creator))
+	{
+   
+	echo ("&nbsp;&nbsp;&nbsp;<span style='font-weight:normal'><a href='?p=creators/creator&id=". $objClassification->Creator->ID ."'>Show Name Authority File</a><span>");
+
+	}
+	
+	
+	echo ("</div><br/>");
+
+
+	
+	
 	echo("<div id='recordsunderlist' class='bground'><div class='listitemcover'></div>");
     foreach($arrCollections as $objCollection)
     {

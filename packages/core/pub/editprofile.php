@@ -79,195 +79,290 @@ function editprofile_form()
     $strConfirmPassword = $objConfirmPasswordPhrase ? $objConfirmPasswordPhrase->getPhraseValue(ENCODE_HTML) : 'Confirm Password';
     $objPrivacyNotePhrase = Phrase::getPhrase('editprofile_privacynote', PACKAGE_CORE, 0, PHRASETYPE_PUBLIC);
     $strPrivacyNote = $objPrivacyNotePhrase ? $objPrivacyNotePhrase->getPhraseValue(ENCODE_HTML) : 'Privacy Note';
-?>
-<h1 id="titleheader"><?php echo(strip_tags($_ARCHON->PublicInterface->Title)); ?></h1>
-<form action="index.php" accept-charset="UTF-8" method="post">
-<div class='userformbox bground'>
-<input type="hidden" name="p" value="<?php echo($_REQUEST['p']); ?>" />
-<input type="hidden" name="f" value="store" />
-<input type="hidden" name="id" value="<?php echo($_ARCHON->Security->Session->User->ID); ?>" />
-  <p class="center">
-    <span class="bold"><?php echo($_ARCHON->PublicInterface->Title); ?></span><br/>
-    <?php echo($strRequired); ?>
-  </p>
-  <div class="userformpair">
-    <div class="userformlabel"><label for="EmailField"><?php echo($strEmail); ?>:</label></div>
-    <div class="userforminput"><input type="text" id="EmailField" name="Email" value="<?php echo($_ARCHON->Security->Session->User->Email); ?>" maxlength="50" /> <span style="color:red">*</span></div>
-  </div>
-  <div class="userformpair">
-    <div class="userformlabel"><label for="FirstNameField"><?php echo($strFirstName); ?>:</label></div>
-    <div class="userforminput"><input type="text" id="FirstNameField" name="FirstName" value="<?php echo($_ARCHON->Security->Session->User->FirstName); ?>" maxlength="50" /> <span style="color:red">*</span></div>
-  </div>
-  <div class="userformpair">
-    <div class="userformlabel"><label for="LastNameField"><?php echo($strLastName); ?>:</label></div>
-    <div class="userforminput"><input type="text" id="LastNameField" name="LastName" value="<?php echo($_ARCHON->Security->Session->User->LastName); ?>" maxlength="50" /> <span style="color:red">*</span></div>
-  </div>
-  <div class="userformpair">
-    <div class="userformlabel"><label for="DisplayNameField"><?php echo($strDisplayName); ?>:</label></div>
-    <div class="userforminput"><input type="text" id="DisplayNameField" name="DisplayName" value="<?php echo($_ARCHON->Security->Session->User->DisplayName); ?>" maxlength="100" /> <span style="color:red">*</span></div>
-  </div>
-  <div class="userformpair">
-    <div class="userformlabel"><label for="PasswordField"><?php echo($strPassword); ?>:</label></div>
-    <div class="userforminput"><input type="password" id="PasswordField" name="Password" /></div>
-  </div>
-  <div class="userformpair">
-    <div class="userformlabel"><label for="ConfirmPasswordField"><?php echo($strConfirmPassword); ?>:</label></div>
-    <div class="userforminput"><input type="password" id="ConfirmPasswordField" name="ConfirmPassword" /></div>
-  </div>
-  <div class="userformpair">
-    <div class="userformlabel"><label for="LanguangeIDField"><?php echo($strLanguage); ?>:</label></div>
-    <div class="userforminput">
-      <select id="LanguangeIDField" name="LanguageID">
-        <option value="0"><?php echo($strSelectOne); ?></option>
-<?php
+
+	$strPageTitle = strip_tags($_ARCHON->PublicInterface->Title);
+
+	$strUserID = $_ARCHON->Security->Session->User->ID;
+
+	$strRequiredMarker = "<span style=\"color:red\">*</span>";
+	$strSubmitButton = "<input type=\"submit\" value=\"$strSubmit\" class=\"button\" />";
+
+	$inputs = array();
+
+	$strEmailValue = $_ARCHON->Security->Session->User->Email;
+	$inputs[] = array(
+		'strInputLabel' => "<label for=\"EmailField\">$strEmail:</label>",
+		'strInputElement' => "<input type=\"text\" id=\"EmailField\" name=\"Email\" value=\"$strEmailValue\" maxlength=\"50\" />",
+		'strRequired' => $strRequiredMarker,
+		'template' => 'FieldGeneral',
+	);
+
+
+	$strFirstNameValue = $_ARCHON->Security->Session->User->FirstName;
+	$inputs[] = array(
+		'strInputLabel' => "<label for=\"FirstNameField\">$strFirstName:</label>",
+		'strInputElement' => "<input type=\"text\" id=\"FirstNameField\" name=\"FirstName\" value=\"$strFirstNameValue\" maxlength=\"50\" />",
+		'strRequired' => $strRequiredMarker,
+		'template' => 'FieldGeneral',
+	);
+
+
+	$strLastNameValue = $_ARCHON->Security->Session->User->LastName;
+	$inputs[] = array(
+		'strInputLabel' => "<label for=\"LastNameField\">$strLastName:</label>",
+		'strInputElement' => "<input type=\"text\" id=\"LastNameField\" name=\"LastName\" value=\"$strLastNameValue\" maxlength=\"50\" />",
+		'strRequired' => $strRequiredMarker,
+		'template' => 'FieldGeneral',
+	);
+
+
+	$strDisplayNameValue = $_ARCHON->Security->Session->User->DisplayName;
+	$inputs[] = array(
+		'strInputLabel' => "<label for=\"DisplayNameField\">$strDisplayName:</label>",
+		'strInputElement' => "<input type=\"text\" id=\"DisplayNameField\" name=\"DisplayName\" value=\"$strDisplayNameValue\" maxlength=\"100\" />",
+		'strRequired' => $strRequiredMarker,
+		'template' => 'FieldGeneral',
+	);
+
+
+	$inputs[] = array(
+		'strInputLabel' => "<label for=\"PasswordField\">$strPassword:</label>",
+		'strInputElement' => "<input type=\"password\" id=\"PasswordField\" name=\"Password\" />",
+		'strRequired' => '',
+		'template' => 'FieldGeneral',
+	);
+
+
+
+	$inputs[] = array(
+		'strInputLabel' => "<label for=\"ConfirmPasswordField\">$strConfirmPassword:</label>",
+		'strInputElement' => "<input type=\"password\" id=\"ConfirmPasswordField\" name=\"ConfirmPassword\" />",
+		'strRequired' => '',
+		'template' => 'FieldGeneral',
+	);
+
+
+	$strLangSelect = <<<EOT
+<select id="LanguangeIDField" name="LanguangeID">
+		<option value="0">$strSelectOne</option>
+EOT;
+
 	if(!empty($arrLanguages))
 	{
-	    foreach($arrLanguages as $objLanguage)
-	    {
-	        $selected = ($_ARCHON->Security->Session->User->LanguageID == $objLanguage->ID) ? ' selected' : '';
-	
-	        echo("        <option value=\"$objLanguage->ID\"$selected>" . $objLanguage->toString() . "</option>");
-	    }
+		foreach($arrLanguages as $objLanguage)
+		{
+            $selected = ($_ARCHON->Security->Session->User->LanguageID == $objLanguage->ID) ? ' selected="selected"' : '';
+			$strLangSelect .= "		<option value=\"$objLanguage->ID\"$selected>" . $objLanguage->toString() . "</option>\n";
+		}
 	}
-?>
-      </select>
-    </div>
-  </div>
-  <div class="userformpair">
-    <div class="userformlabel"><label for="CountryIDField"><?php echo($strCountry); ?>:</label></div>
-    <div class="userforminput">
-      <select id="CountryIDField" name="CountryID">
-        <option value="0"><?php echo($strSelectOne); ?></option>
-<?php
-    if(!empty($arrCountries))
-    {
-        foreach($arrCountries as $objCountry)
-        {
-            $selected = ($UserCountryID == $objCountry->ID) ? ' selected' : '';
-    
-            echo("        <option value=\"$objCountry->ID\"$selected>" . $objCountry->toString() . "</option>");
-        }
-    }
-?>
-      </select><span style="color:red">*</span>
-    </div>
-  </div>
-<?php
-    
+
+	$strLangSelect .= '</select>';
+
+	$inputs[] = array(
+		'strInputLabel' => "<label for=\"LanguangeIDField\">$strLanguage:</label>",
+		'strInputElement' => $strLangSelect,
+		'strRequired' => '',
+		'template' => 'FieldGeneral',
+	);
+
+
+	$strCountrySelect = <<<EOT
+<select id="CountryIDField" name="CountryID">
+		<option value="0">$strSelectOne</option>
+EOT;
+
+	if(!empty($arrCountries))
+	{
+		foreach($arrCountries as $objCountry)
+		{
+            $selected = ($UserCountryID == $objCountry->ID) ? ' selected="selected"' : '';
+			$strCountrySelect .= "		<option value=\"$objCountry->ID\"$selected>" . $objCountry->toString() . "</option>\n";
+		}
+	}
+
+	$strCountrySelect .= '</select>';
+
+	$inputs[] = array(
+		'strInputLabel' => "<label for=\"CountryIDField\">$strCountry:</label>",
+		'strInputElement' => $strCountrySelect,
+		'strRequired' => $strRequiredMarker,
+		'template' => 'FieldGeneral',
+	);
+
     $prevUserProfileFieldCategoryID = 0;
     
     $_ARCHON->Security->Session->User->dbLoadUserProfileFields();
-        
+
+	// Loop through the fields and add them to the form.
     foreach($_ARCHON->Security->Session->User->UserProfileFields as $Key => $objUserProfileField)
     {
     	if(is_natural($Key) && $objUserProfileField->UserEditable && (empty($objUserProfileField->Countries) || isset($objUserProfileField->Countries[$UserCountryID])))
     	{
+
+
+			// Handle section headings
     	    if($prevUserProfileFieldCategoryID != $objUserProfileField->UserProfileFieldCategoryID)
             {
-?>
-  <div class="userformpair">
-    <div class="userformlabel"><label for="UserProfileFieldCategory<?php echo($objUserProfileField->UserProfileFieldCategoryID); ?>"><b><?php echo($objUserProfileField->UserProfileFieldCategory->toString()); ?></b></label></div>
-    <div class="userforminput">&nbsp;</div>
-  </div>
-<?php
+				$inputs[] = array(
+					'strSectionHeading' => $objUserProfileField->UserProfileFieldCategory->toString(),
+					'template' => 'FieldCategory',
+				);
+
                 $prevUserProfileFieldCategoryID = $objUserProfileField->UserProfileFieldCategoryID;
             }
-            
+
+
 		$objUserProfileFieldPhrase = Phrase::getPhrase('editprofile_' . strtolower($objUserProfileField->UserProfileField), PACKAGE_CORE, 0, PHRASETYPE_PUBLIC);
 	        $strUserProfileField = $objUserProfileFieldPhrase ? $objUserProfileFieldPhrase->getPhraseValue(ENCODE_HTML) : $objUserProfileField->UserProfileField;
 	        
-	        $required = $objUserProfileField->Required || (isset($objUserProfileField->Countries[$UserCountryID]) && $objUserProfileField->Countries[$UserCountryID]->Required) ? '<span style="color:red">*</span>' : '';
+	        $required = $objUserProfileField->Required || (isset($objUserProfileField->Countries[$UserCountryID]) && $objUserProfileField->Countries[$UserCountryID]->Required) ? $strRequiredMarker : '';
 	        $value = isset($_REQUEST['userprofilefields'][$objUserProfileField->ID]['value']) ? $_REQUEST['userprofilefields'][$objUserProfileField->ID]['value'] : $_ARCHON->Security->Session->User->UserProfileFields[$objUserProfileField->ID]->Value;
+
+
 	
 	        if($objUserProfileField->InputType == 'radio')
 	        {
-	        	if($value)
-			    {
-			        $checkedYes = ' checked';
-			        $checkedNo = '';
-			    }
-			    else
-			    {
-			        $checkedYes = '';
-			        $checkedNo = ' checked';
-			    }
-?>
-  <div class="userformpair">
-    <div class="userformlabel"><label for="<?php echo($objUserProfileField->UserProfileField); ?>Field"><?php echo($strUserProfileField); ?>:</label></div>
-    <div class="userforminput"><input type="radio" id="<?php echo($objUserProfileField->UserProfileField); ?>Yes" name="UserProfileFields[<?php echo($objUserProfileField->ID); ?>][Value]" value="1"<?php echo($checkedYes);?> /><?php echo($strYes); ?><input type="radio" id="<?php echo($objUserProfileField->UserProfileField); ?>No" name="UserProfileFields[<?php echo($objUserProfileField->ID); ?>][Value]" value="0"<?php echo($checkedNo);?>  /><?php echo($strNo); ?></div>
-  </div>
-<?php
+				if($value)
+				{
+					$checkedYes = ' checked="checked"';
+					$checkedNo = '';
+				}
+				else
+				{
+					$checkedYes = '';
+					$checkedNo = ' checked="checked"';
+				}
+
+				$idYes = $objUserProfileField->UserProfileField.'Yes';
+				$idNo = $objUserProfileField->UserProfileField.'No';
+
+				$inputName = "UserProfileFields[".$objUserProfileField->ID."][Value]";
+
+				$radioButtons = <<<EOT
+				<fieldset>
+					<legend>$strUserProfileField $required</legend>
+					<label for="$idYes"><input type="radio" id="$idYes" name="$inputName" value="1"$checkedYes />$strYes</label>
+					<label for="$idNo"><input type="radio" id="$idNo" name="$inputName" value="0"$checkedNo  />$strNo</label>
+				</fieldset>
+EOT;
+
+				$inputs[] = array(
+					'strInput' => $radioButtons,
+					'template' => 'radio',
+				);
 	        }
+
+
 	        elseif($objUserProfileField->InputType == 'select')
 	        {
 	            $arrSelectChoices = call_user_func(array($_ARCHON, $objUserProfileField->ListDataSource));
-?>
-  <div class="userformpair">
-    <div class="userformlabel"><label for="<?php echo($objUserProfileField->UserProfileField); ?>Field"><?php echo($strUserProfileField); ?>:</label></div>
-    <div class="userforminput">
-      <select id="<?php echo($objUserProfileField->UserProfileField); ?>Field" name="UserProfileFields[<?php echo($objUserProfileField->ID); ?>][Value]">
-        <option value="0"><?php echo($strSelectOne); ?></option>
-<?php
-	            if(!empty($arrSelectChoices))
-	            {
-	                foreach($arrSelectChoices as $obj)
-	                {
-	                    if(!property_exists($obj, 'CountryID') || !isset($obj->CountryID) || $obj->CountryID == $UserCountryID)
-                        {
-                            $selected = ($value == $obj->ID) ? ' selected' : '';
+				$id = $objUserProfileField->UserProfileField.'Field';
+				$fieldName = $objUserProfileField->ID;
 
-                            echo("        <option value=\"$obj->ID\"$selected>" . $obj->toString() . "</option>");
-                        }
-	                }
-	            }
-?>
-      </select> <?php echo($required); ?>
-    </div>
-  </div>
-<?php
+if($id == 'StateProvinceIDField'){
+	ob_start();
+	print "<pre>";
+	var_dump($arrSelectChoices);
+	print "</pre>";
+	$details = ob_get_contents();
+	ob_end_clean();
+	//print $details;
+}
+
+				$strInput = <<<EOT
+      <select id="$id" name="UserProfileFields[$fieldName][Value]">
+        <option value="0">$strSelectOne</option>
+EOT;
+
+                if(!empty($arrSelectChoices))
+                {
+                    foreach($arrSelectChoices as $obj)
+                    {
+                    	if(!property_exists($obj, 'CountryID') || !isset($obj->CountryID) || $obj->CountryID == $UserCountryID)
+                    	{
+                            $selected = ($value == $obj->ID) ? ' selected="selected"' : '';
+                            $strInput .= "        <option value=\"$obj->ID\"$selected>" . $obj->toString() . "</option>";
+                    	}
+                    }
+                }
+
+			$strInput .= "      </select>";
+
+				$inputs[] = array(
+					'strInputLabel' => "<label for=\"$id\">$strUserProfileField:</label>",
+					'strInputElement' => $strInput,
+					'strRequired' => $required,
+					'template' => 'FieldGeneral',
+				);
 	        }
+
+
 	        elseif($objUserProfileField->InputType == 'textarea')
 	        {
-?>
-  <div class="userformpair">
-    <div class="userformlabel"><label for="<?php echo($objUserProfileField->UserProfileField); ?>Field"><?php echo($strUserProfileField); ?>:</label></div>
-    <div class="userforminput"><textarea id="<?php echo($objUserProfileField->UserProfileField); ?>Field" name="UserProfileFields[<?php echo($objUserProfileField->ID); ?>][Value]" rows="<?php echo($objUserProfileField->Size); ?>" cols="50"><?php echo($value); ?></textarea> <?php echo($required); ?></div>
-  </div>
-<?php
+				$id = $objUserProfileField->UserProfileField.'Field';
+				$fieldName = $objUserProfileField->ID;
+				$size = $objUserProfileField->Size;
+
+				$inputs[] = array(
+					'strInputLabel' => "<label for=\"$id\">$strUserProfileField:</label>",
+					'strInputElement' => "<textarea id=\"$id\" name=\"UserProfileFields[$fieldName][Value]\" rows=\"$size\" cols=\"50\">$value</textarea>",
+					'strRequired' => $required,
+					'template' => 'FieldTextArea',
+				);
 	        }
-	   		elseif($objUserProfileField->InputType == 'textfield')
+
+
+	   		elseif($objUserProfileField->InputType == 'textfield' || $objUserProfileField->InputType == 'timestamp')
 	   		{
-?>
-  <div class="userformpair">
-    <div class="userformlabel"><label for="<?php echo($objUserProfileField->UserProfileField); ?>Field"><?php echo($strUserProfileField); ?>:</label></div>
-    <div class="userforminput"><input type="text" id="<?php echo($objUserProfileField->UserProfileField); ?>Field" name="UserProfileFields[<?php echo($objUserProfileField->ID); ?>][Value]" value="<?php echo($value); ?>" size="<?php echo($objUserProfileField->Size); ?>" maxlength="<?php echo($objUserProfileField->MaxLength); ?>" /> <?php echo($required); ?></div>
-  </div>
-<?php
-   		    }
-            elseif($objUserProfileField->InputType == 'timestamp')
-            {
-                if($value && is_natural($value))
+                if($value && is_natural($value) && $objUserProfileField->InputType == 'timestamp')
                 {
                     $value = date(CONFIG_CORE_DATE_FORMAT, $value);
                 }
-?>
-  <div class="userformpair">
-    <div class="userformlabel"><label for="<?php echo($objUserProfileField->UserProfileField); ?>Field"><?php echo($strUserProfileField); ?>:</label></div>
-    <div class="userforminput"><input type="text" id="<?php echo($objUserProfileField->UserProfileField); ?>Field" name="UserProfileFields[<?php echo($objUserProfileField->ID); ?>][Value]" value="<?php echo($value); ?>" size="<?php echo($objUserProfileField->Size); ?>" maxlength="<?php echo($objUserProfileField->MaxLength); ?>" /> <?php echo($required); ?></div>
-  </div>
-<?php
-            }
+
+				$id = $objUserProfileField->UserProfileField.'Field';
+				$fieldName = $objUserProfileField->ID;
+				$size = $objUserProfileField->Size;
+				$maxLength = $objUserProfileField->MaxLength;
+
+				$inputs[] = array(
+					'strInputLabel' => "<label for=\"$id\">$strUserProfileField:</label>",
+					'strInputElement' => "<input type=\"text\" id=\"$id\" name=\"UserProfileFields[$fieldName][Value]\" value=\"$value\" size=\"$size\" maxlength=\"$maxLength\" />",
+					'strRequired' => $required,
+					'template' => 'FieldGeneral',
+				);
+   		    }
     	}
     }
-?>
-  <div id="userformsubmit">
-    <input type="submit" value="<?php echo($strSubmit); ?>" class="button" />
-  </div>
-<br/>
-<p class="center"><a href="?p=core/privacy"><?php echo($strPrivacyNote); ?></a></p>
-</div>
-</form>
-<?php
+
+	$strSubmitButton = "<input type=\"submit\" value=\"$strSubmit\" class=\"button\" />";
+
+
+	echo("<form action=\"index.php\" accept-charset=\"UTF-8\" method=\"post\">\n");
+
+
+	$form = "<input type=\"hidden\" name=\"p\" value=\"$_REQUEST[p]\" />\n";
+	$form .= "<input type=\"hidden\" name=\"f\" value=\"store\" />\n";
+	$form .= "<input type=\"hidden\" name=\"id\" value=\"$strUserID\" />\n";
+
+	foreach($inputs as $input)
+	{
+		$template = array_pop($input);
+		if($template != 'radio')
+		{
+			$form .= $_ARCHON->PublicInterface->executeTemplate('core', $template, $input);
+		}
+		else
+		{
+			$form .= $input['strInput'];
+		}
+	}
+
+	if(!$_ARCHON->Error)
+	{
+		eval($_ARCHON->PublicInterface->Templates['core']['EditProfile']);
+	}
+
+	echo("</form>\n");
     require_once("footer.inc.php");
 }
 

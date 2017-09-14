@@ -6,7 +6,11 @@
  * @author Chris Rishel
  */
 
-set_magic_quotes_runtime(0);
+
+
+if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+	set_magic_quotes_runtime(false);
+}
 
 if(!$_REQUEST)
 {
@@ -62,13 +66,19 @@ if($_ARCHON->db->ServerType == 'MSSQL')
 $phpservertype = strtolower($_ARCHON->db->ServerType);
 $dbdsn = $phpservertype."://".$_ARCHON->db->Login.":".$_ARCHON->db->Password."@".$_ARCHON->db->ServerAddress."/".$_ARCHON->db->DatabaseName;
 
+// MDB2 with MySQLi seems to require this encoding to handle UTF8 characters in Archon's tables.
+if($_ARCHON->db->ServerType == 'MySQL')
+{
+   $dbdsn .= "?CharSet=utf8";
+}
+
 $_ARCHON->QueryLog = New QueryLog();
 
 $dboptions = array('debug' => 1, 'debug_handler' => array($_ARCHON->QueryLog, 'logQuery'), 'portability' => MDB2_PORTABILITY_ALL ^ MDB2_PORTABILITY_FIX_CASE);
 
-$mdb2 =& MDB2::connect($dbdsn, $dboptions);
+$mdb2 = MDB2::connect($dbdsn, $dboptions);
 
-if (PEAR::isError($mdb2))
+if (pear_isError($mdb2))
 {
    echo("Error connecting to database!<br />\n");
    trigger_error($mdb2->getMessage(), E_USER_ERROR);
@@ -82,7 +92,7 @@ if($_ARCHON->db->ServerType == 'MySQL' || $_ARCHON->db->ServerType == 'MySQLi')
    // this makes sure the encoding for the queries is expected
    $query = "SET NAMES 'utf8'";
    $affected = $_ARCHON->mdb2->exec($query);
-   if (PEAR::isError($affected))
+   if (pear_isError($affected))
    {
       trigger_error($affected->getMessage(), E_USER_ERROR);
    }

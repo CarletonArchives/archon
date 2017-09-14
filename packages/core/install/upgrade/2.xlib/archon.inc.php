@@ -568,7 +568,7 @@ abstract class Core_Archon
         {
             $query = "SHOW TABLE STATUS";
             $result = $this->mdb2->query($query);
-            if (PEAR::isError($result)) {
+            if (pear_isError($result)) {
                 trigger_error($result->getMessage(), E_USER_ERROR);
             }
 
@@ -590,7 +590,7 @@ abstract class Core_Archon
 
             $query = "DBCC showfilestats;";
             $result = $this->mdb2->query($query);
-            if(!PEAR::isError($result))
+            if(!pear_isError($result))
             {
                 $row = $result->fetchRow();
                 $result->free();
@@ -598,7 +598,7 @@ abstract class Core_Archon
 
             // Fixes weird issue where SQL Server doesn't like the immediate next query.
             $this->mdb2->query("SELECT * FROM tblCore_Configuration WHERE 1 = 0;");
-            if(!PEAR::isError($result))
+            if(!pear_isError($result))
             {
                 $row = $result->fetchRow();
                 $result->free();
@@ -610,7 +610,7 @@ abstract class Core_Archon
             {
                 $query = "sp_MStablespace {$this->mdb2->quoteIdentifier($tblName)}";
                 $result = $this->mdb2->query($query);
-                if(!PEAR::isError($result))
+                if(!pear_isError($result))
                 {
                     $usagerow = $result->fetchRow();
                     $result->free();
@@ -727,7 +727,7 @@ abstract class Core_Archon
         }
 
         $result = $checkPreps[$strClassName]->execute($ID);
-        if (PEAR::isError($result)) {
+        if (pear_isError($result)) {
             trigger_error($result->getMessage(), E_USER_ERROR);
         }
 
@@ -750,7 +750,7 @@ abstract class Core_Archon
         	}
 
         	$result = $childdrenPreps[$strClassName]->execute($ID);
-            if (PEAR::isError($result)) {
+            if (pear_isError($result)) {
                 trigger_error($result->getMessage(), E_USER_ERROR);
             }
 
@@ -768,7 +768,7 @@ abstract class Core_Archon
         }
 
         $affected = $deletePreps[$strClassName]->execute($ID);
-        if (PEAR::isError($affected)) {
+        if (pear_isError($affected)) {
             trigger_error($affected->getMessage(), E_USER_ERROR);
         }
 
@@ -1072,7 +1072,7 @@ abstract class Core_Archon
             }
 
             $result = $prep->execute($ID);
-	        if (PEAR::isError($result)) {
+	        if (pear_isError($result)) {
 	            trigger_error($result->getMessage(), E_USER_ERROR);
 	        }
             while($row = $result->fetchRow())
@@ -1135,7 +1135,7 @@ abstract class Core_Archon
 
         $query = "SELECT tblCore_Packages.* FROM tblCore_Packages WHERE 1 = 1 $ExcludeDisabledPackagesQuery ORDER BY APRCode";
         $result = $this->mdb2->query($query);
-        if (PEAR::isError($result)) {
+        if (pear_isError($result)) {
             trigger_error($result->getMessage(), E_USER_ERROR);
         }
 
@@ -1466,7 +1466,7 @@ abstract class Core_Archon
         $this->mdb2->setLimit(1);
         $prep = $this->mdb2->prepare('SELECT ID FROM tblCore_Languages WHERE LanguageLong LIKE ? OR LanguageShort LIKE ?', array('text', 'text'), MDB2_PREPARE_RESULT);
         $result = $prep->execute(array($String, $String));
-        if (PEAR::isError($result)) {
+        if (pear_isError($result)) {
             trigger_error($result->getMessage(), E_USER_ERROR);
         }
 
@@ -1524,7 +1524,7 @@ abstract class Core_Archon
         $this->mdb2->setLimit(1);
         $prep = $this->mdb2->prepare('SELECT ID FROM tblCore_Modules WHERE Script = ?', 'text', MDB2_PREPARE_RESULT);
         $result = $prep->execute($Script);
-        if (PEAR::isError($result)) {
+        if (pear_isError($result)) {
             trigger_error($result->getMessage(), E_USER_ERROR);
         }
 
@@ -1552,7 +1552,7 @@ abstract class Core_Archon
         $this->mdb2->setLimit(1);
         $prep = $this->mdb2->prepare('SELECT ID FROM tblCore_Packages WHERE APRCode = ?', 'text', MDB2_PREPARE_RESULT);
         $result = $prep->execute($APRCode);
-        if (PEAR::isError($result)) {
+        if (pear_isError($result)) {
             trigger_error($result->getMessage(), E_USER_ERROR);
         }
 
@@ -1772,7 +1772,7 @@ abstract class Core_Archon
             {
                 // Load all phrases with same package id, module id, phrase type id, and language id.
                 $result = $prepAll->execute(array($LanguageID, $PhraseTypeID, $PackageID, $ModuleID));
-                if (PEAR::isError($result)) {
+                if (pear_isError($result)) {
                     trigger_error($result->getMessage(), E_USER_ERROR);
                 }
 
@@ -1787,7 +1787,7 @@ abstract class Core_Archon
             else
             {
             	$result = $prepOne->execute(array($LanguageID, $PhraseName, $PhraseTypeID, $PackageID, $ModuleID));
-                if (PEAR::isError($result)) {
+                if (pear_isError($result)) {
                     trigger_error($result->getMessage(), E_USER_ERROR);
                 }
 
@@ -1814,7 +1814,7 @@ abstract class Core_Archon
             {
                 // Load all phrases with same package id, module id, phrase type id, and language id.
                 $result = $prepAll->execute(array(CONFIG_CORE_DEFAULT_LANGUAGE, $PhraseTypeID, $PackageID, $ModuleID));
-                if (PEAR::isError($result)) {
+                if (pear_isError($result)) {
                     trigger_error($result->getMessage(), E_USER_ERROR);
                 }
 
@@ -1829,7 +1829,7 @@ abstract class Core_Archon
             else
             {
                 $result = $prepOne->execute(array(CONFIG_CORE_DEFAULT_LANGUAGE, $PhraseName, $PhraseTypeID, $PackageID, $ModuleID));
-                if (PEAR::isError($result)) {
+                if (pear_isError($result)) {
                     trigger_error($result->getMessage(), E_USER_ERROR);
                 }
 
@@ -1883,7 +1883,7 @@ abstract class Core_Archon
         }
 
         $result = $prep->execute($String);
-        if (PEAR::isError($result)) {
+        if (pear_isError($result)) {
             trigger_error($result->getMessage(), E_USER_ERROR);
         }
         $row = $result->fetchRow();
@@ -2027,7 +2027,7 @@ abstract class Core_Archon
         $this->mdb2->setLimit(1);
         $prep = $this->mdb2->prepare('SELECT ID FROM tblCore_Usergroups WHERE Usergroup = ?', 'text', MDB2_PREPARE_RESULT);
         $result = $prep->execute($Usergroup);
-        if (PEAR::isError($result)) {
+        if (pear_isError($result)) {
             trigger_error($result->getMessage(), E_USER_ERROR);
         }
 
@@ -2062,7 +2062,7 @@ abstract class Core_Archon
         $this->mdb2->setLimit(1);
         $prep = $this->mdb2->prepare('SELECT ID FROM tblCore_Users WHERE Login = ?', 'text', MDB2_PREPARE_RESULT);
         $result = $prep->execute($Login);
-        if (PEAR::isError($result)) {
+        if (pear_isError($result)) {
             trigger_error($result->getMessage(), E_USER_ERROR);
         }
         $row = $result->fetchRow();
@@ -2113,7 +2113,7 @@ abstract class Core_Archon
 
         $this->mdb2->loadModule('Manager');
         $arrTables = $this->mdb2->listTables();
-	    if (PEAR::isError($arrTables)) {
+	    if (pear_isError($arrTables)) {
 	        trigger_error($arrTables->getMessage(), E_USER_ERROR);
 	    }
 
@@ -2140,7 +2140,7 @@ abstract class Core_Archon
 
         $query = "SELECT * FROM tblCore_Configuration ORDER BY Directive";
         $result = $this->mdb2->query($query);
-        if (PEAR::isError($result)) {
+        if (pear_isError($result)) {
             trigger_error($result->getMessage(), E_USER_ERROR);
         }
 
@@ -2387,7 +2387,7 @@ abstract class Core_Archon
             }
             else if(!file_exists("packages/$Package/admin/$Script.php"))
             {
-                $this->declareError("Script $Script does not exist in Package $Package.");
+                $this->declareError("Script $Script does123 not exist in Package $Package.");
 
                 $arrP[0] = $arrDefaultPubP[0];
                 $arrP[1] = $arrDefaultPubP[1];
@@ -2416,7 +2416,7 @@ abstract class Core_Archon
             }
             else if(!file_exists("packages/$Package/pub/$Script.php"))
             {
-                $this->declareError("Script $Script does not exist in Package $Package.");
+                $this->declareError("Script $Script does77 not exist in Package $Package.");
 
                 $Package = $arrDefaultPubP[0];
                 $Script = $arrDefaultPubP[1];
@@ -2530,7 +2530,7 @@ abstract class Core_Archon
         static $loadPreps = array();
         $loadPreps[$Table] = $loadPreps[$Table] ? $loadPreps[$Table] : $this->mdb2->prepare("SELECT * FROM {$this->mdb2->quoteIdentifier($Table)} WHERE ID = ?", 'integer', MDB2_PREPARE_RESULT);
         $result = $loadPreps[$Table]->execute($Object->ID);
-        if (PEAR::isError($result)) {
+        if (pear_isError($result)) {
             trigger_error($result->getMessage(), E_USER_ERROR);
         }
         $row = $result->fetchRow();
@@ -2707,7 +2707,7 @@ abstract class Core_Archon
         }
 
         $affected = $prep->execute(array($TableName, $ID, time(), $UserID, $Login, getenv('REMOTE_ADDR'), $ModuleID, $in_f, $request));
-        if (PEAR::isError($affected)) {
+        if (pear_isError($affected)) {
             trigger_error($affected->getMessage(), E_USER_ERROR);
         }
     }
@@ -3240,7 +3240,7 @@ abstract class Core_Archon
             $parentExistsPreps[$strClassName] = $this->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
             }
             $result = $parentExistsPreps[$strClassName]->execute($Object->ParentID);
-            if (PEAR::isError($result)) {
+            if (pear_isError($result)) {
                 trigger_error($result->getMessage(), E_USER_ERROR);
             }
             
@@ -3263,7 +3263,7 @@ abstract class Core_Archon
         	}
 
         	$result = $checkPreps[$strClassName][$checkquery]->execute($CheckVars[$key]);
-            if (PEAR::isError($result)) {
+            if (pear_isError($result)) {
                 trigger_error($result->getMessage(), E_USER_ERROR);
             }
 
@@ -3317,19 +3317,19 @@ abstract class Core_Archon
             {
 	            $query = "INSERT INTO {$this->mdb2->quoteIdentifier($Table)} (" . implode(', ', $arrQuotedColumns) . ") VALUES (" . implode(', ', $arrQuestions) . ")";
 	            $insertPreps[$strClassName][serialize($IgnoredFields)] = $this->mdb2->prepare($query, $arrTypes, MDB2_PREPARE_MANIP);
-	            if (PEAR::isError($insertPreps[$strClassName][serialize($IgnoredFields)])) {
+	            if (pear_isError($insertPreps[$strClassName][serialize($IgnoredFields)])) {
 	            	echo($query);
 	            	trigger_error($insertPreps[$strClassName][serialize($IgnoredFields)]->getMessage(), E_USER_ERROR);
 	            }
             }
             
             $affected = $insertPreps[$strClassName][serialize($IgnoredFields)]->execute($arrVars);
-            if (PEAR::isError($affected)) {
+            if (pear_isError($affected)) {
                 trigger_error($affected->getMessage(), E_USER_ERROR);
             }
 
             $result = $checkPreps[$strClassName][reset($CheckQueries)]->execute(reset($CheckVars));
-            if (PEAR::isError($result)) {
+            if (pear_isError($result)) {
                 trigger_error($result->getMessage(), E_USER_ERROR);
             }
 
@@ -3353,7 +3353,7 @@ abstract class Core_Archon
 
             $existPreps[$strClassName] = $existPreps[$strClassName] ? $existPreps[$strClassName] : $this->mdb2->prepare("SELECT ID FROM {$this->mdb2->quoteIdentifier($Table)} WHERE ID = ?", 'integer', MDB2_PREPARE_RESULT);
             $result = $existPreps[$strClassName]->execute($Object->ID);
-            if (PEAR::isError($result)) {
+            if (pear_isError($result)) {
                 trigger_error($result->getMessage(), E_USER_ERROR);
             }
 
@@ -3412,13 +3412,13 @@ abstract class Core_Archon
             {
                 $query = "UPDATE {$this->mdb2->quoteIdentifier($Table)} SET " . implode(', ', $arrQuotedColumnQuestions) . " WHERE ID = ?";
 	        $updatePreps[$strClassName][serialize($IgnoredFields)] = $this->mdb2->prepare($query, $arrTypes, MDB2_PREPARE_MANIP);
-                if (PEAR::isError($updatePreps[$strClassName][serialize($IgnoredFields)])) {
+                if (pear_isError($updatePreps[$strClassName][serialize($IgnoredFields)])) {
                     trigger_error($updatePreps[$strClassName][serialize($IgnoredFields)]->getMessage(), E_USER_ERROR);
                 }
             }
 
             $affected = $updatePreps[$strClassName][serialize($IgnoredFields)]->execute($arrVars);
-            if (PEAR::isError($affected)) {
+            if (pear_isError($affected)) {
                 trigger_error($affected->getMessage(), E_USER_ERROR);
             }
 
@@ -3501,7 +3501,7 @@ abstract class Core_Archon
         $query = "SELECT * FROM {$this->mdb2->quoteIdentifier($Table)} $ConditionQuery $OrderByQuery";
         $prep = $this->mdb2->prepare($query, $ConditionTypes, MDB2_PREPARE_RESULT);
         $result = $prep->execute($ConditionVars);
-        if (PEAR::isError($result)) {
+        if (pear_isError($result)) {
             trigger_error($result->getMessage(), E_USER_ERROR);
         }
 
@@ -3745,7 +3745,7 @@ abstract class Core_Archon
         call_user_func_array(array($this->mdb2, 'setLimit'), $limitparams);
         $prep = $this->mdb2->prepare($query, $wheretypes, MDB2_PREPARE_RESULT);
         $result = $prep->execute($wherevars);
-        if (PEAR::isError($result)) {
+        if (pear_isError($result)) {
             trigger_error($result->getMessage(), E_USER_ERROR);
         }
 

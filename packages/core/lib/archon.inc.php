@@ -34,6 +34,9 @@ abstract class Core_Archon
          return false;
       }
 
+      isset($this->db->ImportUtilities[$PackageID][$UtilityCode]) or
+         $this->db->ImportUtilities[$PackageID][$UtilityCode] = new stdClass();
+
       if(file_exists("packages/{$this->Packages[$PackageID]->APRCode}/db/interfaces/import-{$UtilityCode}-interface.inc.php"))
       {
          $this->db->ImportUtilities[$PackageID][$UtilityCode]->InterfaceFile = "packages/{$this->Packages[$PackageID]->APRCode}/db/interfaces/import-{$UtilityCode}-interface.inc.php";
@@ -62,6 +65,9 @@ abstract class Core_Archon
          $this->declareError("Could not add DatabaseExportUtility: Package {$this->Packages[$PackageID]->APRCode} version $PackageVersion must be installed (installed version is {$this->Packages[$Package]->DBVersion}).");
          return false;
       }
+
+      isset($this->db->ExportUtilities[$PackageID][$UtilityCode]) or
+         $this->db->ExportUtilities[$PackageID][$UtilityCode] = new stdClass();
 
       if(file_exists("packages/{$this->Packages[$PackageID]->APRCode}/db/interfaces/export-{$UtilityCode}-interface.inc.php"))
       {
@@ -586,7 +592,7 @@ abstract class Core_Archon
 
       if($String)
       {
-         $arrWords = split(" ", $String);
+         $arrWords = explode(" ", $String);
       }
 
       if(!empty($phrases))
@@ -642,13 +648,15 @@ abstract class Core_Archon
       {
          $query = "SHOW TABLE STATUS";
          $result = $this->mdb2->query($query);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
 
          while($row = $result->fetchRow())
          {
+            isset($dbStats->Tables[$row['Name']]) or
+               $dbStats->Tables[$row['Name']] = new stdClass();
             $dbStats->Tables[$row['Name']]->Rows = $row['Rows'];
             $dbStats->Tables[$row['Name']]->DiskUsed = formatsize($row['Data_length'] + $row['Index_length']);
             $useddiskspace += $row['Data_length'] + $row['Index_length'];
@@ -665,7 +673,7 @@ abstract class Core_Archon
 
          $query = "DBCC showfilestats;";
          $result = $this->mdb2->query($query);
-         if(!PEAR::isError($result))
+         if(!pear_isError($result))
          {
             $row = $result->fetchRow();
             $result->free();
@@ -673,7 +681,7 @@ abstract class Core_Archon
 
          // Fixes weird issue where SQL Server doesn't like the immediate next query.
          $this->mdb2->query("SELECT * FROM tblCore_Configuration WHERE 1 = 0;");
-         if(!PEAR::isError($result))
+         if(!pear_isError($result))
          {
             $row = $result->fetchRow();
             $result->free();
@@ -685,7 +693,7 @@ abstract class Core_Archon
          {
             $query = "sp_MStablespace {$this->mdb2->quoteIdentifier($tblName)}";
             $result = $this->mdb2->query($query);
-            if(!PEAR::isError($result))
+            if(!pear_isError($result))
             {
                $usagerow = $result->fetchRow();
                $result->free();
@@ -717,6 +725,8 @@ abstract class Core_Archon
       $mdb2Tables = $this->mdb2->listTables();
       foreach($mdb2Tables as $tblName)
       {
+         isset($dbStructure[$tblName]) or
+            $dbStructure[$tblName] = new stdClass();
          $dbStructure[$tblName]->Columns = array();
 
          $mdb2TableInfo = $this->mdb2->tableInfo($tblName);
@@ -798,7 +808,7 @@ abstract class Core_Archon
       }
 
       $result = $checkPreps[$strClassName]->execute($ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -822,7 +832,7 @@ abstract class Core_Archon
          }
 
          $result = $childdrenPreps[$strClassName]->execute($ID);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -841,7 +851,7 @@ abstract class Core_Archon
       }
 
       $affected = $deletePreps[$strClassName]->execute($ID);
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -888,13 +898,13 @@ abstract class Core_Archon
 
          $preps[$Table][$KeyField] = $this->mdb2->prepare($query, array('integer'), MDB2_PREPARE_MANIP);
 
-         if(PEAR::isError($preps[$Table][$KeyField]))
+         if(pear_isError($preps[$Table][$KeyField]))
          {
             trigger_error($preps[$Table][$KeyField]->getMessage(), E_USER_ERROR);
          }
       }
       $affected = $preps[$Table][$KeyField]->execute($KeyValue);
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -1241,7 +1251,7 @@ abstract class Core_Archon
       $query = 'SELECT tblCore_Modules.* FROM tblCore_Modules INNER JOIN tblCore_Packages ON (tblCore_Modules.PackageID = tblCore_Packages.ID) WHERE 1=1' . $ExcludeDisabledPackagesQuery . ' ORDER BY tblCore_Packages.APRCode, tblCore_Modules.Script';
 
       $result = $this->mdb2->query($query);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -1312,7 +1322,7 @@ abstract class Core_Archon
 
       $query = "SELECT tblCore_Packages.* FROM tblCore_Packages WHERE 1 = 1 $ExcludeDisabledPackagesQuery ORDER BY APRCode";
       $result = $this->mdb2->query($query);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -1562,8 +1572,8 @@ abstract class Core_Archon
 
       foreach($arrUsers as &$objUser)
       {
-         $objUser->dbLoadUsergroups();
-         $objUser->dbLoadPermissions();
+         $objUser->dbLoadUsergroupIDs();
+		 $objUser->dbLoadRepositoryIDs();
       }
 
       $arrUsers[-1] = New User(-1);
@@ -1607,7 +1617,7 @@ abstract class Core_Archon
 
       $prep = $this->mdb2->prepare('SELECT * FROM tblCore_UserProfileFieldCountryIndex', NULL, MDB2_PREPARE_RESULT);
       $result = $prep->execute();
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -1644,7 +1654,7 @@ abstract class Core_Archon
 //      $this->mdb2->setLimit(1);
 //      $prep = $this->mdb2->prepare('SELECT ID FROM tblCore_Countries WHERE ISOAlpha2 = ?', 'text', MDB2_PREPARE_RESULT);
 //      $result = $prep->execute($ISOAlpha2);
-//      if (PEAR::isError($result))
+//      if (pear_isError($result))
 //      {
 //         trigger_error($result->getMessage(), E_USER_ERROR);
 //      }
@@ -1770,7 +1780,7 @@ abstract class Core_Archon
 
          $result = $this->mdb2->query("SELECT LastUpdated,VersionNumber FROM tblCore_VersionCache WHERE VersionName = 'Version';");
          
-         if(!PEAR::isError($result) && $result->numRows())
+         if(!pear_isError($result) && $result->numRows())
          {
             $row = $result->fetchRow();
             if($date > $row['LastUpdated'])
@@ -1778,13 +1788,13 @@ abstract class Core_Archon
                $version = @file_get_contents($this->ArchonURL . 'sys/version.php?aprcode=core');
                $query = "UPDATE tblCore_VersionCache SET VersionNumber = ?, LastUpdated = ?  WHERE VersionName = ? ";
                $prep = $this->mdb2->prepare($query, array('text', 'date', 'text'), MDB2_PREPARE_MANIP);
-               if(PEAR::isError($prep))
+               if(pear_isError($prep))
                {
                   trigger_error($prep->getMessage(), E_USER_ERROR);
                }
 
                $affected = $prep->execute(array($version, $date, 'Version'));
-               if(PEAR::isError($affected))
+               if(pear_isError($affected))
                {
                   trigger_error($affected->getMessage(), E_USER_ERROR);
                }
@@ -1803,10 +1813,10 @@ abstract class Core_Archon
 
             $query = "INSERT INTO tblCore_VersionCache (VersionName, VersionNumber, LastUpdated) VALUES (?, ?, ?)";
             $prep = $this->mdb2->prepare($query, array('text', 'text', 'date'), MDB2_PREPARE_MANIP);
-            if(!PEAR::isError($prep))
+            if(!pear_isError($prep))
             {
                $affected = $prep->execute(array('Version', $version, $date));
-               if(PEAR::isError($affected))
+               if(pear_isError($affected))
                {
                   trigger_error($affected->getMessage(), E_USER_ERROR);
                }
@@ -1842,13 +1852,13 @@ abstract class Core_Archon
                $revision = @file_get_contents($this->ArchonURL . 'sys/version.php?type=revision');
                $query = "UPDATE tblCore_VersionCache SET VersionNumber = ?, LastUpdated = ?  WHERE VersionName = ? ";
                $prep = $this->mdb2->prepare($query, array('text', 'date', 'text'), MDB2_PREPARE_MANIP);
-               if(PEAR::isError($prep))
+               if(pear_isError($prep))
                {
                   trigger_error($prep->getMessage(), E_USER_ERROR);
                }
 
                $affected = $prep->execute(array($revision, $date, 'Revision'));
-               if(PEAR::isError($affected))
+               if(pear_isError($affected))
                {
                   trigger_error($prep->getMessage(), E_USER_ERROR);
                }
@@ -1867,13 +1877,13 @@ abstract class Core_Archon
 
             $query = "INSERT INTO tblCore_VersionCache (VersionName, VersionNumber, LastUpdated) VALUES (?, ?, ?)";
             $prep = $this->mdb2->prepare($query, array('text', 'text', 'date'), MDB2_PREPARE_MANIP);
-            if(PEAR::isError($prep))
+            if(pear_isError($prep))
             {
                trigger_error($prep->getMessage(), E_USER_ERROR);
             }
 
             $affected = $prep->execute(array('Revision', $revision, $date));
-            if(PEAR::isError($affected))
+            if(pear_isError($affected))
             {
                trigger_error($affected->getMessage(), E_USER_ERROR);
             }
@@ -1909,13 +1919,13 @@ abstract class Core_Archon
                $version = @file_get_contents($this->ArchonURL . 'sys/version.php?aprcode=' . $APRCode);
                $query = "UPDATE tblCore_VersionCache SET VersionNumber = ?, LastUpdated = ?  WHERE VersionName = ? ";
                $prep = $this->mdb2->prepare($query, array('text', 'date', 'text'), MDB2_PREPARE_MANIP);
-               if(PEAR::isError($prep))
+               if(pear_isError($prep))
                {
                   trigger_error($prep->getMessage(), E_USER_ERROR);
                }
 
                $affected = $prep->execute(array($version, $date, $APRCode));
-               if(PEAR::isError($affected))
+               if(pear_isError($affected))
                {
                   trigger_error($affected->getMessage(), E_USER_ERROR);
                }
@@ -1934,13 +1944,13 @@ abstract class Core_Archon
 
             $query = "INSERT INTO tblCore_VersionCache (VersionName, VersionNumber, LastUpdated) VALUES (?, ?, ?)";
             $prep = $this->mdb2->prepare($query, array('text', 'text', 'date'), MDB2_PREPARE_MANIP);
-            if(PEAR::isError($prep))
+            if(pear_isError($prep))
             {
                trigger_error($prep->getMessage(), E_USER_ERROR);
             }
 
             $affected = $prep->execute(array($APRCode, $version, $date));
-            if(PEAR::isError($affected))
+            if(pear_isError($affected))
             {
                trigger_error($affected->getMessage(), E_USER_ERROR);
             }
@@ -1969,7 +1979,7 @@ abstract class Core_Archon
       $this->mdb2->setLimit(1);
       $prep = $this->mdb2->prepare('SELECT ID FROM tblCore_Modules WHERE Script = ?', 'text', MDB2_PREPARE_RESULT);
       $result = $prep->execute($Script);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -1996,7 +2006,7 @@ abstract class Core_Archon
       $this->mdb2->setLimit(1);
       $prep = $this->mdb2->prepare('SELECT ID FROM tblCore_Packages WHERE APRCode = ?', 'text', MDB2_PREPARE_RESULT);
       $result = $prep->execute($APRCode);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -2185,7 +2195,7 @@ abstract class Core_Archon
       $this->mdb2->setLimit(1);
       $prep = $this->mdb2->prepare('SELECT ID FROM tblCore_Usergroups WHERE Usergroup = ?', 'text', MDB2_PREPARE_RESULT);
       $result = $prep->execute($Usergroup);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -2217,7 +2227,7 @@ abstract class Core_Archon
       $this->mdb2->setLimit(1);
       $prep = $this->mdb2->prepare('SELECT ID FROM tblCore_Users WHERE Login = ?', 'text', MDB2_PREPARE_RESULT);
       $result = $prep->execute($Login);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -2243,7 +2253,7 @@ abstract class Core_Archon
       $this->mdb2->setLimit(1);
       $prep = $this->mdb2->prepare('SELECT ID FROM tblCore_UserProfileFields WHERE UserProfileField = ?', 'text', MDB2_PREPARE_RESULT);
       $result = $prep->execute($UserProfileField);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -2260,11 +2270,11 @@ abstract class Core_Archon
    {
       $this->mdb2->setLimit(1);
       $result = $this->mdb2->query("SELECT ID FROM tblCore_Configuration");
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          $this->mdb2->setLimit(1);
          $result = $this->mdb2->query("SELECT ID FROM tblArchon_Configuration");
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             // Most likely tblCore_Configuration does not exist, assume older than 2.00
             header("Location: index.php?p=upgrade");
@@ -2350,7 +2360,7 @@ abstract class Core_Archon
       $this->Version = $this->Packages['core']->Version;
 
 
-      $arrDependencies = array_merge($this->Packages['core']->DependedUponBy, $this->Packages['core']->EnhancedBy);
+      $arrDependencies = array_merge((array)$this->Packages['core']->DependedUponBy, (array)$this->Packages['core']->EnhancedBy);
 
       while(!empty($arrDependencies))
       {
@@ -2368,7 +2378,7 @@ abstract class Core_Archon
          }
          else
          {
-            foreach(array_keys(array_merge($this->Packages[$Dependency]->DependedUponBy, $this->Packages[$Dependency]->EnhancedBy)) as $ChildDependency)
+            foreach(array_keys(array_merge((array)$this->Packages[$Dependency]->DependedUponBy, (array)$this->Packages[$Dependency]->EnhancedBy)) as $ChildDependency)
             {
                if($arrSeen[$ChildDependency] && !isset($arrTopologicalSort[$ChildDependency]))
                {
@@ -2437,13 +2447,6 @@ abstract class Core_Archon
       $this->RootDirectory = getcwd();
 
       $this->Packages = $this->getAllPackages();
-//
-//      if($this->Packages['core']->DBVersion <= '2.23' && !$_POST['upgrader'])
-//      {
-//         echo($this->Packages['core']->DBVersion);
-////         header("Location: index.php?p=upgrade");
-//         die($this->Packages['core']->DBVersion);
-//      }
 
       $this->initPackages();
       $this->initModules();
@@ -2465,7 +2468,31 @@ abstract class Core_Archon
       }
 
       $this->Security = New Security();
+          
+      if(defined('PACKAGE_COLLECTIONS'))
+      {
+         if($this->Security->Session->ResearchCart)
+         {
+            if($this->Security->isAuthenticated() && $this->Security->userHasAdministrativeAccess() == false)
+            {                
+                $arrImplodedEntries = explode(',', $this->Security->Session->getRemoteVariable('Cart'));
 
+                if(!empty($arrImplodedEntries))
+                {
+                    foreach($arrImplodedEntries as $strIDs)
+                    {
+                        if($strIDs)
+                        {
+                            list($CollectionID, $CollectionContentID) = explode(':', $strIDs);                            
+                            $this->Security->Session->User->dbAddToCart($CollectionID, $CollectionContentID);
+                        }
+                    }
+                }
+                
+                $this->Security->Session->unsetRemoteVariable('Cart', true);
+            }
+         }
+      }
 
       if(isset($_REQUEST['unsetadmintheme']))
       {
@@ -2659,7 +2686,7 @@ abstract class Core_Archon
          eval("\$result = {$MixinClass}::initialize();");
       }
    }
-
+   
    /**
     * Loads argument object with information from the database
     *
@@ -2731,7 +2758,7 @@ abstract class Core_Archon
       static $loadPreps = array();
       $loadPreps[$Table][$fieldsPrepKey] = $loadPreps[$Table][$fieldsPrepKey] ? $loadPreps[$Table][$fieldsPrepKey] : $this->mdb2->prepare("SELECT {$selectFields} FROM {$this->mdb2->quoteIdentifier($Table)} WHERE ID = ?", 'integer', MDB2_PREPARE_RESULT);
       $result = $loadPreps[$Table][$fieldsPrepKey]->execute($Object->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -2892,13 +2919,13 @@ abstract class Core_Archon
 
       $query = "DELETE FROM tblCore_ModificationLog where Timestamp <= ?";
       $prep = $this->mdb2->prepare($query, 'integer', MDB2_PREPARE_MANIP);
-      if(PEAR::isError($prep))
+      if(pear_isError($prep))
       {
          trigger_error($prep->getMessage(), E_USER_ERROR);
       }
 
       $affected = $prep->execute($Timestamp);
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -2949,7 +2976,7 @@ abstract class Core_Archon
       }
 
       $affected = $prep->execute(array($TableName, $ID, time(), $UserID, $Login, getenv('REMOTE_ADDR'), $ModuleID, $in_f, $request));
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -3465,7 +3492,7 @@ abstract class Core_Archon
       if($RepositoryID)
       {
          $repository = New Repository($RepositoryID);
-         $repsository->dbLoad();
+         $repository->dbLoad();
       }
       else
       {
@@ -3512,7 +3539,7 @@ abstract class Core_Archon
             {
                top.frames['message'].location.href='?p=admin/core/index&f=message&msg=' + msg;
             }
-            elseif(parent.window.opener && parent.window.opener.top.frames['message'])
+            else if(parent.window.opener && parent.window.opener.top.frames['message'])
             {
                parent.window.opener.top.frames['message'].location.href='?p=admin/core/index&f=message&msg=' + msg;
             }
@@ -3600,6 +3627,18 @@ abstract class Core_Archon
          trigger_error("Could not set Mixin method parameters: Callback Function $Callback is not callable", E_USER_ERROR);
       }
 
+      isset($this->Mixins) or
+         $this->Mixins = array();
+      isset($this->Mixins[$ClassName]) or
+         $this->Mixins[$ClassName] = new stdClass();
+      isset($this->Mixins[$ClassName]->Methods) or
+         $this->Mixins[$ClassName]->Methods = array();
+      isset($this->Mixins[$ClassName]->Methods[$Method]) or
+         $this->Mixins[$ClassName]->Methods[$Method] = new stdClass();
+      isset($this->Mixins[$ClassName]->Methods[$Method]->Parameters) or
+         $this->Mixins[$ClassName]->Methods[$Method]->Parameters = array();
+      isset($this->Mixins[$ClassName]->Methods[$Method]->Parameters[$MixinClassName]) or
+         $this->Mixins[$ClassName]->Methods[$Method]->Parameters[$MixinClassName] = new stdClass();
       $this->Mixins[$ClassName]->Methods[$Method]->Parameters[$MixinClassName]->Callback = $Callback;
       $this->Mixins[$ClassName]->Methods[$Method]->Parameters[$MixinClassName]->MixOrder = $MixOrder;
 
@@ -3689,7 +3728,7 @@ abstract class Core_Archon
             $parentExistsPreps[$strClassName] = $this->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
          }
          $result = $parentExistsPreps[$strClassName]->execute($Object->ParentID);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -3710,14 +3749,14 @@ abstract class Core_Archon
          if(!isset($checkPreps[$strClassName][$checkquery]))
          {
             $checkPreps[$strClassName][$checkquery] = $this->mdb2->prepare($checkquery, $CheckTypes[$key], MDB2_PREPARE_RESULT);
-            if(PEAR::isError($checkPreps[$strClassName][$checkquery]))
+            if(pear_isError($checkPreps[$strClassName][$checkquery]))
             {
                trigger_error($checkPreps[$strClassName][$checkquery]->getMessage(), E_USER_ERROR);
             }
          }
 
          $result = $checkPreps[$strClassName][$checkquery]->execute($CheckVars[$key]);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -3777,7 +3816,7 @@ abstract class Core_Archon
          {
             $query = "INSERT INTO {$this->mdb2->quoteIdentifier($Table)} (" . implode(', ', $arrQuotedColumns) . ") VALUES (" . implode(', ', $arrQuestions) . ")";
             $insertPreps[$strClassName][serialize($IgnoredFields)] = $this->mdb2->prepare($query, $arrTypes, MDB2_PREPARE_MANIP);
-            if(PEAR::isError($insertPreps[$strClassName][serialize($IgnoredFields)]))
+            if(pear_isError($insertPreps[$strClassName][serialize($IgnoredFields)]))
             {
                echo($query);
                trigger_error($insertPreps[$strClassName][serialize($IgnoredFields)]->getMessage(), E_USER_ERROR);
@@ -3785,7 +3824,7 @@ abstract class Core_Archon
          }
 
          $affected = $insertPreps[$strClassName][serialize($IgnoredFields)]->execute($arrVars);
-         if(PEAR::isError($affected))
+         if(pear_isError($affected))
          {
             print_r($insertPreps[$strClassName][serialize($IgnoredFields)]->query);
             print_r($arrVars);
@@ -3793,7 +3832,7 @@ abstract class Core_Archon
          }
 
          $result = $checkPreps[$strClassName][reset($CheckQueries)]->execute(reset($CheckVars));
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -3818,7 +3857,7 @@ abstract class Core_Archon
 
          $existPreps[$strClassName] = $existPreps[$strClassName] ? $existPreps[$strClassName] : $this->mdb2->prepare("SELECT ID FROM {$this->mdb2->quoteIdentifier($Table)} WHERE ID = ?", 'integer', MDB2_PREPARE_RESULT);
          $result = $existPreps[$strClassName]->execute($Object->ID);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -3883,14 +3922,14 @@ abstract class Core_Archon
          {
             $query = "UPDATE {$this->mdb2->quoteIdentifier($Table)} SET " . implode(', ', $arrQuotedColumnQuestions) . " WHERE ID = ?";
             $updatePreps[$strClassName][serialize($IgnoredFields)] = $this->mdb2->prepare($query, $arrTypes, MDB2_PREPARE_MANIP);
-            if(PEAR::isError($updatePreps[$strClassName][serialize($IgnoredFields)]))
+            if(pear_isError($updatePreps[$strClassName][serialize($IgnoredFields)]))
             {
                trigger_error($updatePreps[$strClassName][serialize($IgnoredFields)]->getMessage(), E_USER_ERROR);
             }
          }
 
          $affected = $updatePreps[$strClassName][serialize($IgnoredFields)]->execute($arrVars);
-         if(PEAR::isError($affected))
+         if(pear_isError($affected))
          {
             trigger_error($affected->getMessage(), E_USER_ERROR);
          }
@@ -3985,7 +4024,7 @@ abstract class Core_Archon
       $query = "SELECT ID,{$this->mdb2->quoteIdentifier($NameField)} FROM {$this->mdb2->quoteIdentifier($Table)} {$ConditionQuery} {$OrderByQuery}";
       $prep = $this->mdb2->prepare($query, $ConditionTypes, MDB2_PREPARE_RESULT);
       $result = $prep->execute($ConditionVars);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -4018,10 +4057,14 @@ abstract class Core_Archon
     * @param string $ClassName
     * @param string $OrderBy[optional]
     * @param string $Condition[optional]
+    * @param string $ConditionTypes[optional]
+    * @param string $ConditionVarsl[optional]
+    * @param boolean $NoMemoryCache[optional]
+    * @param array $SelectFields[optional]
+    * @param boolean $LoadParents[optional]
     * @return $ClassName[]
     */
-   public function loadTable($Table, $ClassName, $OrderBy = NULL, $Condition = NULL, $ConditionTypes = NULL, $ConditionVars = NULL, $NoMemoryCache = false, $SelectFields = array())
-   {
+   public function loadTable($Table, $ClassName, $OrderBy = NULL, $Condition = NULL, $ConditionTypes = NULL, $ConditionVars = NULL, $NoMemoryCache = false, $SelectFields = array(), $LoadParents = true)   {
       if(!$Table)
       {
          $this->declareError("Could not load Table: Table Name not defined.");
@@ -4082,7 +4125,7 @@ abstract class Core_Archon
       $query = "SELECT {$selectFields} FROM {$this->mdb2->quoteIdentifier($Table)} {$ConditionQuery} {$OrderByQuery}";
       $prep = $this->mdb2->prepare($query, $ConditionTypes, MDB2_PREPARE_RESULT);
       $result = $prep->execute($ConditionVars);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -4100,11 +4143,11 @@ abstract class Core_Archon
       $result->free();
       $prep->free();
 
-      if(!empty($arrParents))
+      if(!empty($arrParents) && $LoadParents == true)
       {
          foreach($arrParents as $ID => $ParentID)
          {
-            if($arrObjects[$ParentID])
+            if($arrObjects[$ParentID] )
             {
                if(!$NoMemoryCache)
                {
@@ -4202,7 +4245,7 @@ abstract class Core_Archon
          }
 
          $result = $currentPreps[$strClassName][$RelatedClassName]->execute($Object->ID);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -4281,7 +4324,7 @@ abstract class Core_Archon
          if(isset($existPreps[$RelatedClassName]))
          {
             $result = $existPreps[$RelatedClassName]->execute($newRelatedID);
-            if(PEAR::isError($result))
+            if(pear_isError($result))
             {
                trigger_error($result->getMessage(), E_USER_ERROR);
             }
@@ -4299,7 +4342,7 @@ abstract class Core_Archon
          }
 
          $result = $checkPreps[$strClassName][$RelatedClassName]->execute(array($Object->ID, $newRelatedID));
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -4317,13 +4360,13 @@ abstract class Core_Archon
 
 
          $affected = $insertPreps[$strClassName][$RelatedClassName]->execute(array($Object->ID, $newRelatedID));
-         if(PEAR::isError($affected))
+         if(pear_isError($affected))
          {
             trigger_error($affected->getMessage(), E_USER_ERROR);
          }
 
          $result = $checkPreps[$strClassName][$RelatedClassName]->execute(array($Object->ID, $newRelatedID));
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -4348,7 +4391,7 @@ abstract class Core_Archon
 
 
          $result = $checkPreps[$strClassName][$RelatedClassName]->execute(array($Object->ID, $newUnrelatedID));
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -4367,13 +4410,13 @@ abstract class Core_Archon
          }
 
          $affected = $deletePreps[$strClassName][$RelatedClassName]->execute(array($Object->ID, $newUnrelatedID));
-         if(PEAR::isError($affected))
+         if(pear_isError($affected))
          {
             trigger_error($affected->getMessage(), E_USER_ERROR);
          }
 
          $result = $checkPreps[$strClassName][$RelatedClassName]->execute(array($Object->ID, $newUnrelatedID));
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -4637,7 +4680,7 @@ abstract class Core_Archon
       call_user_func_array(array($this->mdb2, 'setLimit'), $limitparams);
       $prep = $this->mdb2->prepare($query, $wheretypes, MDB2_PREPARE_RESULT);
       $result = $prep->execute($wherevars);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -4670,7 +4713,7 @@ abstract class Core_Archon
       $query = "SELECT * FROM {$this->mdb2->quoteIdentifier($Table)} WHERE {$this->dbSerialize($Params, " AND ", false)}";
       $result = $this->mdb2->query($query);
 
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          echo($query);
          var_dump($Params);
@@ -4695,7 +4738,7 @@ abstract class Core_Archon
          $affected = $this->mdb2->exec($query);
 
 
-         if(PEAR::isError($affected))
+         if(pear_isError($affected))
          {
             echo($query);
             trigger_error($result->getMessage(), E_USER_ERROR);
@@ -4760,7 +4803,7 @@ abstract class Core_Archon
     *
     * @var int
     */
-   public $CopyrightYear = 2011;
+   public $CopyrightYear = 2017;
    public $db = NULL;
    /**
     * When this variable is set to true, Archon is disabled to the public.
@@ -4801,11 +4844,11 @@ abstract class Core_Archon
    /**
     * @var string
     */
-   public $ReleaseDate = '2011.7.5';
+   public $ReleaseDate = '2017.6.26';
    /**
     * @var string
     */
-   public $Revision = '';
+   public $Revision = '3';
    /**
     * Repository object containing the default repository
     * (unless specified otherwise by setrepositoryid

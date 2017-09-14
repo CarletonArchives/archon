@@ -130,11 +130,6 @@ function core_install_install1()
    <strong>Welcome to Archon!</strong><br /><br />
    Click next to begin.
 </p>
-<div class="notice box">
-   Note: When you install Archon, the IP address of your webserver
-   is transmitted to us so we may
-   keep it in a secure database and aid you should any issues
-   arise with the software. Our webserver will respond with your own installation ID.</div>
 
    <?php
    output_install_footer();
@@ -404,8 +399,8 @@ function core_install_install6()
 {
    global $_ARCHON, $currentstep, $totalsteps, $disablenext, $onsubmit;
    //@TODO: set timeout here or something
-   $InstallationID = @file_get_contents('http://www.archon.org/sys/getid.php?version=' . urlencode($_ARCHON->Version));
-
+//   $InstallationID = @file_get_contents('http://www.archon.org/sys/getid.php?version=' . urlencode($_ARCHON->Version));
+   $InstallationID = rand(10000, getrandmax());
    if($InstallationID && is_natural($InstallationID))
    {
       $query = "UPDATE tblCore_Configuration SET Value = '$InstallationID' WHERE Directive = 'Installation ID'";
@@ -737,7 +732,7 @@ function core_install_install8()
          $result = $_ARCHON->mdb2->query($query);
          $row = $result->fetchRow();
 
-         @file_get_contents('http://www.archon.org/sys/updaterepository.php?installationid=' . $row['Value'] . '&' . http_build_query($objRepository));
+//         @file_get_contents('http://www.archon.org/sys/updaterepository.php?installationid=' . $row['Value'] . '&' . http_build_query($objRepository));
       }
    }
 

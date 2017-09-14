@@ -115,7 +115,7 @@ abstract class Accessions_Accession
          $creatorsPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_MANIP);
       }
       $affected = $creatorsPrep->execute($ID);
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -128,7 +128,7 @@ abstract class Accessions_Accession
          $subjectsPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_MANIP);
       }
       $affected = $subjectsPrep->execute($ID);
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -141,7 +141,7 @@ abstract class Accessions_Accession
          $collectionPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_MANIP);
       }
       $affected = $collectionPrep->execute($ID);
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -302,7 +302,7 @@ abstract class Accessions_Accession
          $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $prep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -365,7 +365,7 @@ abstract class Accessions_Accession
       $query = "SELECT ID FROM tblAccessions_AccessionCollectionIndex WHERE AccessionID = ? ORDER BY PrimaryCollection DESC";
       $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       $result = $prep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -435,7 +435,7 @@ abstract class Accessions_Accession
       $query = "SELECT tblAccessions_AccessionLocationIndex.* FROM tblAccessions_AccessionLocationIndex JOIN tblCollections_Locations ON tblCollections_Locations.ID = tblAccessions_AccessionLocationIndex.LocationID WHERE tblAccessions_AccessionLocationIndex.AccessionID = ? ORDER BY tblAccessions_AccessionLocationIndex.Content, tblCollections_Locations.Location, tblAccessions_AccessionLocationIndex.RangeValue, tblAccessions_AccessionLocationIndex.Section, tblAccessions_AccessionLocationIndex.Shelf";
       $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       $result = $prep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -494,7 +494,7 @@ abstract class Accessions_Accession
       $query = "SELECT tblSubjects_Subjects.* FROM tblSubjects_Subjects JOIN tblAccessions_AccessionSubjectIndex ON tblSubjects_Subjects.ID = tblAccessions_AccessionSubjectIndex.SubjectID WHERE tblAccessions_AccessionSubjectIndex.AccessionID = ?";
       $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       $result = $prep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -620,7 +620,7 @@ abstract class Accessions_Accession
          $existPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $existPrep->execute($CreatorID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -641,7 +641,7 @@ abstract class Accessions_Accession
          $checkPrep = $_ARCHON->mdb2->prepare($checkquery, array('integer', 'integer'), MDB2_PREPARE_RESULT);
       }
       $result = $checkPrep->execute(array($this->ID, $CreatorID));
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -666,7 +666,7 @@ abstract class Accessions_Accession
          $primaryPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $primaryPrep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -687,13 +687,13 @@ abstract class Accessions_Accession
          $insertPrep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer', 'integer'), MDB2_PREPARE_MANIP);
       }
       $affected = $insertPrep->execute(array($this->ID, $CreatorID, $PrimaryCreator));
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
 
       $result = $checkPrep->execute(array($this->ID, $CreatorID));
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -775,7 +775,7 @@ abstract class Accessions_Accession
          $existPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $existPrep->execute($SubjectID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -796,7 +796,7 @@ abstract class Accessions_Accession
          $checkPrep = $_ARCHON->mdb2->prepare($checkquery, array('integer', 'integer'), MDB2_PREPARE_RESULT);
       }
       $result = $checkPrep->execute(array($this->ID, $SubjectID));
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -817,13 +817,13 @@ abstract class Accessions_Accession
          $insertPrep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer'), MDB2_PREPARE_MANIP);
       }
       $affected = $insertPrep->execute(array($this->ID, $SubjectID));
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
 
       $result = $checkPrep->execute(array($this->ID, $SubjectID));
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -1006,7 +1006,7 @@ abstract class Accessions_Accession
          $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_MANIP);
       }
       $affected = $prep->execute($this->ID);
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -1019,7 +1019,7 @@ abstract class Accessions_Accession
          $checkprep = $_ARCHON->mdb2->prepare($checkquery, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $checkprep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -1088,7 +1088,7 @@ abstract class Accessions_Accession
          $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_MANIP);
       }
       $affected = $prep->execute($this->ID);
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -1101,7 +1101,7 @@ abstract class Accessions_Accession
          $checkprep = $_ARCHON->mdb2->prepare($checkquery, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $checkprep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -1183,7 +1183,7 @@ abstract class Accessions_Accession
          $checkprep = $_ARCHON->mdb2->prepare($checkquery, array('integer', 'integer'), MDB2_PREPARE_RESULT);
       }
       $result = $checkprep->execute(array($this->ID, $CreatorID));
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -1206,13 +1206,13 @@ abstract class Accessions_Accession
          $prep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer'), MDB2_PREPARE_MANIP);
       }
       $affected = $prep->execute(array($this->ID, $CreatorID));
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
 
       $result = $checkprep->execute(array($this->ID, $CreatorID));
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -1287,7 +1287,7 @@ abstract class Accessions_Accession
          $checkprep = $_ARCHON->mdb2->prepare($checkquery, array('integer', 'integer'), MDB2_PREPARE_RESULT);
       }
       $result = $checkprep->execute(array($this->ID, $SubjectID));
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -1310,13 +1310,13 @@ abstract class Accessions_Accession
          $prep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer'), MDB2_PREPARE_MANIP);
       }
       $affected = $prep->execute(array($this->ID, $SubjectID));
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
 
       $result = $checkprep->execute(array($this->ID, $SubjectID));
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -1448,7 +1448,7 @@ abstract class Accessions_Accession
          $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $prep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -1505,7 +1505,7 @@ abstract class Accessions_Accession
     * @param integer $MakeIntoLink[optional]
     * @return string
     */
-   public function toString($MakeIntoLink = LINK_NONE)
+   public function toString($MakeIntoLink = LINK_NONE, $ShowId = false)
    {
       global $_ARCHON;
 
@@ -1514,6 +1514,11 @@ abstract class Accessions_Accession
          $_ARCHON->declareError("Could not convert Accession to string: Accession ID not defined.");
          return false;
       }
+
+	  if($ShowId)
+	  {
+	     $String .= $this->getString('Identifier') . ' ';
+	  }
 
       if($MakeIntoLink == LINK_EACH || $MakeIntoLink == LINK_TOTAL)
       {

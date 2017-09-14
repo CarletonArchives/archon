@@ -16,7 +16,7 @@ class ArchonInstaller
    {
       global $_ARCHON;
 
-      if (PEAR::isError($objPEAR))
+      if (pear_isError($objPEAR))
       {
          $error = '';
 
@@ -121,7 +121,7 @@ class ArchonInstaller
 
          ArchonInstaller::updateDBProgressTable('', "Upgrading $strPackageName to version $UpgradeDir...");
 
-         if($_ARCHON->db->ServerType == 'MySQL' && file_exists("structure-mysql.sql"))
+         if(($_ARCHON->db->ServerType == 'MySQL' || $_ARCHON->db->ServerType == 'MySQLi') && file_exists("structure-mysql.sql"))
          {
             ArchonInstaller::execSQLFile("structure-mysql.sql");
          }
@@ -130,7 +130,7 @@ class ArchonInstaller
             ArchonInstaller::execSQLFile("structure-mssql.sql");
          }
 
-         if($_ARCHON->db->ServerType == 'MySQL' && file_exists("insert-mysql.sql"))
+         if(($_ARCHON->db->ServerType == 'MySQL' || $_ARCHON->db->ServerType == 'MySQLi') && file_exists("insert-mysql.sql"))
          {
             ArchonInstaller::execSQLFile("insert-mysql.sql");
          }
@@ -144,7 +144,7 @@ class ArchonInstaller
             ArchonInstaller::execSQLFile("insert.sql");
          }
 
-         if($_ARCHON->db->ServerType == 'MySQL' && file_exists("update-mysql.sql"))
+         if(($_ARCHON->db->ServerType == 'MySQL' || $_ARCHON->db->ServerType == 'MySQLi') && file_exists("update-mysql.sql"))
          {
             ArchonInstaller::execSQLFile("update-mysql.sql");
          }
@@ -163,7 +163,7 @@ class ArchonInstaller
             require_once("update.php");
          }
 
-         if($_ARCHON->db->ServerType == 'MySQL' && file_exists("drop-mysql.sql"))
+         if(($_ARCHON->db->ServerType == 'MySQL' || $_ARCHON->db->ServerType == 'MySQLi') && file_exists("drop-mysql.sql"))
          {
             ArchonInstaller::execSQLFile("drop-mysql.sql");
          }
@@ -262,7 +262,7 @@ class ArchonInstaller
       $cwd = getcwd();
       chdir($PackagePath);
 
-      if($_ARCHON->db->ServerType == 'MySQL')
+      if(($_ARCHON->db->ServerType == 'MySQL' || $_ARCHON->db->ServerType == 'MySQLi'))
       {
          ArchonInstaller::execSQLFile("install-mysql.sql");
       }
@@ -294,7 +294,7 @@ class ArchonInstaller
       $cwd = getcwd();
       chdir($PackagePath);
 
-      if($_ARCHON->db->ServerType == 'MySQL')
+      if(($_ARCHON->db->ServerType == 'MySQL' || $_ARCHON->db->ServerType == 'MySQLi'))
       {
          ArchonInstaller::execSQLFile("uninstall-mysql.sql");
       }
@@ -328,7 +328,7 @@ class ArchonInstaller
          ob_end_clean();
          die("MDB2 MSSQL Driver is not correctly installed.  <br /><br /> <a href='http://archon.org/mdb2.html'>Click here</a> for more information on how to make sure MDB2 is installed and correctly configured.");
       }
-      elseif($_ARCHON->db->ServerType == 'MySQL' && !readfile('MDB2/Driver/mysql.php',true))
+      elseif(($_ARCHON->db->ServerType == 'MySQL' || $_ARCHON->db->ServerType == 'MySQLi') && !(readfile('MDB2/Driver/mysql.php',true) || readfile('MDB2/Driver/mysqli.php', true)))
       {
          ob_end_clean();
          die("MDB2 MySQL Driver is not correctly installed.  <br /><br /> <a href='http://archon.org/mdb2.html'>Click here</a> for more information on how to make sure MDB2 is installed and correctly configured.");
@@ -361,7 +361,7 @@ class ArchonInstaller
 
       $affected = $_ARCHON->mdb2->exec($query);
 
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          echo("ERROR: Could not create progress table -- ".$query."\n");
          trigger_error($affected->getMessage(), E_USER_ERROR);
@@ -371,7 +371,7 @@ class ArchonInstaller
 
       $affected = $_ARCHON->mdb2->exec($query);
 
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          echo("ERROR: Could not create progress table -- ".$query."\n");
          trigger_error($affected->getMessage(), E_USER_ERROR);
@@ -386,14 +386,14 @@ class ArchonInstaller
       {
          $query = "IF EXISTS(SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'db_progress') DROP TABLE db_progress";
       }
-      elseif($_ARCHON->db->ServerType == 'MySQL')
+      elseif($_ARCHON->db->ServerType == 'MySQL' || $_ARCHON->db->ServerType == 'MySQLi')
       {
          $query = "DROP TABLE IF EXISTS db_progress";
       }
 
       $affected = $_ARCHON->mdb2->exec($query);
 
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          echo("ERROR: Could not drop progress table -- ".$query."\n");
          trigger_error($affected->getMessage(), E_USER_ERROR);
@@ -408,7 +408,7 @@ class ArchonInstaller
 
       $affected = $_ARCHON->mdb2->exec($query);
 
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          echo("ERROR: Could not update progress table -- ".$query."\n");
          trigger_error($affected->getMessage(), E_USER_ERROR);
@@ -421,7 +421,7 @@ class ArchonInstaller
 
       $query = "SELECT * FROM db_progress";
       $result = $_ARCHON->mdb2->query($query);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -437,7 +437,7 @@ class ArchonInstaller
 
       $query = "SELECT * FROM db_progress";
       $result = $_ARCHON->mdb2->query($query);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          $exists = false;
       }

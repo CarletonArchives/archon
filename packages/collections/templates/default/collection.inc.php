@@ -82,7 +82,7 @@ echo("<h1 id='titleheader'>" . strip_tags($_ARCHON->PublicInterface->Title) . "<
    if($objCollection->Extent)
    {
       ?><p><span class='bold'>Extent:</span> <?php echo(preg_replace('/\.(\d)0/', ".$1", $objCollection->getString('Extent'))); ?> <?php
-   echo($objCollection->getString('ExtentUnit'));
+   echo($objCollection->ExtentUnit->toString());
    if($objCollection->AltExtentStatement)
    {
       echo(". <a href='#AltExtentStatement'>More info below.</a>");

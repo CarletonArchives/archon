@@ -5,16 +5,12 @@
  * @package Archon
  * @author Chris Rishel
  */
-
 isset($_ARCHON) or die();
-
 
 if(!$_ARCHON->PublicInterface->Templates['creators']['Creator'])
 {
    $_ARCHON->declareError("Could not display Creator: Creator template not defined for template set {$_ARCHON->PublicInterface->TemplateSet}.");
 }
-
-
 
 
 $in_Char = isset($_REQUEST['char']) ? $_REQUEST['char'] : NULL;
@@ -24,27 +20,29 @@ $in_Browse = isset($_REQUEST['browse']) ? true : false;
 
 $objCreatorsTitlePhrase = Phrase::getPhrase('creators_title', PACKAGE_CREATORS, 0, PHRASETYPE_PUBLIC);
 $strCreatorsTitle = $objCreatorsTitlePhrase ? $objCreatorsTitlePhrase->getPhraseValue(ENCODE_HTML) : 'Browse by Creator';
-
 $_ARCHON->PublicInterface->Title = $strCreatorsTitle;
 $_ARCHON->PublicInterface->addNavigation($_ARCHON->PublicInterface->Title, "?p={$_REQUEST['p']}");
+$_ARCHON->PublicInterface->Title .= ' | '.$_ARCHON->Repository->Name;
 
 
 if($in_Char)
 {
-   creators_listCreatorsForChar($in_Char);
+   $vars = creators_listCreatorsForChar($in_Char);
 }
 elseif($in_Browse)
 {
    $in_Page = $_REQUEST['page'] ? $_REQUEST['page'] : 1;
 
-   creators_listAllCreators($in_Page);
-
+   $vars = creators_listAllCreators($in_Page);
 }
 else
 {
-   creators_main();
+   $vars = creators_main();
 }
 
+require_once("header.inc.php");
+
+echo($_ARCHON->PublicInterface->executeTemplate('creators', 'CreatorNav', $vars));
 
 require_once("footer.inc.php");
 
@@ -61,53 +59,51 @@ function creators_main()
    $objViewAllPhrase = Phrase::getPhrase('viewall', PACKAGE_CORE, 0, PHRASETYPE_PUBLIC);
    $strViewAll = $objViewAllPhrase ? $objViewAllPhrase->getPhraseValue(ENCODE_HTML) : 'View All';
 
-   require_once("header.inc.php");
-
    $arrCreatorCount = $_ARCHON->countCreators(true);
 
-   echo("<h1 id='titleheader'>" . strip_tags($_ARCHON->PublicInterface->Title) . "</h1>\n");
+	$vars['strPageTitle'] = strip_tags($_ARCHON->PublicInterface->Title);
+	$vars['strSubTitle'] = $strShowBeginningWith.":";
+	$vars['strSubTitleClasses'] = 'bold center';
+	$vars['strBackgroundID'] = '';
 
+	$content = "<div class=\"center\">\n";
 
+	 if(!empty($arrCreatorCount['#']))
+	 {
+		$content .= "<a href='?p={$_REQUEST['p']}&amp;char=" . urlencode('#'). "'>-#-</a>" . INDENT;
+	 }
+	 else
+	 {
+		$content .= "-#-" . INDENT;
+	 }
 
-   ?>
-<div class='center'>
-   <span class='bold'><?php echo($strShowBeginningWith); ?>:</span><br/><br/>
-   <div class='bground beginningwith'>
-         <?php
-         if(!empty($arrCreatorCount['#']))
-         {
-            echo("<a href='?p={$_REQUEST['p']}&amp;char=" . urlencode('#'). "'>-#-</a>" . INDENT);
-         }
-         else
-         {
-            echo("-#-" . INDENT);
-         }
+	 for($i = 65; $i < 91; $i++)
+	 {
+		$char = chr($i);
 
-         for($i = 65; $i < 91; $i++)
-         {
-            $char = chr($i);
+		if(!empty($arrCreatorCount[encoding_strtolower($char)]))
+		{
+		   $content .= "<a href='?p={$_REQUEST['p']}&amp;char=$char'>-$char-</a>" . INDENT;
+		}
+		else
+		{
+		   $content .= "-$char-" . INDENT;
+		}
 
-            if(!empty($arrCreatorCount[encoding_strtolower($char)]))
-            {
-               echo("<a href='?p={$_REQUEST['p']}&amp;char=$char'>-$char-</a>" . INDENT);
-            }
-            else
-            {
-               echo("-$char-" . INDENT);
-            }
+		if($char == 'M')
+		{
+		   $content .= "<br /><br />\n";
+		}
+	 }
 
-            if($char == 'M')
-            {
-               echo("<br/><br/>\n");
-            }
-         }
-         echo("<br/><br/><a href='?p={$_REQUEST['p']}&amp;browse'>{$strViewAll}</a>");
+	$content .= "<br /><br /><a href='?p={$_REQUEST['p']}&amp;browse'>{$strViewAll}</a>";
+	$content .= "</div>\n";
 
-         ?>
-   </div>
-</div>
-   <?php
+	$vars['content'] = $content;
+
+	return $vars;
 }
+
 
 function creators_listCreatorsForChar($Char)
 {
@@ -127,8 +123,11 @@ function creators_listCreatorsForChar($Char)
       $_ARCHON->declareError("Could not list Creators: CreatorList template not defined for template set {$_ARCHON->PublicInterface->TemplateSet}.");
    }
 
-   require_once("header.inc.php");
-   echo("<h1 id='titleheader'>" . strip_tags($_ARCHON->PublicInterface->Title) . "</h1>\n");
+   $vars['strPageTitle'] = strip_tags($_ARCHON->PublicInterface->Title);
+   $vars['strSubTitle'] = str_replace('$1', encoding_strtoupper($Char), $strCreatorsBeginningWith);
+   $vars['strSubTitleClasses'] = 'listitemhead bold';
+   $vars['strBackgroundID'] = ' id="listitemwrapper"';
+   $content = '';
 
    if(!$_ARCHON->Error)
    {
@@ -136,18 +135,15 @@ function creators_listCreatorsForChar($Char)
 
       if(!empty($arrCreators))
       {
-         echo("<div class='listitemhead bold'>" . str_replace('$1', encoding_strtoupper($Char), $strCreatorsBeginningWith) . "</div><br/><br/>\n");
-
-         echo("<div id='listitemwrapper' class='bground'><div class='listitemcover'></div>");
-
          foreach($arrCreators as $objCreator)
          {
-            eval($_ARCHON->PublicInterface->Templates[$_ARCHON->Package->APRCode]['CreatorList']);
+            $content .= $_ARCHON->PublicInterface->executeTemplate('creators', 'CreatorList', array('objCreator' => $objCreator));
          }
-
-         echo("</div>");
       }
    }
+
+   $vars['content'] = $content;
+   return $vars;
 }
 
 function creators_listAllCreators($Page)
@@ -178,54 +174,48 @@ function creators_listAllCreators($Page)
 
    $_ARCHON->PublicInterface->addNavigation($strViewAll);
 
-   require_once("header.inc.php");
 
    if(!$_ARCHON->PublicInterface->Templates[$_ARCHON->Package->APRCode]['CreatorList'])
    {
       $_ARCHON->declareError("Could not list Creators: CreatorList template not defined for template set {$_ARCHON->PublicInterface->TemplateSet}.");
    }
 
-   echo("<h1 id='titleheader'>" . strip_tags($_ARCHON->PublicInterface->Title) . "</h1>\n");
-
+   $vars['strPageTitle'] = strip_tags($_ARCHON->PublicInterface->Title);
+   $vars['strSubTitle'] = $strViewAll;
+   $vars['strSubTitleClasses'] = 'listitemhead bold';
+   $vars['strBackgroundID'] = '';
+   $content = '';
 
    if(!$_ARCHON->Error)
    {
       if(!empty($arrCreators))
       {
-         echo("<div class='listitemhead bold'>$strViewAll</div><br/><br/>\n");
-         echo("<div id='listitemwrapper' class='bground'><div class='listitemcover'></div>");
-
          foreach($arrCreators as $objCreator)
          {
-            eval($_ARCHON->PublicInterface->Templates[$_ARCHON->Package->APRCode]['CreatorList']);
+			$content .= $_ARCHON->PublicInterface->executeTemplate('creators', 'CreatorList', array('objCreator' => $objCreator));
          }
-
-         echo("</div>");
       }
 
       if($Page > 1 || $morePages)
       {
-         echo("<div class='paginationnav'>");
+         $content .= "<div class='paginationnav'>";
 
          if($Page > 1)
          {
             $prevPage = $Page - 1;
             $prevURL = encode($paginationURL . "&page=$prevPage", ENCODE_HTML);
-            echo("<span class='paginationprevlink'><a href='$prevURL'>Prev</a></span>");
+            $content .= "<span class='paginationprevlink'><a href='$prevURL'>Prev</a></span>";
          }
          if($morePages)
          {
             $nextPage = $Page + 1;
             $nextURL = encode($paginationURL . "&page=$nextPage", ENCODE_HTML);
-            echo("<span class='paginationnextlink'><a href='$nextURL'>Next</a></span>");
+            $content .= "<span class='paginationnextlink'><a href='$nextURL'>Next</a></span>";
          }
-         echo("</div>");
+         $content .= "</div>";
       }
    }
+
+	$vars['content'] = $content;
+	return $vars;
 }
-
-
-require_once("footer.inc.php");
-
-
-?>

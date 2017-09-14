@@ -96,14 +96,24 @@ header('Content-type: text/html; charset=UTF-8');
             $('div.listitem:last-child').addClass('lastlistitem');
             $('#locationtable tr:nth-child(odd)').addClass('oddtablerow');
             $('.expandable').expander({
-               slicePoint:       600,              // make expandable if over this x chars
-               widow:            100,              // do not make expandable unless total length > slicePoint + widow
-               expandPrefix:     '. . . ',         // text to come before the expand link
-               expandText:         '[read more]',  //text to use for expand link
-               expandEffect:     'fadeIn',         // or slideDown
-               expandSpeed:      700,              // in milliseconds
-               collapseTimer:    0,                // milliseconds before auto collapse; default is 0 (don't re-collape)
-               userCollapseText: '[collapse]'      // text for collaspe link
+               slicePoint:       600,             // make expandable if over this x chars
+               widow:            100,             // do not make expandable unless total length > slicePoint + widow
+               expandPrefix:     '. . . ',        // text to come before the expand link
+               expandText:       'more',     			//text to use for expand link
+               expandEffect:     'fadeIn',        // or slideDown
+               expandSpeed:      0,              	// in milliseconds
+               collapseTimer:    0,               // milliseconds before auto collapse; default is 0 (don't re-collape)
+               userCollapseText: '[collapse]'     // text for collaspe link
+            });
+				$('.expandablesmall').expander({
+               slicePoint:       100,             // make expandable if over this x chars
+               widow:            10,              // do not make expandable unless total length > slicePoint + widow
+               expandPrefix:     '. . . ',       	// text to come before the expand link
+               expandText:       'more',  				//text to use for expand link
+               expandEffect:     'fadeIn',        // or slideDown
+               expandSpeed:      0,              	// in milliseconds
+               collapseTimer:    0,              	// milliseconds before auto collapse; default is 0 (don't re-collape)
+               userCollapseText: '[collapse]'     // text for collaspe link
             });
          });
 
@@ -123,13 +133,12 @@ header('Content-type: text/html; charset=UTF-8');
       {
          $message = $_ARCHON->PublicInterface->Header->Message;
       }
+      $_ARCHON->PublicInterface->outputGoogleAnalyticsCode();
       ?>
    </head>
    <body>
       <?php
-      $_ARCHON->PublicInterface->outputGoogleAnalyticsCode();
-
-
+     
       if($message)
       {
          echo("<div class='message'>" . encode($message, ENCODE_HTML) . "</div>\n");

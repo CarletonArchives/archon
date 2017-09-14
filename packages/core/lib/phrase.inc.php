@@ -26,7 +26,7 @@ class Phrase extends AObject
 
       // Load all phrases for 'module_name'
       $result = $prep->execute(array($LanguageID, $PhraseTypeID, 'module_name'));
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -40,7 +40,7 @@ class Phrase extends AObject
 
       // Load all phrases for 'package_name'
       $result = $prep->execute(array($LanguageID, $PhraseTypeID, 'package_name'));
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -162,7 +162,7 @@ class Phrase extends AObject
             if(!$loadAllFlag[$PackageID][$ModuleID][$PhraseTypeID][$LanguageID])
             {
                $result = $prepAll->execute(array($LanguageID, $PhraseTypeID, $PackageID, $ModuleID));
-               if(PEAR::isError($result))
+               if(pear_isError($result))
                {
                   trigger_error($result->getMessage(), E_USER_ERROR);
                }
@@ -184,7 +184,7 @@ class Phrase extends AObject
 //            $_ARCHON->TestingError .= "Loaded one: ".$PhraseName." ".$PackageID." ".$ModuleID." ".$PhraseTypeID."<br />";
 
             $result = $prepOne->execute(array($LanguageID, $PhraseName, $PhraseTypeID, $PackageID, $ModuleID));
-            if(PEAR::isError($result))
+            if(pear_isError($result))
             {
                trigger_error($result->getMessage(), E_USER_ERROR);
             }

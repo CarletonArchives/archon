@@ -36,7 +36,7 @@ abstract class Collections_CollectionContent
             $checkParentPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
          }
          $result = $checkParentPrep->execute($this->ParentID);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -50,7 +50,7 @@ abstract class Collections_CollectionContent
                $noContentPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_MANIP);
             }
             $affected = $noContentPrep->execute($this->ParentID);
-            if(PEAR::isError($affected))
+            if(pear_isError($affected))
             {
                trigger_error($affected->getMessage(), E_USER_ERROR);
             }
@@ -149,7 +149,7 @@ abstract class Collections_CollectionContent
             $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
          }
          $result = $prep->execute($this->ID);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -218,7 +218,7 @@ abstract class Collections_CollectionContent
          $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $prep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -271,7 +271,7 @@ abstract class Collections_CollectionContent
             $prevPrep = $_ARCHON->mdb2->prepare($prevQuery, 'integer', MDB2_PREPARE_RESULT);
          }
          $result = $prevPrep->execute($this->ID);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -362,7 +362,7 @@ abstract class Collections_CollectionContent
       }
 
       $sortorderresult = $sortOrderCheckPrep->execute(array($this->CollectionID, $this->ParentID, $this->SortOrder, $this->ID));
-      if(PEAR::isError($sortorderresult))
+      if(pear_isError($sortorderresult))
       {
          trigger_error($sortorderresult->getMessage(), E_USER_ERROR);
       }
@@ -391,7 +391,7 @@ abstract class Collections_CollectionContent
                $newSetContainsPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_MANIP);
             }
             $affected = $newSetContainsPrep->execute($this->ParentID);
-            if(PEAR::isError($affected))
+            if(pear_isError($affected))
             {
                trigger_error($affected->getMessage(), E_USER_ERROR);
             }
@@ -403,7 +403,7 @@ abstract class Collections_CollectionContent
                $newParentRootIDPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
             }
             $parentresult = $newParentRootIDPrep->execute($this->ParentID);
-            if(PEAR::isError($parentresult))
+            if(pear_isError($parentresult))
             {
                trigger_error($parentresult->getMessage(), E_USER_ERROR);
             }
@@ -421,7 +421,7 @@ abstract class Collections_CollectionContent
                   $newSetRootIDPrep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer'), MDB2_PREPARE_MANIP);
                }
                $affected = $newSetRootIDPrep->execute(array($this->RootContentID, $this->ID));
-               if(PEAR::isError($affected))
+               if(pear_isError($affected))
                {
                   trigger_error($affected->getMessage(), E_USER_ERROR);
                }
@@ -437,7 +437,7 @@ abstract class Collections_CollectionContent
                $newSetOwnRootPrep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer'), MDB2_PREPARE_MANIP);
             }
             $affected = $newSetOwnRootPrep->execute(array($this->RootContentID, $this->ID));
-            if(PEAR::isError($affected))
+            if(pear_isError($affected))
             {
                trigger_error($affected->getMessage(), E_USER_ERROR);
             }
@@ -470,7 +470,7 @@ abstract class Collections_CollectionContent
                      $reloadSortOrderPrep = $_ARCHON->mdb2->prepare($reloadSortOrderQuery, 'integer', MDB2_PREPARE_RESULT);
                   }
                   $reloadSortOrderResult = $reloadSortOrderPrep->execute($this->ID);
-                  if(PEAR::isError($reloadSortOrderResult))
+                  if(pear_isError($reloadSortOrderResult))
                   {
                      trigger_error($reloadSortOrderResult->getMessage(), E_USER_ERROR);
                   }
@@ -482,7 +482,7 @@ abstract class Collections_CollectionContent
 
                   //check for conflict again
                   $sortorderresult = $sortOrderCheckPrep->execute(array($this->CollectionID, $this->ParentID, $this->SortOrder, $this->ID));
-                  if(PEAR::isError($sortorderresult))
+                  if(pear_isError($sortorderresult))
                   {
                      trigger_error($sortorderresult->getMessage(), E_USER_ERROR);
                   }
@@ -539,7 +539,7 @@ abstract class Collections_CollectionContent
             $oldParentCheckPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
          }
          $result = $oldParentCheckPrep->execute($this->ID);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -549,7 +549,7 @@ abstract class Collections_CollectionContent
          {
             $query = "UPDATE tblCollections_Content SET ContainsContent = ? WHERE ID = ?";
             $oldSetContainsPrep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer'), MDB2_PREPARE_MANIP);
-            if(PEAR::isError($oldSetContainsPrep))
+            if(pear_isError($oldSetContainsPrep))
             {
                trigger_error($oldSetContainsPrep->getMessage(), E_USER_ERROR);
             }
@@ -558,7 +558,7 @@ abstract class Collections_CollectionContent
          if($result->numRows() > 0)
          {
             $affected = $oldSetContainsPrep->execute(array(1, $this->ID));
-            if(PEAR::isError($affected))
+            if(pear_isError($affected))
             {
                trigger_error($affected->getMessage(), E_USER_ERROR);
             }
@@ -566,7 +566,7 @@ abstract class Collections_CollectionContent
          else
          {
             $affected = $oldSetContainsPrep->execute(array(0, $this->ID));
-            if(PEAR::isError($affected))
+            if(pear_isError($affected))
             {
                trigger_error($affected->getMessage(), E_USER_ERROR);
             }
@@ -584,7 +584,7 @@ abstract class Collections_CollectionContent
                $oldParentRootIDPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
             }
             $parentresult = $oldParentRootIDPrep->execute($this->ParentID);
-            if(PEAR::isError($parentresult))
+            if(pear_isError($parentresult))
             {
                trigger_error($parentresult->getMessage(), E_USER_ERROR);
             }
@@ -602,7 +602,7 @@ abstract class Collections_CollectionContent
                   $oldSetRootIDPrep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer'), MDB2_PREPARE_MANIP);
                }
                $affected = $oldSetRootIDPrep->execute(array($this->RootContentID, $this->ID));
-               if(PEAR::isError($affected))
+               if(pear_isError($affected))
                {
                   trigger_error($affected->getMessage(), E_USER_ERROR);
                }
@@ -618,7 +618,7 @@ abstract class Collections_CollectionContent
                $oldSetOwnRootPrep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer'), MDB2_PREPARE_MANIP);
             }
             $affected = $oldSetOwnRootPrep->execute(array($this->RootContentID, $this->ID));
-            if(PEAR::isError($affected))
+            if(pear_isError($affected))
             {
                trigger_error($affected->getMessage(), E_USER_ERROR);
             }
@@ -635,7 +635,7 @@ abstract class Collections_CollectionContent
                $oldContainsPrep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer'), MDB2_PREPARE_MANIP);
             }
             $affected = $oldSetContainsPrep->execute(array(1, $this->ParentID));
-            if(PEAR::isError($affected))
+            if(pear_isError($affected))
             {
                trigger_error($affected->getMessage(), E_USER_ERROR);
             }
@@ -649,7 +649,7 @@ abstract class Collections_CollectionContent
                $oldCheckContainsPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
             }
             $result = $oldCheckContainsPrep->execute($prevParentID);
-            if(PEAR::isError($result))
+            if(pear_isError($result))
             {
                trigger_error($result->getMessage(), E_USER_ERROR);
             }
@@ -657,7 +657,7 @@ abstract class Collections_CollectionContent
             if($result->numRows() == 0)
             {
                $affected = $oldSetContainsPrep->execute(array(0, $prevParentID));
-               if(PEAR::isError($affected))
+               if(pear_isError($affected))
                {
                   trigger_error($affected->getMessage(), E_USER_ERROR);
                }
@@ -689,7 +689,7 @@ abstract class Collections_CollectionContent
             while($recParentID = array_pop($arrParentIDs))
             {
                $childrenresult = $childrenIDsPrep->execute($recParentID);
-               if(PEAR::isError($result))
+               if(pear_isError($result))
                {
                   trigger_error($result->getMessage(), E_USER_ERROR);
                }
@@ -697,7 +697,7 @@ abstract class Collections_CollectionContent
                while($childrow = $childrenresult->fetchRow())
                {
                   $affected = $updateChildrenRootsPrep->execute(array($this->CollectionID, $this->RootContentID, $childrow['ID']));
-                  if(PEAR::isError($affected))
+                  if(pear_isError($affected))
                   {
                      trigger_error($affected->getMessage(), E_USER_ERROR);
                   }
@@ -750,7 +750,7 @@ abstract class Collections_CollectionContent
             {
                $objContent->Enabled = 1;
                $affected = $setEnabledPrep->execute(array($objContent->Enabled, $objContent->ID));
-               if(PEAR::isError($affected))
+               if(pear_isError($affected))
                {
                   trigger_error($affected->getMessage(), E_USER_ERROR);
                }
@@ -801,7 +801,7 @@ abstract class Collections_CollectionContent
             {
                $objContent->Enabled = $this->Enabled;
                $affected = $setEnabledPrep->execute(array($objContent->Enabled, $objContent->ID));
-               if(PEAR::isError($affected))
+               if(pear_isError($affected))
                {
                   trigger_error($affected->getMessage(), E_USER_ERROR);
                }
@@ -835,7 +835,7 @@ abstract class Collections_CollectionContent
          $setSortOrderPrep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer'), MDB2_PREPARE_MANIP);
       }
       $affected = $setSortOrderPrep->execute(array($this->SortOrder, $this->ID));
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -891,7 +891,7 @@ abstract class Collections_CollectionContent
       $query = "SELECT tblCreators_Creators.* FROM tblCreators_Creators JOIN tblCollections_CollectionContentCreatorIndex ON tblCreators_Creators.ID = tblCollections_CollectionContentCreatorIndex.CreatorID WHERE tblCollections_CollectionContentCreatorIndex.CollectionContentID = ? ORDER BY tblCreators_Creators.Name";
       $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       $result = $prep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -945,7 +945,7 @@ abstract class Collections_CollectionContent
       $query = "SELECT tblSubjects_Subjects.* FROM tblSubjects_Subjects JOIN tblCollections_CollectionContentSubjectIndex ON tblSubjects_Subjects.ID = tblCollections_CollectionContentSubjectIndex.SubjectID WHERE tblCollections_CollectionContentSubjectIndex.CollectionContentID = ?";
       $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       $result = $prep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -1082,7 +1082,7 @@ abstract class Collections_CollectionContent
             $fromPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
          }
          $result = $fromPrep->execute($this->ID);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -1135,7 +1135,7 @@ abstract class Collections_CollectionContent
       }
       $_ARCHON->mdb2->setLimit(1);
       $result = $prep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }

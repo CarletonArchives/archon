@@ -30,7 +30,7 @@ abstract class Collections_Classification
       $collIDPrep = $collIDPrep ? $collIDPrep : $_ARCHON->mdb2->prepare('SELECT ID FROM tblCollections_Collections WHERE ClassificationID = ?', 'integer', MDB2_PREPARE_RESULT);
 
       $result = $collIDPrep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -48,7 +48,7 @@ abstract class Collections_Classification
       foreach($arrClassifications as $classification)
       {
          $result = $collIDPrep->execute($classification->ID);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -146,7 +146,7 @@ abstract class Collections_Classification
          $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $prep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -194,7 +194,7 @@ abstract class Collections_Classification
       $collIDPrep = $collIDPrep ? $collIDPrep : $_ARCHON->mdb2->prepare('SELECT ID FROM tblCollections_Collections WHERE ClassificationID = ?', 'integer', MDB2_PREPARE_RESULT);
 
       $result = $collIDPrep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -212,7 +212,7 @@ abstract class Collections_Classification
       foreach($arrClassifications as $classification)
       {
          $result = $collIDPrep->execute($classification->ID);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -253,7 +253,7 @@ abstract class Collections_Classification
       }
       $_ARCHON->mdb2->setLimit(1);
       $result = $prep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }

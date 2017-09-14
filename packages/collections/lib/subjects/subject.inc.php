@@ -15,7 +15,7 @@ abstract class Collections_Subject
       $collIDPrep = $collIDPrep ? $collIDPrep : $_ARCHON->mdb2->prepare('SELECT CollectionID FROM tblCollections_CollectionSubjectIndex WHERE SubjectID = ?', 'integer', MDB2_PREPARE_RESULT);
 
       $result = $collIDPrep->execute($ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -32,7 +32,7 @@ abstract class Collections_Subject
       foreach($arrSubjects as $subject)
       {
          $result = $collIDPrep->execute($subject->ID);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -55,7 +55,7 @@ abstract class Collections_Subject
          $contentIDPrep = $contentIDPrep ? $contentIDPrep : $_ARCHON->mdb2->prepare('SELECT tblCollections_Content.CollectionID FROM tblCollections_CollectionContentSubjectIndex JOIN tblCollections_Content ON tblCollections_CollectionContentSubjectIndex.CollectionContentID = tblCollections_Content.ID WHERE SubjectID = ?', 'integer', MDB2_PREPARE_RESULT);
          $result = $contentIDPrep->execute($ID);
 
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -72,7 +72,7 @@ abstract class Collections_Subject
          foreach($arrSubjects as $subject)
          {
             $result = $contentIDPrep->execute($subject->ID);
-            if(PEAR::isError($result))
+            if(pear_isError($result))
             {
                trigger_error($result->getMessage(), E_USER_ERROR);
             }
@@ -116,7 +116,7 @@ abstract class Collections_Subject
       static $prep = NULL;
       $prep = $prep ? $prep : $_ARCHON->mdb2->prepare('DELETE FROM tblCollections_CollectionSubjectIndex WHERE SubjectID = ?', 'integer', MDB2_PREPARE_MANIP);
       $affected = $prep->execute($ID);
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -185,7 +185,7 @@ abstract class Collections_Subject
          $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $prep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }

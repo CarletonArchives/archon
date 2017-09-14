@@ -18,7 +18,7 @@ class LiveSession extends Session
       ini_set('session.gc_probability', '1');
       ini_set('session.gc_divisor', '10');
 
-      if(ini_get(session.gc_maxlifetime) < SESSION_EXPIRATION)
+      if(ini_get('session.gc_maxlifetime') < SESSION_EXPIRATION)
       {
          ini_set('session.gc_maxlifetime', SESSION_EXPIRATION);
       }
@@ -90,7 +90,7 @@ class LiveSession extends Session
 
       $prep = $_ARCHON->mdb2->prepare('SELECT * FROM tblCore_Sessions WHERE Hash = ?', array('text'), MDB2_PREPARE_RESULT);
       $result = $prep->execute($this->Hash);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -165,7 +165,7 @@ class LiveSession extends Session
 
       $prep = $_ARCHON->mdb2->prepare('DELETE FROM tblCore_Sessions WHERE Expires <= ?', array('integer'), MDB2_PREPARE_MANIP);
       $affected = $prep->execute(time());
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -193,17 +193,17 @@ class LiveSession extends Session
 
       $requireSecureConnection = ($_ARCHON->config->ForceHTTPS && $this->User->IsAdminUser);
 
-      $prep = $_ARCHON->mdb2->prepare('DELETE FROM tblCore_Sessions WHERE Hash = ?', 'text', MDB2_PREPARE_MANIP);
+      $prep = $_ARCHON->mdb2->prepare('DELETE FROM tblCore_Sessions WHERE Hash = ?');
       $affected = $prep->execute($this->Hash);
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
       $prep->free();
 
-      $prep = $_ARCHON->mdb2->prepare('INSERT INTO tblCore_Sessions (Hash, UserID, RemoteHost, Expires, Persistent, SecureConnection) VALUES (?, ?, ?, ?, ?, ?)', array('text', 'integer', 'text', 'integer', 'boolean', 'boolean'), MDB2_PREPARE_MANIP);
+      $prep = $_ARCHON->mdb2->prepare('INSERT INTO tblCore_Sessions (Hash, UserID, RemoteHost, Expires, Persistent, SecureConnection) VALUES (?, ?, ?, ?, ?, ?)', array('text', 'integer', 'text', 'integer', 'boolean', 'boolean'));
       $affected = $prep->execute(array($this->Hash, $this->UserID, $_SERVER['REMOTE_ADDR'], $this->Expires, $this->Persistent, $requireSecureConnection));
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -235,7 +235,7 @@ class LiveSession extends Session
 
       $prep = $_ARCHON->mdb2->prepare('DELETE FROM tblCore_Sessions WHERE Hash = ?', 'text', MDB2_PREPARE_MANIP);
       $affected = $prep->execute($this->Hash);
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -384,7 +384,7 @@ class LiveSession extends Session
 
       $prep = $_ARCHON->mdb2->prepare('UPDATE tblCore_Sessions SET SecureConnection = 1 WHERE Hash = ?', 'text', MDB2_PREPARE_MANIP);
       $affected = $prep->execute($this->Hash);
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -477,63 +477,132 @@ class LiveSession extends Session
     *
     * @return boolean
     */
-   public function verify()
-   {
-      global $_ARCHON;
+    public function verify()
+    {
+        global $_ARCHON;
 
-      if(!$this->_dbLoad())
-      {
-         return false;
-      }
+        if(!$this->_dbLoad())
+        {
+            return false;
+        }
 
-      if($this->Expires <= time())
-      {
-         return false;
-      }
+        if($this->Expires <= time())
+        {
+            return false;
+        }
 
-      if($this->RemoteHost != $_SERVER['REMOTE_ADDR'])
-      {
-         return false;
-      }
+        if($this->RemoteHost != $_SERVER['REMOTE_ADDR'])
+        {
+            return false;
+        }
 
-      $this->Expires = ($this->Persistent) ? time() + COOKIE_EXPIRATION : time() + SESSION_EXPIRATION;
+        $this->Expires = ($this->Persistent) ? time() + COOKIE_EXPIRATION : time() + SESSION_EXPIRATION;
 
-      if($this->SecureConnection && !$this->isSecureConnection())
-      {
-         die('<html><body onLoad="location.href=\'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] .'\';"></body></html>');
-         //header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
-      }
+        if($this->SecureConnection && !$this->isSecureConnection())
+        {
+            die('<html><body onLoad="location.href=\'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] .'\';"></body></html>');
+            //header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+        }
 
-      // this will be called if user setting has changed mid-session
-      if($_ARCHON->config->ForceHTTPS && $this->User->IsAdminUser && !$this->SecureConnection)
-      {
-         $this->requireSecureConnection();
-      }
-
-
-      // do we want to update every time? we might want to change this to not update the expiration
-      $affected = $_ARCHON->mdb2->exec("UPDATE tblCore_Sessions SET Expires = {$this->Expires} WHERE ID = {$this->ID}");
-      if(PEAR::isError($affected))
-      {
-         trigger_error($affected->getMessage(), E_USER_ERROR);
-      }
-
-      if($this->Persistent)
-      {
-         setcookie(session_name().'_persistent', 1, $this->Expires, $this->CookiePath);
-      }
-      else
-      {
-         setcookie(session_name().'_persistent', 0, time()-86400, $this->CookiePath);
-      }
-
-      return true;
-   }
+        // this will be called if user setting has changed mid-session
+        if($_ARCHON->config->ForceHTTPS && $this->User->IsAdminUser && !$this->SecureConnection)
+        {
+            $this->requireSecureConnection();
+        }
 
 
+        // do we want to update every time? we might want to change this to not update the expiration
+        $affected = $_ARCHON->mdb2->exec("UPDATE tblCore_Sessions SET Expires = {$this->Expires} WHERE ID = {$this->ID}");
+        if(pear_isError($affected))
+        {
+            trigger_error($affected->getMessage(), E_USER_ERROR);
+        }
+
+        if($this->Persistent)
+        {
+            setcookie(session_name().'_persistent', 1, $this->Expires, $this->CookiePath);
+        }
+        elseif (!headers_sent())
+        {
+            setcookie(session_name().'_persistent', 0, time()-86400, $this->CookiePath);
+        }
+
+        return true;
+    }
 
 
-   public function dbLoad()
+    public function verifySession($hash)
+    {
+        if(!$hash)
+        {
+            return false;
+        }
+        global $_ARCHON;
+
+        $prep = $_ARCHON->mdb2->prepare('SELECT * FROM tblCore_Sessions WHERE Hash = ?', array('text'), MDB2_PREPARE_RESULT);
+        $result = $prep->execute($hash);
+        if (pear_isError($result)) {
+            trigger_error($result->getMessage(), E_USER_ERROR);
+        }
+        $row = $result->fetchRow();
+        $result->free();
+        $prep->free();
+
+        if(!$row['ID'])
+        {
+            return false;
+        }
+
+        $row = array_change_key_case($row);
+        $arrVariables = get_object_vars($this);
+        foreach($arrVariables as $name => $defaultvalue)
+        {
+            if(isset($row[strtolower($name)]))
+            {
+                $this->$name = $row[strtolower($name)];
+            }
+        }
+
+        if($this->Expires <= time())
+        {
+            return false;
+        }
+
+        if($this->RemoteHost != $_SERVER['REMOTE_ADDR'])
+        {
+            return false;
+        }
+
+        if($this->Persistent)
+        {
+            $this->Expires = time() + COOKIE_EXPIRATION;
+        }
+        else
+        {
+            $this->Expires = time() + SESSION_EXPIRATION;
+        }
+
+        if(!$this->User && $this->UserID)
+        {
+            $this->User = New User2x($this->UserID);
+            $this->User->dbLoad();
+        }
+
+        $prep = $_ARCHON->mdb2->prepare('UPDATE tblCore_Sessions SET Expires = ? WHERE ID = ?', array('integer', 'integer'), MDB2_PREPARE_MANIP);
+        $affected = $prep->execute(array($this->Expires, $this->ID));
+        if (pear_isError($affected)) {
+            trigger_error($affected->getMessage(), E_USER_ERROR);
+        }
+        $prep->free();
+
+
+        return true;
+    }
+
+
+
+
+        public function dbLoad()
    {
       // stub to remove inherited functionality that is unwanted
    }

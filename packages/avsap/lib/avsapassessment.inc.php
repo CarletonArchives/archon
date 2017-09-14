@@ -38,7 +38,7 @@ abstract class AVSAP_AVSAPAssessment
          $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $prep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -449,7 +449,7 @@ abstract class AVSAP_AVSAPAssessment
          $preps[$strTypeName] = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $preps[$strTypeName]->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -590,7 +590,7 @@ abstract class AVSAP_AVSAPAssessment
             $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
          }
          $result = $prep->execute($this->ID);
-         if (PEAR::isError($result))
+         if (pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }

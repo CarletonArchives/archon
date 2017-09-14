@@ -46,7 +46,7 @@ header("Cache-Control: private", false); // required for certain browsers
 header("Content-type: {$objFile->FileType->ContentType}");
 header("Content-Disposition: attachment; filename=\"{$objFile->Filename}\"");
 header("Content-Transfer-Encoding: binary");
-header("Content-Length: {$objFile->Size}");
+//header("Content-Length: {$objFile->Size}");
 
 if($_ARCHON->config->CacheFiles && file_exists('packages/digitallibrary/files/' . $objFile->ID . '/' .$prefix. $objFile->Filename))
 {

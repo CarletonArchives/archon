@@ -15,7 +15,7 @@ abstract class Core_Security
 
       $prep = $_ARCHON->mdb2->prepare('DELETE FROM tblCore_Sessions WHERE Expires <= ?', array('integer'), MDB2_PREPARE_MANIP);
       $affected = $prep->execute(time());
-      if (PEAR::isError($affected))
+      if (pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -203,7 +203,7 @@ abstract class Core_Security
 
          $prep = $_ARCHON->mdb2->prepare('DELETE FROM tblCore_Sessions WHERE Hash = ?', 'text', MDB2_PREPARE_MANIP);
          $affected = $prep->execute($this->Session->Hash);
-         if (PEAR::isError($affected))
+         if (pear_isError($affected))
          {
             trigger_error($affected->getMessage(), E_USER_ERROR);
          }
@@ -211,7 +211,7 @@ abstract class Core_Security
 
          $prep = $_ARCHON->mdb2->prepare('INSERT INTO tblCore_Sessions (Hash, UserID, RemoteHost, Expires, Persistent, SecureConnection) VALUES (?, ?, ?, ?, ?, ?)', array('text', 'integer', 'text', 'integer', 'boolean', 'boolean'), MDB2_PREPARE_MANIP);
          $affected = $prep->execute(array($this->Session->Hash, $UserID, $_SERVER['REMOTE_ADDR'], $Expires, $this->Session->Persistent, $this->Session->User->RequireSecureConnection));
-         if (PEAR::isError($affected))
+         if (pear_isError($affected))
          {
             trigger_error($affected->getMessage(), E_USER_ERROR);
          }
@@ -220,7 +220,7 @@ abstract class Core_Security
          $_ARCHON->mdb2->setLimit(1);
          $prep = $_ARCHON->mdb2->prepare('SELECT * FROM tblCore_Sessions WHERE UserID = ? AND RemoteHost = ? ORDER BY ID DESC', array('integer', 'text'), MDB2_PREPARE_RESULT);
          $result = $prep->execute(array($UserID, $_SERVER['REMOTE_ADDR']));
-         if (PEAR::isError($result))
+         if (pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }

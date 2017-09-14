@@ -94,7 +94,7 @@ abstract class Core_UserProfileField
       $query = "SELECT * FROM tblCore_UserProfileFieldCountryIndex WHERE UserProfileFieldID = ?;";
       $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       $result = $prep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -218,7 +218,7 @@ abstract class Core_UserProfileField
       }
 
       $result = $currentPrep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -312,7 +312,7 @@ abstract class Core_UserProfileField
       {
 
 //         $result = $existPrep->execute($newRelatedCountryID);
-//         if (PEAR::isError($result))
+//         if (pear_isError($result))
 //         {
 //            trigger_error($result->getMessage(), E_USER_ERROR);
 //         }
@@ -330,7 +330,7 @@ abstract class Core_UserProfileField
 
 
          $result = $checkPrep->execute(array($this->ID, $newRelatedCountryID));
-         if (PEAR::isError($result))
+         if (pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -357,13 +357,13 @@ abstract class Core_UserProfileField
 
 
          $affected = $insertPrep->execute(array($this->ID, $newRelatedCountryID, $requiredCountry));
-         if (PEAR::isError($affected))
+         if (pear_isError($affected))
          {
             trigger_error($affected->getMessage(), E_USER_ERROR);
          }
 
          $result = $checkPrep->execute(array($this->ID, $newRelatedCountryID));
-         if (PEAR::isError($result))
+         if (pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -387,7 +387,7 @@ abstract class Core_UserProfileField
 
 
          $result = $checkPrep->execute(array($this->ID, $newUnrelatedCountryID));
-         if (PEAR::isError($result))
+         if (pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -411,13 +411,13 @@ abstract class Core_UserProfileField
          }
 
          $affected = $deletePrep->execute(array($this->ID, $newUnrelatedCountryID));
-         if (PEAR::isError($affected))
+         if (pear_isError($affected))
          {
             trigger_error($affected->getMessage(), E_USER_ERROR);
          }
 
          $result = $checkPrep->execute(array($this->ID, $newUnrelatedCountryID));
-         if (PEAR::isError($result))
+         if (pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -444,7 +444,7 @@ abstract class Core_UserProfileField
       {
 
          $result = $checkPrep->execute(array($this->ID, $newRequiredCountryID));
-         if (PEAR::isError($result))
+         if (pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -463,7 +463,7 @@ abstract class Core_UserProfileField
          }
 
          $affected = $updatePrep->execute(array(1, $this->ID, $newRequiredCountryID));
-         if (PEAR::isError($affected))
+         if (pear_isError($affected))
          {
             trigger_error($affected->getMessage(), E_USER_ERROR);
          }
@@ -478,7 +478,7 @@ abstract class Core_UserProfileField
       {
 
          $result = $checkPrep->execute(array($this->ID, $newOptionalCountryID));
-         if (PEAR::isError($result))
+         if (pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -497,7 +497,7 @@ abstract class Core_UserProfileField
          }
 
          $affected = $updatePrep->execute(array(0, $this->ID, $newOptionalCountryID));
-         if (PEAR::isError($affected))
+         if (pear_isError($affected))
          {
             trigger_error($affected->getMessage(), E_USER_ERROR);
          }

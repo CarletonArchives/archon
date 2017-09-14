@@ -32,7 +32,7 @@ abstract class DigitalLibrary_File
 
       $query = "SELECT Filename,Size FROM tblDigitalLibrary_Files WHERE DigitalContentID = -1 AND ID = {$this->ID}";
       $result = $_ARCHON->mdb2->query($query);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          echo($query);
          trigger_error($result->getMessage(), E_USER_ERROR);
@@ -84,7 +84,7 @@ abstract class DigitalLibrary_File
          $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $prep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -215,7 +215,7 @@ abstract class DigitalLibrary_File
 
             $query = "UPDATE tblDigitalLibrary_Files SET FileContents = " . '0x' . $FileHex['hex'] . " WHERE ID = '{$this->ID}'";
             $affected = $_ARCHON->mdb2->exec($query);
-            if(PEAR::isError($affected))
+            if(pear_isError($affected))
             {
                trigger_error($affected->getMessage(), E_USER_ERROR);
             }
@@ -232,7 +232,7 @@ abstract class DigitalLibrary_File
                $concatFunction = ($_ARCHON->db->ServerType == 'MSSQL') ? "(FileContents + " : "CONCAT(FileContents, ";
                $query = "UPDATE tblDigitalLibrary_Files SET FileContents = " . $concatFunction . '0x' . $FileHex['hex'] . ") WHERE ID = '{$this->ID}'";
                $affected = $_ARCHON->mdb2->exec($query);
-               if(PEAR::isError($affected))
+               if(pear_isError($affected))
                {
                   trigger_error($affected->getMessage(), E_USER_ERROR);
                }
@@ -251,7 +251,7 @@ abstract class DigitalLibrary_File
                $lengthPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
             }
             $result = $lengthPrep->execute($this->ID);
-            if(PEAR::isError($result))
+            if(pear_isError($result))
             {
                trigger_error($result->getMessage(), E_USER_ERROR);
             }
@@ -298,7 +298,7 @@ abstract class DigitalLibrary_File
 
                $query = "UPDATE tblDigitalLibrary_Files SET FilePreviewLong = " . '0x' . $FileHex['hex'] . " WHERE ID = '{$this->ID}'";
                $affected = $_ARCHON->mdb2->exec($query);
-               if(PEAR::isError($affected))
+               if(pear_isError($affected))
                {
                   trigger_error($affected->getMessage(), E_USER_ERROR);
                }
@@ -313,7 +313,7 @@ abstract class DigitalLibrary_File
 
                $query = "UPDATE tblDigitalLibrary_Files SET FilePreviewShort = " . '0x' . $FileHex['hex'] . " WHERE ID = '{$this->ID}'";
                $affected = $_ARCHON->mdb2->exec($query);
-               if(PEAR::isError($affected))
+               if(pear_isError($affected))
                {
                   trigger_error($affected->getMessage(), E_USER_ERROR);
                }
@@ -661,7 +661,7 @@ abstract class DigitalLibrary_File
          $accessSizePrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $accessSizePrep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -747,15 +747,24 @@ abstract class DigitalLibrary_File
       static $preps = array();
       if(!isset($preps[$this->fpointer]))
       {
-         $query = "SELECT SUBSTRING({$_ARCHON->mdb2->quoteIdentifier($this->fpointer)}, ?, ?) as FilePacket FROM tblDigitalLibrary_Files WHERE ID = ?";
+         
+        if($_ARCHON->db->ServerType == 'MySQL')
+		{
+			$query = "SELECT HEX(SUBSTRING({$_ARCHON->mdb2->quoteIdentifier($this->fpointer)}, ?, ?)) as FilePacket FROM tblDigitalLibrary_Files WHERE ID = ?";
+        }
+        else 
+        {
+			$query = "SELECT SUBSTRING({$_ARCHON->mdb2->quoteIdentifier($this->fpointer)}, ?, ?) as FilePacket FROM tblDigitalLibrary_Files WHERE ID = ?";
+		} 
+         
          $preps[$this->fpointer] = $_ARCHON->mdb2->prepare($query, array('integer', 'integer', 'integer'), MDB2_PREPARE_RESULT);
-         if(PEAR::isError($preps[$this->fpointer]))
+         if(pear_isError($preps[$this->fpointer]))
          {
             trigger_error($preps[$this->fpointer]->getMessage(), E_USER_ERROR);
          }
       }
       $result = $preps[$this->fpointer]->execute(array($this->fposition, $Bytes, $this->ID));
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -765,8 +774,18 @@ abstract class DigitalLibrary_File
 
       if($row['FilePacket'])
       {
-         $this->fposition += strlen($row['FilePacket']);
-         return $row['FilePacket'];
+   
+   		if($_ARCHON->db->ServerType == 'MySQL')
+		{
+			$data = pack('H*', $row['FilePacket']);
+    	    $this->fposition += strlen($data);
+       		return $data;
+		}
+        else 
+  		{ 
+        $this->fposition += strlen($row['FilePacket']);
+        return $row['FilePacket'];
+        }
       }
       else
       {

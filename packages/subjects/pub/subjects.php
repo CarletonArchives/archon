@@ -22,7 +22,7 @@ $strSubjectsTitle = $objSubjectsTitlePhrase ? $objSubjectsTitlePhrase->getPhrase
 
 $_ARCHON->PublicInterface->Title = $strSubjectsTitle;
 $_ARCHON->PublicInterface->addNavigation($_ARCHON->PublicInterface->Title, "?p={$_REQUEST['p']}");
-
+$_ARCHON->PublicInterface->Title .= ' | ' . $_ARCHON->Repository->Name;
 
 if($in_SubjectTypeID)
 {
@@ -33,31 +33,33 @@ if($in_SubjectTypeID)
 
 if($in_ID)
 {
-   subjects_listChildSubjects($in_ID);
+   $vars = subjects_listChildSubjects($in_ID);
 }
 elseif($in_Char)
 {
-   subjects_listSubjectsForChar($in_Char, $in_SubjectTypeID);
+   $vars = subjects_listSubjectsForChar($in_Char, $in_SubjectTypeID);
 }
 elseif($in_Browse)
 {
    $in_Page = $_REQUEST['page'] ? $_REQUEST['page'] : 1;
 
-   subjects_listAllSubjects($in_Page, $in_SubjectTypeID);
-
+   $vars = subjects_listAllSubjects($in_Page, $in_SubjectTypeID);
 }
 else
 {
-   subjects_main($in_SubjectTypeID);
+   $vars = subjects_main($in_SubjectTypeID);
 }
+
+require_once("header.inc.php");
+
+echo($_ARCHON->PublicInterface->executeTemplate('subjects', 'SubjectNav', $vars));
+
+require_once("footer.inc.php");
 
 
 function subjects_main($SubjectTypeID)
 {
    global $_ARCHON;
-
-
-   
 
    $objOfTypePhrase = Phrase::getPhrase('subjects_oftype', PACKAGE_SUBJECTS, 0, PHRASETYPE_PUBLIC);
    $strOfType = $objOfTypePhrase ? $objOfTypePhrase->getPhraseValue(ENCODE_HTML) : 'Of Type "$1"';
@@ -70,9 +72,11 @@ function subjects_main($SubjectTypeID)
    $arrSubjectCount = $_ARCHON->countSubjects(true, $SubjectTypeID);
    $arrSubjectTypes = $_ARCHON->getAllSubjectTypes();
 
-   require_once("header.inc.php");
+   $vars['strPageTitle'] = strip_tags($_ARCHON->PublicInterface->Title);
+   $vars['strSubTitleClasses'] = 'bold';
+   $vars['strBackgroundID'] = '';
 
-   echo("<h1 id='titleheader'>" . strip_tags($_ARCHON->PublicInterface->Title) . "</h1>\n");
+	$strShowBeginning = '';
 
    if($arrSubjectTypes[$SubjectTypeID])
    {
@@ -80,15 +84,19 @@ function subjects_main($SubjectTypeID)
       $strTypedShowBeginningWith = $objTypedShowBeginningWithPhrase ? $objTypedShowBeginningWithPhrase->getPhraseValue(ENCODE_HTML) : 'Show "$1" Subjects Beginning with';
       $strTypedShowBeginningWith = str_replace('$1', $arrSubjectTypes[$SubjectTypeID]->toString(), $strTypedShowBeginningWith);
 
-      echo("<div class='center'><span class='bold'>$strTypedShowBeginningWith:</span><br/><br/><div class='bground beginningwith'>");
+      $strShowBeginning = $strTypedShowBeginningWith;
    }
    else
    {
       $objShowBeginningWithPhrase = Phrase::getPhrase('subjects_showbeginningwith', PACKAGE_SUBJECTS, 0, PHRASETYPE_PUBLIC);
       $strShowBeginningWith = $objShowBeginningWithPhrase ? $objShowBeginningWithPhrase->getPhraseValue(ENCODE_HTML) : 'Show Subjects Beginning with';
 
-      echo("<div class='center'><span class='bold'>$strShowBeginningWith:</span><br/><br/><div class='bground beginningwith'>");
+      $strShowBeginning = $strShowBeginningWith;
    }
+
+   $vars['strSubTitle'] = $strShowBeginning.":";
+
+   $content = "<div class=\"center\">\n";
 
    if(!empty($arrSubjectCount['#']))
    {
@@ -97,11 +105,11 @@ function subjects_main($SubjectTypeID)
       {
          $href .= "&amp;subjecttypeid=$SubjectTypeID";
       }
-      echo("<a href='$href'>-#-</a>" . INDENT);
+      $content .= "<a href='$href'>-#-</a>" . INDENT;
    }
    else
    {
-      echo("-#-" . INDENT);
+      $content .= "-#-" . INDENT;
    }
 
    for($i = 65; $i < 91; $i++)
@@ -115,45 +123,49 @@ function subjects_main($SubjectTypeID)
          {
             $href .= "&amp;subjecttypeid=$SubjectTypeID";
          }
-         echo("<a href='$href'>-$char-</a>" . INDENT);
+         $content .= "<a href='$href'>-$char-</a>" . INDENT;
       }
       else
       {
-         echo("-$char-" . INDENT);
+         $content .= "-$char-" . INDENT;
       }
 
       if($char == 'M')
       {
-         echo("<br/><br/>\n");
+         $content .= "<br /><br />\n";
       }
    }
-   echo("<br/><br/><a href='?p={$_REQUEST['p']}&amp;browse&amp;subjecttypeid={$SubjectTypeID}'>{$strViewAll}</a>");
+   $content .= "<br /><br /><a href='?p={$_REQUEST['p']}&amp;browse&amp;subjecttypeid={$SubjectTypeID}'>{$strViewAll}</a>";
+   $content .= "</div>\n";
 
    $objFilterByPhrase = Phrase::getPhrase('subjects_filterby', PACKAGE_SUBJECTS, 0, PHRASETYPE_PUBLIC);
    $strFilterBy = $objFilterByPhrase ? $objFilterByPhrase->getPhraseValue(ENCODE_HTML) : 'Filter Subjects by';
 
-   ?>
-</div><br/>
-<span class='bold'><?php echo($strFilterBy); ?>:</span>
-<br/><br/>
-   <?php
+	$vars['strFilterBy'] = $strFilterBy;
+
+   $subTopics = '';
+
    if(!empty($arrSubjectTypes))
    {
       foreach($arrSubjectTypes as $objSubjectType)
       {
          if($objSubjectType->ID != $SubjectTypeID)
          {
-            echo("<a href='?p={$_REQUEST['p']}&amp;subjecttypeid=$objSubjectType->ID'>" . $objSubjectType->toString() . "</a><br/>");
+            $subTopics .= "<a href='?p={$_REQUEST['p']}&amp;subjecttypeid=$objSubjectType->ID'>" . $objSubjectType->toString() . "</a><br />";
          }
          else
          {
-            echo("{$objSubjectType->toString()}<br/>");
+            $subTopics .= "{$objSubjectType->toString()}<br />";
          }
       }
    }
-   ?>
-</div>
-   <?php
+
+
+
+   $vars['content'] = $content;
+   $vars['subTopics'] = $subTopics;
+
+   return $vars;
 }
 
 
@@ -161,8 +173,6 @@ function subjects_listChildSubjects($ID)
 {
    global $_ARCHON;
 
-   
- 
    $objSubject = New Subject($ID);
    $objSubject->dbLoad();
 
@@ -182,36 +192,41 @@ function subjects_listChildSubjects($ID)
       header("Location: index.php?p=core/search&subjectid=$ID");
    }else
    {
-      require_once("header.inc.php");
 
       if(!$_ARCHON->PublicInterface->Templates[$_ARCHON->Package->APRCode]['SubjectList'])
       {
          $_ARCHON->declareError("Could not list Subjects: SubjectList template not defined for template set {$_ARCHON->PublicInterface->TemplateSet}.");
       }
 
-      echo("<h1 id='titleheader'>" . strip_tags($_ARCHON->PublicInterface->Title) . "</h1>\n");
-      echo("<div class='listitemhead bold'>$strSubTermHeader:</div><br/><br/>\n");
-      echo("<div id='listitemwrapper' class='bground'><div class='listitemcover'></div>");
-      echo("<span class='small' style='margin-left:.5em'>(<a href='?p=core/search&amp;subjectid=$ID'>$strRelatedRecords</a>)</span>");
-      echo("<br/><br/>\n");
+      $vars['strPageTitle'] = strip_tags($_ARCHON->PublicInterface->Title);
+      $vars['strSubTitleClasses'] = 'listitemhead bold';
+      $vars['strSubTitle'] = $strSubTermHeader.':';
+      $vars['strBackgroundID'] = 'listitemwrapper';
+
+      $content = '';
+
+      $content .= "<span class='small' style='margin-left:.5em'>(<a href='?p=core/search&amp;subjectid=$ID'>$strRelatedRecords</a>)</span>";
 
 
       foreach($arrSubjects as $objSubject)
       {
-         eval($_ARCHON->PublicInterface->Templates[$_ARCHON->Package->APRCode]['SubjectList']);
+		ob_start();
+        eval($_ARCHON->PublicInterface->Templates[$_ARCHON->Package->APRCode]['SubjectList']);
+		$content .= ob_get_contents();
+		ob_end_clean();
       }
-      echo ("</div>");
    }
 
+   $vars['content'] = $content;
+   $vars['subTopics'] = false;
+
+   return $vars;
 }
 
 
 function subjects_listSubjectsForChar($Char, $SubjectTypeID)
 {
    global $_ARCHON;
-
-
-   
 
    $objTypedBeginningWithPhrase = Phrase::getPhrase('subjects_typedbeginningwith', PACKAGE_SUBJECTS, 0, PHRASETYPE_PUBLIC);
    $strTypedBeginningWith = $objTypedBeginningWithPhrase ? $objTypedBeginningWithPhrase->getPhraseValue(ENCODE_HTML) : 'Of Type "$1" Beginning with "$2"';
@@ -232,16 +247,17 @@ function subjects_listSubjectsForChar($Char, $SubjectTypeID)
    }
 
 
-   require_once("header.inc.php");
-
    if(!$_ARCHON->PublicInterface->Templates[$_ARCHON->Package->APRCode]['SubjectList'])
    {
       $_ARCHON->declareError("Could not list Subjects: SubjectList template not defined for template set {$_ARCHON->PublicInterface->TemplateSet}.");
    }
 
 
-   echo("<h1 id='titleheader'>" . strip_tags($_ARCHON->PublicInterface->Title) . "</h1>\n");
+   $vars['strPageTitle'] = strip_tags($_ARCHON->PublicInterface->Title);
+   $vars['strSubTitleClasses'] = 'listitemhead bold';
+   $vars['strBackgroundID'] = '';
 
+   $content = '';
 
    $arrSubjects = $_ARCHON->getSubjectsForChar($Char, $SubjectTypeID);
 
@@ -253,7 +269,7 @@ function subjects_listSubjectsForChar($Char, $SubjectTypeID)
          $strTypedBeginningWithHeader = $objTypedBeginningWithHeaderPhrase ? $objTypedBeginningWithHeaderPhrase->getPhraseValue(ENCODE_HTML) : '"$1" Subjects Beginning with "$2"';
          $strTypedBeginningWithHeader = str_replace(array('$1', '$2'), array($arrSubjectTypes[$SubjectTypeID]->toString(), encoding_strtoupper($Char)), $strTypedBeginningWithHeader);
 
-         echo("<div class='listitemhead bold'>$strTypedBeginningWithHeader</div><br/><br/>\n");
+         $vars['strSubTitle'].= $strTypedBeginningWithHeader;
       }
       else
       {
@@ -261,20 +277,24 @@ function subjects_listSubjectsForChar($Char, $SubjectTypeID)
          $strSubjectsBeginningWithHeader = $objSubjectsBeginningWithHeaderPhrase ? $objSubjectsBeginningWithHeaderPhrase->getPhraseValue(ENCODE_HTML) : 'Subjects Beginning with "$1"';
          $strSubjectsBeginningWithHeader = str_replace('$1', encoding_strtoupper($Char), $strSubjectsBeginningWithHeader);
 
-         echo("<div class='listitemhead bold'>$strSubjectsBeginningWithHeader</div><br/><br/>\n");
+         $vars['strSubTitle'] = $strSubjectsBeginningWithHeader;
       }
-
-      echo("<div id='listitemwrapper' class='bground'><div class='listitemcover'></div>");
 
       foreach($arrSubjects as $objSubject)
       {
+         ob_start();
          eval($_ARCHON->PublicInterface->Templates[$_ARCHON->Package->APRCode]['SubjectList']);
+         $content .= ob_get_contents();
+         ob_end_clean();
       }
-
-      echo("</div>");
    }
 
+   $vars['content'] = $content;
+   $vars['subTopics'] = false;
+
+   return $vars;
 }
+
 
 function subjects_listAllSubjects($Page, $SubjectTypeID)
 {
@@ -304,53 +324,63 @@ function subjects_listAllSubjects($Page, $SubjectTypeID)
 
    $_ARCHON->PublicInterface->addNavigation($strViewAll);
 
-   require_once("header.inc.php");
 
    if(!$_ARCHON->PublicInterface->Templates[$_ARCHON->Package->APRCode]['SubjectList'])
    {
       $_ARCHON->declareError("Could not list Subjects: SubjectList template not defined for template set {$_ARCHON->PublicInterface->TemplateSet}.");
    }
 
-   echo("<h1 id='titleheader'>" . strip_tags($_ARCHON->PublicInterface->Title) . "</h1>\n");
+   $vars['strPageTitle'] = strip_tags($_ARCHON->PublicInterface->Title);
+   $vars['strSubTitleClasses'] = 'listitemhead bold';
+   $vars['strBackgroundID'] = '';
 
+   $content = '';
 
    if(!$_ARCHON->Error)
    {
       if(!empty($arrSubjects))
       {
-         echo("<div class='listitemhead bold'>$strViewAll</div><br/><br/>\n");
-         echo("<div id='listitemwrapper' class='bground'><div class='listitemcover'></div>");
+         $vars['strSubTitle'] = $strViewAll;
 
          foreach($arrSubjects as $objSubject)
          {
+            ob_start();
             eval($_ARCHON->PublicInterface->Templates[$_ARCHON->Package->APRCode]['SubjectList']);
+            $content .= ob_get_contents();
+            ob_end_clean();
          }
-
-         echo("</div>");
       }
+
 
       if($Page > 1 || $morePages)
       {
-         echo("<div class='paginationnav'>");
+         $pages = '';
+         $pages .= "<div class='paginationnav'>";
 
          if($Page > 1)
          {
             $prevPage = $Page - 1;
             $prevURL = encode($paginationURL . "&page=$prevPage", ENCODE_HTML);
-            echo("<span class='paginationprevlink'><a href='$prevURL'>Prev</a></span>");
+            $pages .= "<span class='paginationprevlink'><a href='$prevURL'>Prev</a></span>";
          }
          if($morePages)
          {
             $nextPage = $Page + 1;
             $nextURL = encode($paginationURL . "&page=$nextPage", ENCODE_HTML);
-            echo("<span class='paginationnextlink'><a href='$nextURL'>Next</a></span>");
+            $pages .= "<span class='paginationnextlink'><a href='$nextURL'>Next</a></span>";
          }
-         echo("</div>");
+         $pages .= "</div>";
       }
    }
+
+   $vars['content'] = $content;
+   if(isset($pages)){ $vars['pages'] = $pages; }
+
+   return $vars;
 }
 
 
-require_once("footer.inc.php");
+
+
 
 ?>

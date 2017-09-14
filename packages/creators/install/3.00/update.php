@@ -7,7 +7,7 @@ ArchonInstaller::updateDBProgressTable('', "Set RepositoryID to default reposito
 $query = "SELECT Value FROM tblCore_Configuration WHERE Directive = 'Default Repository'";
 
 $result = $_ARCHON->mdb2->query($query);
-if (PEAR::isError($result))
+if (pear_isError($result))
 {
    trigger_error($result->getMessage(), E_USER_ERROR);
 }
@@ -25,7 +25,7 @@ ArchonInstaller::updateDBProgressTable('', "Copy any ParentBody fields into new 
 $query = "SELECT ID FROM tblCreators_CreatorTypes WHERE CreatorType = 'Unassigned'";
 
 $result = $_ARCHON->mdb2->query($query);
-if (PEAR::isError($result))
+if (pear_isError($result))
 {
    trigger_error($result->getMessage(), E_USER_ERROR);
 }
@@ -35,7 +35,7 @@ $result->free();
 
 $query = "SELECT ID,ParentBody FROM tblCreators_Creators WHERE ParentBody IS NOT NULL AND ParentBody != ''";
 $result = $_ARCHON->mdb2->query($query);
-if (PEAR::isError($result))
+if (pear_isError($result))
 {
    trigger_error($result->getMessage(), E_USER_ERROR);
 }
@@ -46,7 +46,7 @@ while($row = $result->fetchRow())
    $query = "SELECT ID FROM tblCreators_Creators WHERE Name ='".$strParentBody."' OR NameFullerForm ='".$strParentBody."' OR NameVariants ='".$strParentBody."'";
    $_ARCHON->mdb2->setLimit(1);
    $parentbodyresult = $_ARCHON->mdb2->query($query);
-   if (PEAR::isError($parentbodyresult))
+   if (pear_isError($parentbodyresult))
    {
       trigger_error($parentbodyresult->getMessage(), E_USER_ERROR);
    }
@@ -64,7 +64,7 @@ while($row = $result->fetchRow())
 
       $query = "SELECT ID FROM tblCreators_Creators WHERE Name = '".$strParentBody."'";
       $parentbodyresult = $_ARCHON->mdb2->query($query);
-      if (PEAR::isError($parentbodyresult))
+      if (pear_isError($parentbodyresult))
       {
          trigger_error($parentbodyresult->getMessage(), E_USER_ERROR);
       }
@@ -88,7 +88,7 @@ ArchonInstaller::updateDBProgressTable('', "Copy any RelatedCreators fields into
 
 $query = "SELECT ID,RelatedCreators FROM tblCreators_Creators WHERE RelatedCreators IS NOT NULL AND RelatedCreators != ''";
 $result = $_ARCHON->mdb2->query($query);
-if (PEAR::isError($result))
+if (pear_isError($result))
 {
    trigger_error($result->getMessage(), E_USER_ERROR);
 }
@@ -99,7 +99,7 @@ while($row = $result->fetchRow())
    $query = "SELECT ID FROM tblCreators_Creators WHERE Name ='".$strRelatedCreators."' OR NameFullerForm ='".$strRelatedCreators."' OR NameVariants ='".$strRelatedCreators."'";
    $_ARCHON->mdb2->setLimit(1);
    $relatedcreatorsresult = $_ARCHON->mdb2->query($query);
-   if (PEAR::isError($relatedcreatorsresult))
+   if (pear_isError($relatedcreatorsresult))
    {
       trigger_error($relatedcreatorsresult->getMessage(), E_USER_ERROR);
    }
@@ -118,7 +118,7 @@ while($row = $result->fetchRow())
 
       $query = "SELECT ID FROM tblCreators_Creators WHERE Name = '".$strRelatedCreators."'";
       $relatedcreatorsresult = $_ARCHON->mdb2->query($query);
-      if (PEAR::isError($relatedcreatorsresult))
+      if (pear_isError($relatedcreatorsresult))
       {
          trigger_error($relatedcreatorsresult->getMessage(), E_USER_ERROR);
       }

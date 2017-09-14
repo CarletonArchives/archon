@@ -205,7 +205,7 @@ function locations_ui_main()
 
       foreach($_ARCHON->getExtentForLocation($_ARCHON->AdministrativeInterface->Object->ID) as $objExtent)
       {
-         $strExtents[] = $objExtent->Extent . ' ' . ($objExtent->ExtentUnit ? $objExtent->ExtentUnit->getString('ExtentUnit') : '');
+         $strExtents[] = $objExtent->Extent . ' ' . ($objExtent->ExtentUnit ? $objExtent->ExtentUnit->toString() : '');
       }
       $infoSection->insertRow('extentinformation')->insertInformation('ExtentInformation', $strExtents);
    }

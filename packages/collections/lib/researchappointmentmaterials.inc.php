@@ -123,7 +123,7 @@ abstract class Collections_ResearchAppointmentMaterials
             $prep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer', 'integer'), MDB2_PREPARE_MANIP);
         }
         $affected = $prep->execute(array(time(), $_ARCHON->Security->Session->getUserID(), $this->ID));
-        if (PEAR::isError($affected)) {
+        if (pear_isError($affected)) {
             trigger_error($affected->getMessage(), E_USER_ERROR);
         }
 

@@ -76,7 +76,7 @@ abstract class Collections_ResearchAppointment
          $existPrep = $_ARCHON->mdb2->prepare('SELECT ID FROM tblCollections_ResearchAppointments WHERE ID = ?', 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $existPrep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -96,7 +96,7 @@ abstract class Collections_ResearchAppointment
          $loadPrep = $_ARCHON->mdb2->prepare('SELECT * FROM tblCollections_ResearchAppointmentMaterialsIndex WHERE AppointmentID = ?', 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $loadPrep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -203,7 +203,7 @@ abstract class Collections_ResearchAppointment
          $collectionPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $collectionPrep->execute($CollectionID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -226,7 +226,7 @@ abstract class Collections_ResearchAppointment
             $contentPrep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
          }
          $result = $contentPrep->execute($CollectionContentID);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -254,7 +254,7 @@ abstract class Collections_ResearchAppointment
          $checkprep = $_ARCHON->mdb2->prepare($checkquery, array('integer', 'integer', 'integer'), MDB2_PREPARE_RESULT);
       }
       $result = $checkprep->execute(array($this->ID, $CollectionID, $CollectionContentID));
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -275,13 +275,13 @@ abstract class Collections_ResearchAppointment
          $insertPrep = $_ARCHON->mdb2->prepare($query, array('integer', 'integer', 'integer'), MDB2_PREPARE_MANIP);
       }
       $affected = $insertPrep->execute(array($this->ID, $CollectionID, $CollectionContentID));
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
 
       $result = $checkprep->execute(array($this->ID, $CollectionID, $CollectionContentID));
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -349,7 +349,7 @@ abstract class Collections_ResearchAppointment
 
       $prep = $_ARCHON->mdb2->prepare($query, $types, MDB2_PREPARE_MANIP);
       $affected = $prep->execute($vars);
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }
@@ -413,7 +413,7 @@ abstract class Collections_ResearchAppointment
 
       $prep = $_ARCHON->mdb2->prepare($query, $types, MDB2_PREPARE_MANIP);
       $affected = $prep->execute($vars);
-      if(PEAR::isError($affected))
+      if(pear_isError($affected))
       {
          trigger_error($affected->getMessage(), E_USER_ERROR);
       }

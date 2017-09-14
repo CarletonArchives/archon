@@ -325,15 +325,16 @@ else
     $_ARCHON->PublicInterface->addNavigation($objBook->getString('Title', 30), "?p=collections/bookcard&amp;id=$objBook->ID");
     $_ARCHON->PublicInterface->addNavigation($strMarcRecord, "?p={$_REQUEST['p']}&amp;id=$objBook->ID");
 
+
+	$vars = array(
+		'strPageTitle' => strip_tags($_ARCHON->PublicInterface->Title),
+		'strSubTitle' => str_replace('$1', $objBook->toString(), $strRecordForBook),
+		'strMarcHTML' => nl2br(encode($objMARCRecord->formatted(), ENCODE_HTML)),
+		'strRawLink' => "<a href=\"?p={$_REQUEST['p']}&amp;id=$objBook->ID&amp;raw=1\">$strRawMarc</a>",
+	);
+
     require("header.inc.php");
-    echo("<h1 id='titleheader'>" . strip_tags($_ARCHON->PublicInterface->Title) . "</h1>\n");
-
-    echo(str_replace('$1', $objBook->toString(), $strRecordForBook) . "<br/><br/>\n");
-    echo("<pre>");
-    echo(nl2br(encode($objMARCRecord->formatted(), ENCODE_HTML)));
-    echo("</pre>");
-    echo("<br/><a href='?p={$_REQUEST['p']}&amp;id=$objBook->ID&amp;raw=1'>$strRawMarc</a>");
-
+	echo($_ARCHON->PublicInterface->executeTemplate('collections', 'Marc', $vars));
     require("footer.inc.php");
 }
 ?>

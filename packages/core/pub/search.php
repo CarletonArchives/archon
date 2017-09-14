@@ -29,7 +29,13 @@ else
 }
 
 require_once("header.inc.php");
-echo("<h1 id='titleheader'>" . strip_tags($_ARCHON->PublicInterface->Title) . "</h1>\n");
+
+if(!$_ARCHON->Error)
+{
+	$strPageTitle = strip_tags($_ARCHON->PublicInterface->Title);
+	eval($_ARCHON->PublicInterface->Templates['core']['SearchTitle']);
+}
+
 
 $in_LanguageID = $_REQUEST['languageid'] ? $_REQUEST['languageid'] : 0;
 
@@ -108,5 +114,5 @@ else
 }
 
 
-echo ("<br/>");
+echo ("<br />");
 require_once("footer.inc.php");

@@ -16,7 +16,7 @@ abstract class Collections_ExtentUnit
       $collIDPrep = $collIDPrep ? $collIDPrep : $_ARCHON->mdb2->prepare('SELECT ID FROM tblCollections_Collections WHERE ExtentUnitID = ?', 'integer', MDB2_PREPARE_RESULT);
 
       $result = $collIDPrep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -86,7 +86,7 @@ abstract class Collections_ExtentUnit
       $collIDPrep = $collIDPrep ? $collIDPrep : $_ARCHON->mdb2->prepare('SELECT ID FROM tblCollections_Collections WHERE ExtentUnitID = ?', 'integer', MDB2_PREPARE_RESULT);
 
       $result = $collIDPrep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }

@@ -182,7 +182,7 @@ abstract class Books_Books
       $query = "SELECT tblCreators_Creators.*, tblCollections_BookCreatorIndex.PrimaryCreator FROM tblCreators_Creators JOIN tblCollections_BookCreatorIndex ON tblCreators_Creators.ID = tblCollections_BookCreatorIndex.CreatorID WHERE tblCollections_BookCreatorIndex.BookID = ? ORDER BY tblCollections_BookCreatorIndex.PrimaryCreator DESC, tblCreators_Creators.Name";
       $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       $result = $prep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -248,7 +248,7 @@ abstract class Books_Books
       $query = "SELECT tblSubjects_Subjects.* FROM tblSubjects_Subjects JOIN tblCollections_BookSubjectIndex ON tblSubjects_Subjects.ID = tblCollections_BookSubjectIndex.SubjectID WHERE tblCollections_BookSubjectIndex.BookID = ?";
       $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       $result = $prep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -317,7 +317,7 @@ abstract class Books_Books
       $query = "SELECT LanguageID FROM tblCollections_BookLanguageIndex WHERE BookID = ?";
       $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       $result = $prep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -485,7 +485,7 @@ abstract class Books_Books
          $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $prep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -531,7 +531,7 @@ abstract class Books_Books
          $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $prep->execute($this->ID);
-      if (PEAR::isError($result))
+      if (pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }

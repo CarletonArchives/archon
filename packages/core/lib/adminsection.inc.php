@@ -497,6 +497,8 @@ abstract class Core_AdminSection
          }
       }
 
+      is_array($_ARCHON->AdministrativeInterface->Object->{$this->MultipleArguments->ArrayName}) or
+         $_ARCHON->AdministrativeInterface->Object->{$this->MultipleArguments->ArrayName} = array();
       array_unshift($_ARCHON->AdministrativeInterface->Object->{$this->MultipleArguments->ArrayName}, $objNewObject);
 
       echo("<table class='multipletable'>\n");
@@ -511,7 +513,7 @@ abstract class Core_AdminSection
 
       echo("</tr>\n");
 
-      foreach ($_ARCHON->AdministrativeInterface->Object->{$this->MultipleArguments->ArrayName} as $objObject)
+      foreach ((array)$_ARCHON->AdministrativeInterface->Object->{$this->MultipleArguments->ArrayName} as $objObject)
       {
          $this->CurrentMultipleObject = $objObject;
 
@@ -562,6 +564,8 @@ abstract class Core_AdminSection
          global $_ARCHON;
 
          $this->Modal = true;
+         isset($this->DialogArguments) or
+            $this->DialogArguments = new stdClass();
          $this->DialogArguments->Type = $DialogType;
          $this->DialogArguments->Object = $Object;
          $this->DialogArguments->PValue = $PValue;
@@ -573,6 +577,8 @@ abstract class Core_AdminSection
       {
          global $_ARCHON;
 
+         isset($this->MultipleArguments) or
+            $this->MultipleArguments = new stdClass();
          $this->MultipleArguments->Class = $Class;
          $this->MultipleArguments->ArrayName = $ArrayName;
          $this->MultipleArguments->ArrayLoadFunction = $ArrayLoadFunction;
@@ -583,6 +589,8 @@ abstract class Core_AdminSection
       {
          global $_ARCHON;
 
+         isset($this->PermissionArguments) or
+            $this->PermissionArguments = new stdClass();
          $this->PermissionArguments->GetPermissionsFunction = $GetPermissionsFunction;
 
          $_ARCHON->AdministrativeInterface->addReloadSection($this);

@@ -17,7 +17,7 @@ abstract class Collections_Location
       $query = "SELECT ID FROM tblCollections_CollectionLocationIndex WHERE LocationID = ?";
       $prep = $_ARCHON->mdb2->prepare($query, array('integer'), MDB2_PREPARE_RESULT);
       $result = $prep->execute(array($ID));
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -33,7 +33,7 @@ abstract class Collections_Location
          $query = "SELECT ID FROM tblAccessions_AccessionLocationIndex WHERE LocationID = ?";
          $prep = $_ARCHON->mdb2->prepare($query, array('integer'), MDB2_PREPARE_RESULT);
          $result = $prep->execute(array($ID));
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -113,7 +113,7 @@ abstract class Collections_Location
          $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $prep->execute($this->ID);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -154,7 +154,7 @@ abstract class Collections_Location
       $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       $result = $prep->execute($this->ID);
 
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -295,7 +295,7 @@ abstract class Collections_Location
             $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
          }
          $result = $prep->execute($this->ID);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }

@@ -38,7 +38,7 @@ abstract class Subjects_Archon
          $query = "SELECT ID FROM tblSubjects_Subjects WHERE (Subject LIKE '0%' OR Subject LIKE '1%' OR Subject LIKE '2%' OR Subject LIKE '3%' OR Subject LIKE '4%' OR Subject LIKE '5%' OR Subject LIKE '6%' OR Subject LIKE '7%' OR Subject LIKE '8%' OR Subject LIKE '9%')$subjecttypeidquery";
          $prep = $this->mdb2->prepare($query, $subjecttypeidtypes, MDB2_PREPARE_RESULT);
          $result = $prep->execute($subjecttypeidtypes);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
@@ -54,7 +54,7 @@ abstract class Subjects_Archon
             $char = chr($i);
 
             $result = $prep->execute(array_merge(array("$char%"), $subjecttypeidvars));
-            if(PEAR::isError($result))
+            if(pear_isError($result))
             {
                trigger_error($result->getMessage(), E_USER_ERROR);
             }
@@ -148,6 +148,12 @@ abstract class Subjects_Archon
    {
       $arrSubjects = $this->loadTable("tblSubjects_Subjects", "Subject", "Subject");
 
+	  foreach($arrSubjects as &$objSubject)
+	  
+	  {
+	  $objSubject->dbLoadSubjectSource();
+	  }
+
       if($MakeIntoIndex)
       {
          foreach($arrSubjects as $objSubject)
@@ -181,6 +187,62 @@ abstract class Subjects_Archon
          return $arrSubjects;
       }
    }
+
+ /**
+    * Retrieves all Subjects from the database in ID order and w/out subject sources, 
+    * for ASpace migration
+    *
+    * If $MakeIntoIndex is false, the returned array of Subject objects
+    * is sorted by Subject and has IDs as keys.
+    *
+    * If $MakeIntoIndex is true, the returned array is a
+    * two dimensional array, with the first dimension indexed with
+    * 0 (representing numeric characters) and the lowercase characters a-z.
+    * Each of those arrays will contain a sorted set of Subject objects, with
+    * the Subject's IDs as keys.
+    *
+    * @param boolean $MakeIntoIndex[optional]
+    * @return Subject[]
+    */
+   public function getAllSubjectsforJSON($MakeIntoIndex = false)
+   {
+      $arrSubjects = $this->loadTable("tblSubjects_Subjects", "Subject", "ID");
+
+      if($MakeIntoIndex)
+      {
+         foreach($arrSubjects as $objSubject)
+         {
+            $arrSorter[$objSubject->toString(LINK_NONE, true)] = $objSubject;
+         }
+
+         natcaseksort($arrSorter);
+
+         $arrIndex = array();
+
+         if(!empty($arrSorter))
+         {
+            foreach($arrSorter as $strSubject => &$objSubject)
+            {
+               if(is_natural($strSubject{0}))
+               {
+                  $arrIndex['#'][$objSubject->ID] = $objSubject;
+               }
+
+               $arrIndex[encoding_strtolower($strSubject{0})][$objSubject->ID] = $objSubject;
+            }
+
+            ksort($arrIndex);
+         }
+
+         return $arrIndex;
+      }
+      else
+      {
+         return $arrSubjects;
+      }
+   }
+
+
 
    /**
     * Retrieves all Subjects for a subject type from the database
@@ -405,7 +467,7 @@ abstract class Subjects_Archon
       $this->mdb2->setLimit(1);
       $prep = $this->mdb2->prepare("SELECT ID FROM tblSubjects_Subjects WHERE Subject LIKE ?$parent_query ORDER BY ParentID", array_merge(array('text'), $parent_types), MDB2_PREPARE_RESULT);
       $result = $prep->execute(array_merge(array($String), $parent_vars));
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -461,7 +523,7 @@ abstract class Subjects_Archon
 
       $prep = $this->mdb2->prepare($query, $subjecttypeidtypes, MDB2_PREPARE_RESULT);
       $result = $prep->execute($subjecttypeidvars);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -490,7 +552,7 @@ abstract class Subjects_Archon
       $this->mdb2->setLimit(1);
       $prep = $this->mdb2->prepare("SELECT ID FROM tblSubjects_SubjectSources WHERE SubjectSource LIKE ?", 'text', MDB2_PREPARE_RESULT);
       $result = $prep->execute($String);
-      if(PEAR::isError($result))
+      if(pear_isError($result))
       {
          trigger_error($result->getMessage(), E_USER_ERROR);
       }
@@ -561,7 +623,7 @@ abstract class Subjects_Archon
                $result = $facetedPrep->execute(trim($facet));
             }
 
-            if(PEAR::isError($result))
+            if(pear_isError($result))
             {
                trigger_error($result->getMessage(), E_USER_ERROR);
             }
@@ -687,7 +749,7 @@ abstract class Subjects_Archon
          call_user_func_array(array($this->mdb2, 'setLimit'), $limitparams);
          $prep = $this->mdb2->prepare($query, $wheretypes, MDB2_PREPARE_RESULT);
          $result = $prep->execute($wherevars);
-         if(PEAR::isError($result))
+         if(pear_isError($result))
          {
             trigger_error($result->getMessage(), E_USER_ERROR);
          }
