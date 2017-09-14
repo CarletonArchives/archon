@@ -27,7 +27,7 @@ where tblDigitalLibrary_Files.FileTypeID = '2' and
 tblDigitalLibrary_Files.DefaultAccessLevel = '2' AND 
 tblDigitalLibrary_DigitalContent.Browsable = 1
 and tblDigitalLibrary_Files.DigitalContentID = 	tblDigitalLibrary_DigitalContent.ID
-ORDER BY RAND() LIMIT 5";        
+ORDER BY RAND() LIMIT 5";
 $result = $_ARCHON -> mdb2 -> query($query);
 if (PEAR::isError($res)) {
     trigger_error($result->getMessage(), E_USER_ERROR);

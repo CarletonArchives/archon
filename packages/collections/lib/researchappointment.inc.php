@@ -643,7 +643,7 @@ $Summary\n\n";
 
       if($Repository->Email)
       {
-         if(!mail(encoding_convert_encoding($Repository->Email, 'ISO-8859-1'), encoding_convert_encoding($Repository->Name, 'ISO-8859-1') . ": Research Request Received", encoding_convert_encoding($ArchivistMessage, 'ISO-8859-1'), "From: " . encoding_convert_encoding($this->Researcher->Email, 'ISO-8859-1')))
+         if(!mail(encoding_convert_encoding($Repository->Email, 'ISO-8859-1'), encoding_convert_encoding($Repository->Name, 'ISO-8859-1') . ": Research Request Received From {$this->Researcher->FirstName} {$this->Researcher->LastName}", encoding_convert_encoding($ArchivistMessage, 'ISO-8859-1'), "From: " . encoding_convert_encoding($this->Researcher->Email, 'ISO-8859-1')))
          {
             $_ARCHON->declareError("Could not send appointment emails: mail() reported an error for ArchivistMessage.");
             return false;

@@ -4,6 +4,8 @@
  *
  * @package Archon
  * @author Chris Rishel
+ *
+ * TODO: Test research stuff.
  */
 isset($_ARCHON) or die();
 
@@ -415,7 +417,7 @@ function research_exec()
          ?>
          {"response":
          {
-         "message":"Item added to research cart",
+         "message":"Item added to research cart <br><br><a href='?p=collections/research&f=cart'>View Cart (<?php echo($_ARCHON->Security->Session->ResearchCart->getCartCount()); ?>)</a>",
          "cartcount":<?php echo($_ARCHON->Security->Session->ResearchCart->getCartCount()); ?>
          }
          }

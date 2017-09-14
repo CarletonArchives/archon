@@ -631,7 +631,7 @@ abstract class Collections_Collection
             }
             $result->free();
 
-            $query = "SELECT ID,CollectionContentID FROM tblDigitalLibrary_DigitalContent WHERE CollectionContentID IN (SELECT CollectionContentID FROM tblDigitalLibrary_DigitalContent WHERE CollectionID = $this->ID AND CollectionContentID IN (" . implode(",", $contentKeys) . ") $browsable GROUP BY CollectionContentID HAVING COUNT(1) = 1)";
+            $query = "SELECT dd.ID,dd.CollectionContentID FROM tblDigitalLibrary_DigitalContent dd, (SELECT CollectionContentID FROM tblDigitalLibrary_DigitalContent WHERE CollectionID = $this->ID AND CollectionContentID IN (" . implode(",", $contentKeys) . ") $browsable GROUP BY CollectionContentID HAVING COUNT(1) = 1) a where dd.CollectionContentID = a.CollectionContentID";
             $result = $_ARCHON->mdb2->query($query);
             if(pear_isError($result))
             {
@@ -647,6 +647,7 @@ abstract class Collections_Collection
             foreach($arrContentStrings as $ContentID => $String)
             {
                $this->Content[$ContentID]['String'] .= "<a href='$String'><img class='dl' src='{$_ARCHON->PublicInterface->ImagePath}/dl.gif' title='$strViewContent' alt='$strViewContent' /></a>";
+               $this->Content[$ContentID]["DigitalContentLink"] = $arrContentStrings[$ContentID];
             }
          }
          else

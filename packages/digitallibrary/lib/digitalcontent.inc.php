@@ -244,7 +244,8 @@ abstract class DigitalLibrary_DigitalContent
       static $prep = NULL;
       if(!isset($prep))
       {
-         $query = "SELECT ID, DefaultAccessLevel, DigitalContentID, Title, Filename, FileTypeID, Size, DisplayOrder FROM tblDigitalLibrary_Files WHERE DigitalContentID = ? ORDER BY DisplayOrder, Title";
+            //Loads DirectLink of each File as well
+            $query = "SELECT ID, DefaultAccessLevel, DigitalContentID, Title, Filename, FileTypeID, DirectLink, Size, DisplayOrder FROM tblDigitalLibrary_Files WHERE DigitalContentID = ? ORDER BY DisplayOrder, Title";
          $prep = $_ARCHON->mdb2->prepare($query, 'integer', MDB2_PREPARE_RESULT);
       }
       $result = $prep->execute($this->ID);
@@ -456,13 +457,13 @@ abstract class DigitalLibrary_DigitalContent
          $arrSorter[$objSubject->toString(LINK_NONE, true)] = $objSubject;
 
          // this should now be taken care of by calling dbLoad() within the subject class which is invoked by toString()
-//         // In case parents are used multiple times
-//         $objTransSubject = $objSubject;
-//         while($objTransSubject)
-//         {
-//            $_ARCHON->MemoryCache['Objects']['Subject'][$objTransSubject->ID] = $objTransSubject;
-//            $objTransSubject = $objTransSubject->Parent;
-//         }
+            // // In case parents are used multiple times
+            // $objTransSubject = $objSubject;
+            // while($objTransSubject)
+            // {
+            //    $_ARCHON->MemoryCache['Objects']['Subject'][$objTransSubject->ID] = $objTransSubject;
+            //    $objTransSubject = $objTransSubject->Parent;
+            // }
       }
       $result->free();
       $prep->free();
@@ -515,6 +516,68 @@ abstract class DigitalLibrary_DigitalContent
 
       return true;
    }
+
+
+    /**
+    * Digital Library Update – Last edited by Caleb Braun 7/20/16
+    * Gets all of the files currently in the ContentURL directory
+    *
+    * @return array($fileURL => $fileSize, errorsArray)
+    */
+    public function getContentURLFilePaths()
+    {
+        global $_ARCHON;
+
+        $fileArray = array();
+        $unrecognizable = array();
+
+        if ($this -> ContentURL)
+        {
+            // Get the file path from "files" to the directory the file is in
+            preg_match("/files.*/", $this -> ContentURL, $matches);
+            $contentURLFilePath = $matches[0];
+
+            if (is_dir($contentURLFilePath))
+            {
+                $filedir = scandir($contentURLFilePath);
+
+                // Get every file in the directory that is valid
+                foreach($filedir as $file) {
+                    $filePath = $contentURLFilePath . "/" . $file;
+                    $ext = pathinfo($filePath, PATHINFO_EXTENSION);
+                    $ext = encoding_strtolower($ext);
+
+                    if ($file[0] == '.' || is_dir($filePath)) {
+                        continue;
+                    }
+                    elseif ($_ARCHON->getFileTypeForExtension($ext)) {
+                        $fileArray[$this -> ContentURL."/".$file] = filesize($filePath);
+                    } else {
+                        $unrecognizable[] = $this -> ContentURL."/".$file;
+                    }
+                }
+            }
+            else {
+                // Check if the content url refers to an item with a valid extension
+                $ext = pathinfo($contentURLFilePath, PATHINFO_EXTENSION);
+                $ext = encoding_strtolower($ext);
+                if ($_ARCHON->getFileTypeForExtension($ext)) {
+                    $fileArray[$this -> ContentURL] = filesize($contentURLFilePath);
+                }
+                else {
+                    $unrecognizable[] = $this -> ContentURL;
+                }
+            }
+        }
+        else
+        {
+            $_ARCHON->declareError("No URL found for location of digital content.");
+        }
+
+        $fileArray["Errors"] = $unrecognizable;
+        return $fileArray;
+    }
+
 
    /**
     * Stores DigitalContent to the database
@@ -832,7 +895,7 @@ abstract class DigitalLibrary_DigitalContent
    /**
     * @var integer
     */
-//   public $DefaultAccessLevel = DIGITALLIBRARY_ACCESSLEVEL_FULL;
+    //   public $DefaultAccessLevel = DIGITALLIBRARY_ACCESSLEVEL_FULL;
    /**
     * @var bit
     */

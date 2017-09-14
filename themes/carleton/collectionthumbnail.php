@@ -11,56 +11,13 @@ as a thumbnail.
 *
 *The following lines will have to be changed depending on the institution's database and system configuration:
 *
-*$mysql_link = mysql_connect("localhost", "[database user name]", "[user password]");
-*Note: "Localhost" should work for most instances.
-*
-*mysql_select_db("[database name]", $mysql_link) or die("Could not select database");
-*
-*It is also necessary to make a new limited database user for this function. In the case below, I made a user
-*named "archon" with the following database privileges:
-*
-*Select
-
 *Bug: Certrain special characters dont get passes well through the variables and come out as "?." This might be fixed if we
 *decoded the characters as they come out in index.php
 
 */
 
 
-/*  Connects to the database  */
-
-/*$mysql_link = mysql_connect("localhost", "readuser", "readonly");
-if (!$mysql_link)
-{
-die('Could not connect: ' . mysql_error());
-}
-mysql_select_db("archon", $mysql_link) or die("Could not select database");*/
-
 /*  Looks for digital library files that are associated with the current collection  */
-
-/*$result = mysql_query(
-"Select
-tblDigitalLibrary_Files.ID,
-tblDigitalLibrary_DigitalContent.Title,
-tblDigitalLibrary_DigitalContent.CollectionID,
-tblDigitalLibrary_Files.FileTypeID,
-tblDigitalLibrary_Files.DigitalContentID
-from tblDigitalLibrary_Files,
-tblDigitalLibrary_DigitalContent
-where tblDigitalLibrary_Files.FileTypeID = '2' and
-tblDigitalLibrary_Files.DefaultAccessLevel = '2'
-and tblDigitalLibrary_Files.DigitalContentID = tblDigitalLibrary_DigitalContent.ID
-and tblDigitalLibrary_DigitalContent.CollectionID =".$objCollection->ID."
-ORDER BY RAND() LIMIT 1");
-
-while($row = mysql_fetch_object($result))
-{
-$id=$row->ID;
-$title=$row->Title;
-$collection=$row->DigitalContentID;
-}
-
-mysql_close($mysql_link);*/
 
 global $_ARCHON;
 

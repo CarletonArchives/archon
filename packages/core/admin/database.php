@@ -1,12 +1,15 @@
 <?php
 /**
- * Database Manager
- *
- *
- * @package Archon
- * @subpackage AdminUI
- * @author Chris Rishel; converted to new interface by Chris Prom, 1/29/2009
- */
+* Database Manager
+*
+* packages\core\admin\database.php
+*
+* @package Archon
+* @subpackage AdminUI
+* @author Chris Rishel; converted to new interface by Chris Prom, 1/29/2009
+* Last modified by Caleb Braun 8/17/2016
+*
+*/
 
 isset($_ARCHON) or die();
 
@@ -14,22 +17,31 @@ isset($_ARCHON) or die();
 
 database_ui_initialize();
 
+#decides what needs to be shown
 function database_ui_initialize()
 {
    global $_ARCHON;
 
+  // Loads the base page
    if(!$_REQUEST['f'])
    {
       database_ui_main();
    }
+  // Loads the import popup
    elseif($_REQUEST['f'] == 'dialog_import')
    {
       database_ui_dialog_import();
    }
+  // Loads the export popup
    elseif($_REQUEST['f'] == 'dialog_export')
    {
       database_ui_dialog_export();
    }
+  // Loads the index search popup
+  elseif($_REQUEST['f'] == 'dialog_index')
+  {
+    database_ui_dialog_index_search();
+  }
    elseif($_REQUEST['f'] == 'import')
    {
       list($APRCode, $ImportUtility) = explode('/', $_REQUEST['importutility']);
@@ -67,8 +79,53 @@ function database_ui_initialize()
          require("packages/$APRCode/db/export-$ExportUtility.inc.php");
       }
    }
+  // Runs the index search
+  elseif ($_REQUEST['f'] == 'indexitems') {
+    require_once('indexutil.php');
+  }
 }
 
+/**
+* LOAD THE DIALOG BOX FOR INDEX SEARCH
+*
+*
+* @global type $_ARCHON
+*/
+function database_ui_dialog_index_search()
+// - Goes to open dialogue in js
+// - Stores select in url param
+// - Puts param into IndexUtility
+// - We can now access and do stuff with it here!
+{
+  global $_ARCHON;
+  // Sets up the dialog
+  $dialogSection = $_ARCHON->AdministrativeInterface->insertSection('dialogform', 'dialog');
+  $_ARCHON->AdministrativeInterface->OverrideSection = $dialogSection;
+  $dialogSection->setDialogArguments('form', NULL, 'admin/core/database', 'indexitems');
+
+  // Gets the data that has been passed to the url, this will tell us which
+  // function we are using (item, collection, all) and puts it in $IndexUtility
+  list($IndexUtility) = explode('/', $_REQUEST['indexutility']);
+
+  // insertInformation() inserts a text row
+  $desc = "This utility updates the key words that will be found upon searching the database.";
+  $dialogSection->insertRow('Description')->insertInformation('desc', $desc);
+
+  // insertTextField() inserts a text box for user input
+  if ($IndexUtility == 'Collection') {
+    $dialogSection->insertRow('collidnum')->insertTextField('collidnum', 30, 100);
+  }
+  elseif ($IndexUtility == 'Item') {
+    $dialogSection->insertRow('itemidnum')->insertTextField('itemidnum', 30, 100);
+  }
+  else {
+    $yousure = "This will attempt to index all items in the database.";
+    $dialogSection->insertRow('indexallitems')->insertInformation('caution', $yousure);
+  }
+
+  // Starts the interface
+  $_ARCHON->AdministrativeInterface->outputInterface();
+}
 
 function database_ui_dialog_export()
 {
@@ -110,31 +167,33 @@ function database_ui_dialog_export()
 
 
 
+
 function database_ui_dialog_import()
 {
    global $_ARCHON;
 
    $DescriptionPhraseTypeID = $_ARCHON->getPhraseTypeIDFromString('Description');
 
-//   $objInvalidUtilityPhrase = Phrase::getPhrase('invalidutility', $_ARCHON->Package->ID, $_ARCHON->Module->ID, PHRASETYPE_ADMIN);
-//   $strInvalidUtility = $objInvalidUtilityPhrase ? $objInvalidUtilityPhrase->getPhraseValue(ENCODE_HTML) : 'Invalid Utility';
-//
-//   $objRequiresFilesPhrase = Phrase::getPhrase('requiresfiles', $_ARCHON->Package->ID, $_ARCHON->Module->ID, PHRASETYPE_ADMIN);
-//   $strRequiresFiles = $objRequiresFilesPhrase ? $objRequiresFilesPhrase->getPhraseValue(ENCODE_HTML) : 'This utility requires a file as input';
-//   $objOrPhrase = Phrase::getPhrase('or', PACKAGE_CORE, 0, PHRASETYPE_ADMIN);
-//   $strOr = $objOrPhrase ? $objOrPhrase->getPhraseValue(ENCODE_HTML) : 'or';
-//
-//   $objAreYouSurePhrase = Phrase::getPhrase('areyousure', PACKAGE_CORE, 0, PHRASETYPE_ADMIN);
-//   $strAreYouSure = $objAreYouSurePhrase ? $objAreYouSurePhrase->getPhraseValue(ENCODE_JAVASCRIPT) : 'Are you sure?';
-//
-//   $objPleaseWaitPhrase = Phrase::getPhrase('pleasewait', PACKAGE_CORE, 0, PHRASETYPE_ADMIN);
-//   $strPleaseWait = $objPleaseWaitPhrase ? $objPleaseWaitPhrase->getPhraseValue(ENCODE_JAVASCRIPT) : 'Please wait...';
+  //   $objInvalidUtilityPhrase = Phrase::getPhrase('invalidutility', $_ARCHON->Package->ID, $_ARCHON->Module->ID, PHRASETYPE_ADMIN);
+  //   $strInvalidUtility = $objInvalidUtilityPhrase ? $objInvalidUtilityPhrase->getPhraseValue(ENCODE_HTML) : 'Invalid Utility';
+  //
+  //   $objRequiresFilesPhrase = Phrase::getPhrase('requiresfiles', $_ARCHON->Package->ID, $_ARCHON->Module->ID, PHRASETYPE_ADMIN);
+  //   $strRequiresFiles = $objRequiresFilesPhrase ? $objRequiresFilesPhrase->getPhraseValue(ENCODE_HTML) : 'This utility requires a file as input';
+  //   $objOrPhrase = Phrase::getPhrase('or', PACKAGE_CORE, 0, PHRASETYPE_ADMIN);
+  //   $strOr = $objOrPhrase ? $objOrPhrase->getPhraseValue(ENCODE_HTML) : 'or';
+  //
+  //   $objAreYouSurePhrase = Phrase::getPhrase('areyousure', PACKAGE_CORE, 0, PHRASETYPE_ADMIN);
+  //   $strAreYouSure = $objAreYouSurePhrase ? $objAreYouSurePhrase->getPhraseValue(ENCODE_JAVASCRIPT) : 'Are you sure?';
+  //
+  //   $objPleaseWaitPhrase = Phrase::getPhrase('pleasewait', PACKAGE_CORE, 0, PHRASETYPE_ADMIN);
+  //   $strPleaseWait = $objPleaseWaitPhrase ? $objPleaseWaitPhrase->getPhraseValue(ENCODE_JAVASCRIPT) : 'Please wait...';
 
    $dialogSection = $_ARCHON->AdministrativeInterface->insertSection('dialogform', 'dialog');
    $_ARCHON->AdministrativeInterface->OverrideSection = $dialogSection;
    $dialogSection->setDialogArguments('form', NULL, 'admin/core/database', 'import');
 
    list($APRCode, $ImportUtility) = explode('/', $_REQUEST['importutility']);
+
 
    $objNamePhrase = Phrase::getPhrase('import_' . $ImportUtility, $_ARCHON->Packages[$APRCode]->ID, 0, PHRASETYPE_ADMIN);
    $strNamePhrase = $objNamePhrase ? $objNamePhrase->getPhraseValue(ENCODE_HTML) : $ImportUtility;
@@ -143,6 +202,7 @@ function database_ui_dialog_import()
 
    $dialogSection->insertRow('name')->insertInformation('Name', $strNamePhrase);
    $dialogSection->getRow('name')->insertHTML("<input type='hidden' class='reloadparam' name='importutility' value='{$_REQUEST['importutility']}' />");
+
 
    if($strDescriptionPhrase)
    {
@@ -201,9 +261,6 @@ function database_ui_dialog_import()
    }
 
 
-
-
-
    $_ARCHON->AdministrativeInterface->outputInterface();
 }
 
@@ -215,9 +272,6 @@ function database_ui_main()
 
    $_ARCHON->AdministrativeInterface->getSection('browse')->disable();
    $_ARCHON->AdministrativeInterface->disableQuickSearch();
-
-
-
 
    $objModulePhrase = Phrase::getPhrase('header', $_ARCHON->Package->ID, $_ARCHON->Module->ID, PHRASETYPE_ADMIN);
    $strModule = $objModulePhrase ? $objModulePhrase->getPhraseValue(ENCODE_HTML) : 'Archon Module';
@@ -234,7 +288,6 @@ function database_ui_main()
    $objInstalledPhrase = Phrase::getPhrase('installed', $_ARCHON->Package->ID, $_ARCHON->Module->ID, PHRASETYPE_ADMIN);
    $strInstalled = $objInstalledPhrase ? $objInstalledPhrase->getPhraseValue(ENCODE_HTML) : 'Installed Utilities';
   
-
    $objDatabaseInfoPhrase = Phrase::getPhrase('databaseinfo', $_ARCHON->Package->ID, $_ARCHON->Module->ID, PHRASETYPE_ADMIN);
    $strDatabaseInfo = $objDatabaseInfoPhrase ? $objDatabaseInfoPhrase->getPhraseValue(ENCODE_HTML) : 'Database Information';
 
@@ -287,7 +340,6 @@ function database_ui_main()
    //    $generalSection->getRow($strDatabaseInfo)->insertHTML("$strDiskUsagePhrase: $strDiskUsage / $strDiskFree<br/>");
    $generalSection->getRow('databaseinfo')->insertHTML("$strDiskUsagePhrase: $strDiskUsage<br/>");
 
-
    if(!empty($arrImportUtilities))
    {
       $arrImportOpts = array();
@@ -309,9 +361,11 @@ function database_ui_main()
       $import_select = $generalSection->insertRow('import')->insertSelect('importutility', $arrImportOpts, array(), NULL, 70);
       $import_select->Watch = false;
       ob_start();
+    // Close opening php tag
       ?>
-<a id="launchimport" href="#"><?php echo($strLaunch); ?></a>
-<script type="text/javascript">
+
+    <a id="launchimport" href="#"><?php echo($strLaunch); ?></a>
+    <script type="text/javascript">
    /* <![CDATA[ */
    $(function () {
       $('#launchimport').button({icons:{primary: 'ui-icon-newwin'}, disabled: true})
@@ -329,7 +383,6 @@ function database_ui_main()
    function admin_ui_submitimport()
    {
       $('#dialogmodal .relatedselect>*').attr('selected','selected');
-
 
       var admindialog = $('#dialogmodal');
       $('#dialogform').ajaxForm({
@@ -356,15 +409,12 @@ function database_ui_main()
             log.html(html);
 
             response.dialog('open');
-
          }
       });
       $('#dialogform').submit();
 
       $('#dialogform .relatedselect>*').removeAttr('selected');
    }
-
-
 
 
    function admin_ui_launchimport(){
@@ -393,12 +443,11 @@ function database_ui_main()
    }
 
    /* ]]> */
-</script>
+    </script>
       <?php
       $button = ob_get_clean();
 
       $generalSection->getRow('import')->insertHTML($button);
-
    }
 
 
@@ -424,8 +473,8 @@ function database_ui_main()
       $export_select->Watch = false;
       ob_start();
       ?>
-<a id="launchexport" href="#"><?php echo($strLaunch); ?></a>
-<script type="text/javascript">
+    <a id="launchexport" href="#"><?php echo($strLaunch); ?></a>
+    <script type="text/javascript">
    /* <![CDATA[ */
    $(function () {
       $('#launchexport').button({icons:{primary: 'ui-icon-newwin'}, disabled: true})
@@ -472,20 +521,172 @@ function database_ui_main()
    }
 
    /* ]]> */
-</script>
+
+    </script>
+
       <?php
       $button = ob_get_clean();
-
       $generalSection->getRow('export')->insertHTML($button);
+  }
 
+  $tableinformationsection = $_ARCHON->AdministrativeInterface->insertSection('tableinformation', 'custom');
+
+
+
+
+  //Start of Reports install button Mod.
+  if(file_exists("packages/core/admin/reports.php")){ //If the script is present
+    $query="SELECT * from tblCore_Modules WHERE Script='reports'"; //And the table isn't
+    $res =$_ARCHON->mdb2->query($query);
+	if (!PEAR::isError($res)) {
+      if(!$row=$res->fetchRow()){
+		$generalSection->insertRow('Mods')->insertHTML("<button type='button' class='adminformbutton' onclick='window.open(\"index.php?p=admin/core/reports&f=install\");'>Install Reports</button>");
+      } //Add an install button.
+	}
+  }
+  //End of Reports install button Mod.
+  ob_start();
+
+
+  /*
+  *
+  * Setting up the index search row that will launch the popup.
+  *
+  */
+  // Set up the select box
+
+  $indexInstall=-1;
+  foreach($_ARCHON->MemoryCache['Objects']['Configuration'] as $config){
+	if($config->Directive=='Enable Index Search'){
+      $indexInstall=$config->ID;
+    }
+  }
+  if($indexInstall!=-1){
+  if($_ARCHON->MemoryCache['Objects']['Configuration'][$indexInstall]->Value){
+  $indexOpts = array ("All" => 'All', "Collection" => 'Collection', "Item" => 'Item');
+  // Row is Index search, select is what goes in that row
+  $indexSearch = $generalSection->insertRow('Index search')->insertSelect('indexChoices', $indexOpts, array());
+  // Unsure what this does. $Watch is a bool in lib/adminfield.inc.php
+  $indexSearch->Watch = false;
+
+  // Digital Content Updater
+  $generalSection->insertRow('Synchrony II')->insertHTML("<button type='button' class='adminformbutton' onclick='window.open(\"index.php?p=admin/digitallibrary/updatecontentfiles\");'>Sync Digital Content</button>");
+  // Update blobs
+  $generalSection->insertRow('What About Blob?')->insertHTML("<button type='button' class='adminformbutton' onclick='window.open(\"index.php?p=admin/digitallibrary/convertblobs\");'>Update Blobs</button>");
+  // Put all output in an output buffer
+  ob_start();
+  ?>
+
+  <!-- sets up the html/ javascript for the launch button -->
+  <a id="launchindexsearch" href="#"><?php echo($strLaunch); ?></a>
+  <script type="text/javascript">
+  /* <![CDATA[ */
+  $(function () {
+    $('#launchindexsearch').button({icons:{primary: 'ui-icon-newwin'}, disabled: ($('#indexChoicesInput').val() == "0")})
+    .click(function() {admin_ui_launch_index_search(); return false});
+
+    $('#indexChoicesInput').change(function(){
+      if($(this).val() != "0"){
+        $('#launchindexsearch').button('enable');
+      }else{
+        $('#launchindexsearch').button('disable');
    }
+    })
+  });
+
+  function admin_ui_launch_index_search(){
+    var indexutility = $('#indexChoicesInput').val();
+
+    if(indexutility != "0"){
+      var dialog = $('#dialogmodal');
+      var orig_buttons = dialog.dialog('option', 'buttons');
+
+      // dialog.dialog('option', 'buttons', {
+      dialog.dialog({
+        buttons: [
+        {
+            id: "button-run",
+            text: "Run",
+            click: function() {
+              $('#dialogloadingscreen').show();
+              admin_ui_submit_index_search();
+            }
+        },
+        {
+          id: "button-cancel",
+          text: "Cancel",
+          click: function() {
+            $(this).dialog('close');
+            $(this).dialog('option','buttons', orig_buttons);
+          }
+        }
+      ]
+      });
+      admin_ui_opendialog('core','database', 'index', {indexutility: indexutility});
+    }
+  }
 
 
+  function admin_ui_submit_index_search()
+  {
+    $('#dialogmodal .relatedselect>*').attr('selected','selected');
 
-   $tableinformationsection = $_ARCHON->AdministrativeInterface->insertSection('tableinformation', 'custom');
+    $("#button-run").button("disable");
+    $("#button-cancel").button("disable");
+
+    var admindialog = $('#dialogmodal');
+    $('#dialogform').ajaxForm({
+      dataType: 'html',
+      success: function (html) {
+        $('#dialogloadingscreen').hide();
+        admindialog.dialog('close');
+        if(dialogCallback){
+          dialogCallback();
+        }
+
+        var response = $('#response');
+        response.dialog('option', 'width', 600);
+
+        var log = $('<div />')
+        .css('padding', '6px')
+        .css('height', '400px')
+        .css('overflow', 'auto')
+        .css('color', 'white')
+        .css('background', '#333')
+        .css('font-size', '12px')
+        .css('font-weight', 'normal')
+        .appendTo(response);
+        log.html(html);
+
+        response.dialog('open');
+      }
+    });
+    $('#dialogform').submit();
+
+    $('#dialogform .relatedselect>*').removeAttr('selected');
+  }
+
+
+  /* ]]> */
+  </script>
+
+  <?php
+  // Adds the button to the row
+  $button = ob_get_clean();
+  $generalSection->getRow('Index search')->insertHTML($button);
+  $generalSection->getRow('Index search')->insertHTML($temp);
+  }
+  }
+  else{
+    $generalSection->insertRow('Mods')->insertHTML("<button type='button' class='adminformbutton' onclick='window.open(\"index.php?p=admin/core/indexutil&f=install&num=102\");'>Install IndexUtil</button>");
+
+  }
+  // Index search mod END
+
    ob_start();
    ?>
-<script type="text/javascript">
+
+  <script type="text/javascript">
    /* <![CDATA[ */
    $(function () {
       $('#moduletabs').bind('tabsshow', function (event, ui) {
@@ -512,12 +713,12 @@ function database_ui_main()
       $('#refreshimportutility').button({icons:{primary: 'ui-icon-refresh'}, text: false});
    });
    /* ]]> */
-</script>
+  </script>
    <?php
    if($_REQUEST['adminoverridesection'] == 'tableinformation')
    {
       ?>
-<div style="max-height:500px; overflow: auto">
+    <div style="max-height:500px; overflow: auto">
    <table id="databasetables">
       <tr>
          <td><b><?php echo($strTableName); ?></b></td>
@@ -604,22 +805,15 @@ function database_ui_main()
             }
             ?>
    </table>
-</div>
+    </div>
       <?php
    }
 
    $strTablesTable = ob_get_clean();
    $tableinformationsection->setCustomArguments($strTablesTable);
 
-
    $_ARCHON->AdministrativeInterface->outputInterface();
-
 }
-
-
-
-
-
 
 
 
