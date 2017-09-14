@@ -31,7 +31,7 @@ config.inc.php
 ehthumbs.db
 Icon?
 Thumbs.db
-
+*files/*
 
 # OTHER STUFF #
 #
