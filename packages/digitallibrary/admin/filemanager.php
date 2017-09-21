@@ -7,6 +7,7 @@
  * @package Archon
  * @subpackage AdminUI
  * @author Chris Rishel
+ * TODO: Deal with blobs on upload, not through button.
  */
 isset($_ARCHON) or die();
 

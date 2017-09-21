@@ -7,6 +7,7 @@
  */
 isset($_ARCHON) or die();
 require_once("header.inc.php");
+echo("Reached spot 1!");
 ?>
 <div style="display: block; z-index: 1002; outline: 0px; height: auto; width: 600px; top: 28px; left: 306px; " id="main" class="ui-dialog ui-widget ui-widget-content ui-corner-all " tabindex="-1" role="dialog" aria-labelledby="ui-dialog-title-response"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span class="ui-dialog-title" id="ui-dialog-title-response">Admin Response</span><a href="#" class="ui-dialog-titlebar-close ui-corner-all" role="button"><span class="ui-icon ui-icon-closethick">close</span></a></div><div id="response" style="width: auto; min-height: 31.266666889190674px; height: auto; " class="ui-dialog-content ui-widget-content"><div style="padding: 6px; height: 400px; overflow: auto; color: white; background-color: rgb(51, 51, 51); font-size: 12px; font-weight: normal; background-position: initial initial; background-repeat: initial initial; "><br><br>
 <?php
@@ -43,7 +44,7 @@ function downloadFile($id,$path) {
     echo "<li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>File Already Exists:</b> '" . suffix($path) . "'";
     return false;
 }
-
+echo("Reached spot 2");
 $root = substr(dirname(__FILE__),0,-1 * strlen("/packages/digitallibrary/admin"));
 
 $query = 'SELECT ID,DigitalContentID,Title,Size,Filename,FileTypeID FROM tblDigitalLibrary_Files
@@ -54,10 +55,11 @@ AND DefaultAccessLevel > 0
 AND DirectLink IS NULL
 ORDER BY DigitalContentID ASC';
 $result = $_ARCHON -> mdb2 -> query($query);
-if(PEAR::isError($result)) {
+if(pear_isError($result)) {
     echo($query);
     trigger_error($result->getMessage(), E_USER_ERROR);
 }
+echo("Reached spot 3");
 $rows = $result -> fetchAll();
 $result -> free();
 $digitalContentArray = array();
@@ -70,6 +72,7 @@ foreach ($rows as $file) {
     }
     $digitalContentArray[$file[DigitalContentID]][$file[ID]] = $file;
 }
+echo("Reached spot 4");
 $allChanges = array();
 foreach ($digitalContentArray as $digitalContent) {
     $objDigitalContent = New DigitalContent($digitalContent[DigitalContentID]);
@@ -169,6 +172,7 @@ foreach ($digitalContentArray as $digitalContent) {
    }
    $allChanges[$objDigitalContent -> ID] = $dcChanges;
 }
+echo("Reached spot 5");
 $NewDirectories = array();
 $Downloads = array();
 $Copies = array();
@@ -187,7 +191,7 @@ foreach (array_slice($allChanges,0) as $dcChanges) {
                   WHERE DirectLink LIKE '%$OriginalFileSuffix%'
                   AND DigitalContentID > 0";
         $result = $_ARCHON -> mdb2 -> query($query);
-        if(PEAR::isError($result)) {
+        if(pear_isError($result)) {
             echo($query);
             trigger_error($result->getMessage(), E_USER_ERROR);
         }
@@ -229,16 +233,17 @@ foreach (array_slice($allChanges,0) as $dcChanges) {
     echo $_SERVER['DOCUMENT_ROOT'];
     echo "<br>";
     echo $root;*/
+    echo("Should have a button after this, spot 6");
 
 ?>
         </div>
     <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
         <a class="helplink {phrasename: &quot;header&quot;, packageid: 6, moduleid: 81} active" title="Click for help" id="headerhelplink" style="font-size:32px;color:#005e89">?</a>
 
-        <div class="ui-dialog-buttonset"><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text" onClick="location.href='?p=admin/digitallibrary/digitallibrary'">Cancel</span></button></div>
-        <!-- <div class="ui-dialog-buttonset"><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="true"><span class="ui-button-text" onClick="location.href='?p=admin/digitallibrary/convertblobs&commit=1'">Commit Changes, Retain BLOBS</span></button></div>     
-        -->
-        <div class="ui-dialog-buttonset"><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text" onClick="location.href='?p=admin/digitallibrary/convertblobs&commit=1;&delete=1'">Commit Changes (Deletes Blobs)</span></button></div></div>           
+        <div class="ui-dialog-buttonset"><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" onClick="location.href='?p=admin/digitallibrary/digitallibrary'"><span class="ui-button-text">Cancel</span></button></div>
+        <div class="ui-dialog-buttonset"><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" onClick="location.href='?p=admin/digitallibrary/convertblobs&commit=1'"><span class="ui-button-text">Commit Changes, Retain BLOBS</span></button></div>     
+        
+        <div class="ui-dialog-buttonset"><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" onclick="location.href='?p=admin/digitallibrary/convertblobs&commit=1;&delete=1'"><span class="ui-button-text">Commit Changes (Deletes Blobs)</span></button></div></div>
     <?
     
     
@@ -289,7 +294,7 @@ if ($_GET['commit']) {
                   VALUES (" . $blob['DigitalContentID'] . ",'" . $blob['Title'] . "','" . $blob['Filename'] . "'," . $blob['FileTypeID'] . ",'" . $blob['DirectLink'] . "')";
         //echo "<li><br><br>" . $query . "<br><br>";
         $resolution =& $_ARCHON -> mdb2 -> exec($query);
-        if(PEAR::isError($deletion)) {
+        if(pear_isError($deletion)) {
             echo "<li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Failed to Insert row for file:</b> '" . suffix($blob['Path']) . "' and DigitalContentID '" . $blob['DigitalContentID'] . "'<br>";
             trigger_error($deletion->getMessage(), E_USER_ERROR);       
         }
@@ -314,7 +319,7 @@ if ($_GET['commit']) {
         $successBlob = $success . "for file '" . suffix($blob['Path']) . "' with ID '" . $blob['ID'] . "'<br>";
         $failureBlob = $failure . "for file '" . suffix($blob['Path']) . "' with ID '" . $blob['ID'] . "'<br>";
         $resolution =& $_ARCHON -> mdb2 -> exec($queryBlob);
-        if(PEAR::isError($deletion)) {
+        if(pear_isError($deletion)) {
             echo($failureBlob);
             trigger_error($deletion->getMessage(), E_USER_ERROR);       
         }
@@ -325,7 +330,7 @@ if ($_GET['commit']) {
     echo "</ul><br><b>Updating ContentURL's in tblDigitalLibrary_DigitalContent:</b><ul><br>";
     foreach($Queries as $Query) {
         $resolution =& $_ARCHON -> mdb2 -> exec($Query['Query']);
-        if(PEAR::isError($deletion)) {
+        if(pear_isError($deletion)) {
             echo "<li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Failed To Changed ContentURL</b> " . $Query['OldContentURL'] . " to " . $Query['NewContentURL'] . " on record with ID " . $Query['DigitalContentID'] . "<br>";
             trigger_error($deletion->getMessage(), E_USER_ERROR);       
         }
@@ -338,7 +343,7 @@ if ($_GET['commit']) {
     </div>
         <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
             <a class="helplink {phrasename: &quot;header&quot;, packageid: 6, moduleid: 81} active" title="Click for help" id="headerhelplink" style="font-size:32px;color:#005e89">?</a>
-            <div class="ui-dialog-buttonset"><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text" onClick="location.href='?p=admin/digitallibrary/digitallibrary'">Cancel</span></button></div>   
+            <div class="ui-dialog-buttonset"><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"  onClick="location.href='?p=admin/digitallibrary/digitallibrary'"><span class="ui-button-text">Cancel</span></button></div>   
     <?
 }
 

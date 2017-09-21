@@ -7,6 +7,7 @@
 * @package Archon
 * @subpackage AdminUI
 * @author Caleb Braun, 7/13/2016
+* TODO: Polish up installer.
 */
 
 isset($_ARCHON) or die();
@@ -450,7 +451,7 @@ function runQuery($q, &$sessionStats, $getOnlyFirstRow = false) {
   // completely necessary to be extra security conscience about this utility.
   $result = $_ARCHON -> mdb2 -> query($q);
   $sessionStats["queries"]++;
-  if(PEAR::isError($result)) {
+  if(pear_isError($result)) {
     echo "ERROR: Unable to index ".$sessionStats["indexType"];
     echo ". There is a problem with the following query:<br><br>";
     echo "$q<br><br>  Make sure you have defined the index terms correctly in

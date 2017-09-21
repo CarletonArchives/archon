@@ -418,6 +418,7 @@ function digitallibrary_ui_main()
    $fileSection->insertHiddenField('Filename');
    $fileSection->insertHiddenField('FileTypeID');
    //added DirectLink
+   //TODO: Installer for DirectLink. See addDirectLinkColumn in convertblobs
    $fileSection->insertHiddenField('DirectLink');
    $fileSection->insertHiddenField('Size');
 

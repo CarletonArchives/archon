@@ -4,6 +4,7 @@
  *
  * @package Archon
  * @author Paul Sorensen, originally adapted from "default" by Chris Rishel, Chris Prom, Kyle Fox
+ * TODO: New logo!
  */
 isset($_ARCHON) or die();
 

@@ -1,6 +1,7 @@
 <?php
 /*
 *    This is supposed to generate a report. It probably won't, but I'll keep trying.
+*    TODO: Polish. Including Installer!
 *
 */
 isset($_ARCHON) or die();
