@@ -7,7 +7,6 @@
  */
 isset($_ARCHON) or die();
 require_once("header.inc.php");
-echo("Reached spot 1!");
 ?>
 <div style="display: block; z-index: 1002; outline: 0px; height: auto; width: 600px; top: 28px; left: 306px; " id="main" class="ui-dialog ui-widget ui-widget-content ui-corner-all " tabindex="-1" role="dialog" aria-labelledby="ui-dialog-title-response"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span class="ui-dialog-title" id="ui-dialog-title-response">Admin Response</span><a href="#" class="ui-dialog-titlebar-close ui-corner-all" role="button"><span class="ui-icon ui-icon-closethick">close</span></a></div><div id="response" style="width: auto; min-height: 31.266666889190674px; height: auto; " class="ui-dialog-content ui-widget-content"><div style="padding: 6px; height: 400px; overflow: auto; color: white; background-color: rgb(51, 51, 51); font-size: 12px; font-weight: normal; background-position: initial initial; background-repeat: initial initial; "><br><br>
 <?php
@@ -44,7 +43,6 @@ function downloadFile($id,$path) {
     echo "<li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>File Already Exists:</b> '" . suffix($path) . "'";
     return false;
 }
-echo("Reached spot 2");
 $root = substr(dirname(__FILE__),0,-1 * strlen("/packages/digitallibrary/admin"));
 
 $query = 'SELECT ID,DigitalContentID,Title,Size,Filename,FileTypeID FROM tblDigitalLibrary_Files
@@ -59,7 +57,6 @@ if(pear_isError($result)) {
     echo($query);
     trigger_error($result->getMessage(), E_USER_ERROR);
 }
-echo("Reached spot 3");
 $rows = $result -> fetchAll();
 $result -> free();
 $digitalContentArray = array();
@@ -72,7 +69,6 @@ foreach ($rows as $file) {
     }
     $digitalContentArray[$file[DigitalContentID]][$file[ID]] = $file;
 }
-echo("Reached spot 4");
 $allChanges = array();
 foreach ($digitalContentArray as $digitalContent) {
     $objDigitalContent = New DigitalContent($digitalContent[DigitalContentID]);
@@ -172,7 +168,6 @@ foreach ($digitalContentArray as $digitalContent) {
    }
    $allChanges[$objDigitalContent -> ID] = $dcChanges;
 }
-echo("Reached spot 5");
 $NewDirectories = array();
 $Downloads = array();
 $Copies = array();
@@ -233,7 +228,6 @@ foreach (array_slice($allChanges,0) as $dcChanges) {
     echo $_SERVER['DOCUMENT_ROOT'];
     echo "<br>";
     echo $root;*/
-    echo("Should have a button after this, spot 6");
 
 ?>
         </div>

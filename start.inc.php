@@ -92,6 +92,7 @@ if($_ARCHON->db->ServerType == 'MySQL' || $_ARCHON->db->ServerType == 'MySQLi')
    // this makes sure the encoding for the queries is expected
    $query = "SET NAMES 'utf8'";
    $affected = $_ARCHON->mdb2->exec($query);
+
    if (pear_isError($affected))
    {
       trigger_error($affected->getMessage(), E_USER_ERROR);
@@ -99,16 +100,18 @@ if($_ARCHON->db->ServerType == 'MySQL' || $_ARCHON->db->ServerType == 'MySQLi')
 
    // This might fail.
    $query = "SET max_allowed_packet=1073741824";
-   $affected = $_ARCHON->mdb2->exec($query);
+
+   //$affected = $_ARCHON->mdb2->exec($query);
+
 }
 
 if($_ARCHON->mdb2)
 {
    if($_REQUEST['p'] != 'install' && $_REQUEST['p'] != 'upgrade')
    {
-      $_ARCHON->initialize();
+      $_ARCHON->initialize(); 
    }
-   elseif($_REQUEST['p'] == 'install')
+   else if($_REQUEST['p'] == 'install')
    {
       $_ARCHON->Script = 'packages/core/install/install.php';
    }
