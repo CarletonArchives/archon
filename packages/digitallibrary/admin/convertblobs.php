@@ -6,7 +6,7 @@
  * change copied file's DirectLink (nothing new inserted into Files)
  */
 isset($_ARCHON) or die();
-require_once("header.inc.php");
+#require_once("header.inc.php");
 ?>
 <div style="display: block; z-index: 1002; outline: 0px; height: auto; width: 600px; top: 28px; left: 306px; " id="main" class="ui-dialog ui-widget ui-widget-content ui-corner-all " tabindex="-1" role="dialog" aria-labelledby="ui-dialog-title-response"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span class="ui-dialog-title" id="ui-dialog-title-response">Admin Response</span><a href="#" class="ui-dialog-titlebar-close ui-corner-all" role="button"><span class="ui-icon ui-icon-closethick">close</span></a></div><div id="response" style="width: auto; min-height: 31.266666889190674px; height: auto; " class="ui-dialog-content ui-widget-content"><div style="padding: 6px; height: 400px; overflow: auto; color: white; background-color: rgb(51, 51, 51); font-size: 12px; font-weight: normal; background-position: initial initial; background-repeat: initial initial; "><br><br>
 <?php
