@@ -10,7 +10,7 @@
 */
 
 isset($_ARCHON) or die();
-#require_once("header.inc.php");
+require_once("header.inc.php");
 ?>
 
 <div style="display: block; z-index: 1002; outline: 0px; height: auto; width: 600px; top: 28px; left: 306px; " class="ui-dialog ui-widget ui-widget-content ui-corner-all " tabindex="-1" role="dialog" aria-labelledby="ui-dialog-title-response">
@@ -163,6 +163,6 @@ function addDirectLinkColumn() {
     </div>
 </div>
 
-<?
+<?php
 require_once("footer.inc.php");
 ?>

@@ -6,7 +6,7 @@
  * change copied file's DirectLink (nothing new inserted into Files)
  */
 isset($_ARCHON) or die();
-#require_once("header.inc.php");
+require_once("header.inc.php");
 ?>
 <div style="display: block; z-index: 1002; outline: 0px; height: auto; width: 600px; top: 28px; left: 306px; " id="main" class="ui-dialog ui-widget ui-widget-content ui-corner-all " tabindex="-1" role="dialog" aria-labelledby="ui-dialog-title-response"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span class="ui-dialog-title" id="ui-dialog-title-response">Admin Response</span><a href="#" class="ui-dialog-titlebar-close ui-corner-all" role="button"><span class="ui-icon ui-icon-closethick">close</span></a></div><div id="response" style="width: auto; min-height: 31.266666889190674px; height: auto; " class="ui-dialog-content ui-widget-content"><div style="padding: 6px; height: 400px; overflow: auto; color: white; background-color: rgb(51, 51, 51); font-size: 12px; font-weight: normal; background-position: initial initial; background-repeat: initial initial; "><br><br>
 <?php
@@ -238,7 +238,7 @@ foreach (array_slice($allChanges,0) as $dcChanges) {
         <div class="ui-dialog-buttonset"><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" onClick="location.href='?p=admin/digitallibrary/convertblobs&commit=1'"><span class="ui-button-text">Commit Changes, Retain BLOBS</span></button></div>     
         
         <div class="ui-dialog-buttonset"><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" onclick="location.href='?p=admin/digitallibrary/convertblobs&commit=1;&delete=1'"><span class="ui-button-text">Commit Changes (Deletes Blobs)</span></button></div></div>
-    <?
+    <?php
     
     
 if ($_GET['commit']) { 
@@ -246,7 +246,7 @@ if ($_GET['commit']) {
         ?>
         <script type="text/javascript"> document.getElementById("main").style.display  = 'none'; </script>
         <div style="display: block; z-index: 1002; outline: 0px; height: auto; width: 600px; top: 28px; left: 306px; " class="ui-dialog ui-widget ui-widget-content ui-corner-all " tabindex="-1" role="dialog" aria-labelledby="ui-dialog-title-response"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span class="ui-dialog-title" id="ui-dialog-title-response">Admin Response</span><a href="#" class="ui-dialog-titlebar-close ui-corner-all" role="button"><span class="ui-icon ui-icon-closethick">close</span></a></div><div id="response" style="width: auto; min-height: 31.266666889190674px; height: auto; " class="ui-dialog-content ui-widget-content"><div style="padding: 6px; height: 400px; overflow: auto; color: white; background-color: rgb(51, 51, 51); font-size: 12px; font-weight: normal; background-position: initial initial; background-repeat: initial initial; "><br><br>
-        <?
+        <?php
     echo "<b>Creating New Directories:</b><ul><br>";
     foreach($NewDirectories as $dir) {
         $oldumask = umask(0);
@@ -338,7 +338,7 @@ if ($_GET['commit']) {
         <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
             <a class="helplink {phrasename: &quot;header&quot;, packageid: 6, moduleid: 81} active" title="Click for help" id="headerhelplink" style="font-size:32px;color:#005e89">?</a>
             <div class="ui-dialog-buttonset"><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"  onClick="location.href='?p=admin/digitallibrary/digitallibrary'"><span class="ui-button-text">Cancel</span></button></div>   
-    <?
+    <?php
 }
 
 
