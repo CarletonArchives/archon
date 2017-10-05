@@ -1,4 +1,5 @@
 <?php
+
 if(!file_exists('packages/core/index.php'))
 {
    die('The Archon Core could not be found in packages/core/');
@@ -11,7 +12,6 @@ if(preg_match('/^install([\d]+)$/', $_REQUEST['f'], $arrMatch) && $arrMatch[1] <
 {
    $currentstep = $arrMatch[1];
 }
-
 $cwd = getcwd();
 chdir('packages/core/lib/');
 require_once('index.php');
@@ -23,6 +23,7 @@ ArchonInstaller::checkForMDB2();
 require_once('MDB2.php');
 
 require_once('config.inc.php');
+
 require_once('start.inc.php');
 
 
@@ -55,7 +56,6 @@ else
 function core_install_main()
 {
    global $_ARCHON, $currentstep, $totalsteps, $disablenext;
-
 
    ob_start();
    $query = "SELECT ID FROM tblCore_Configuration LIMIT 1";

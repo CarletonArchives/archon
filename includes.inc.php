@@ -15,6 +15,7 @@ if(defined('E_DEPRECATED'))
    // This is the recommended verbosity for production. If you are an Archon
    // developer, or you are debugging an Archon problem, set this to E_ALL.
    error_reporting(E_ERROR | E_PARSE);
+//error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);
 }
 else
 {
