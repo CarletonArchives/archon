@@ -397,12 +397,12 @@ function digitallibrary_ui_main()
       $_ARCHON->AdministrativeInterface->insertHeaderControl(
               "$(this).attr('href', '?p=digitallibrary/digitallibrary'); $(this).attr('target', '_blank');", 'publicview', false);
      //adds "Update All" button
-      $_ARCHON->AdministrativeInterface->insertHeaderControl(
+      /*$_ARCHON->AdministrativeInterface->insertHeaderControl(
               "$(this).attr('href', '?p=admin/digitallibrary/updatecontentfiles'); $(this).attr('target', '_blank');", 'Update All', false);      
      //adds "Convert Blobs" button
       $_ARCHON->AdministrativeInterface->insertHeaderControl(
               "$(this).attr('href', '?p=admin/digitallibrary/convertblobs'); $(this).attr('target', '_blank');", 'Convert Blobs', false); 
-              
+      */        
       
    }
 
