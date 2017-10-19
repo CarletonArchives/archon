@@ -50,12 +50,8 @@ if (!empty($rows[0])) {
     $file -> dbLoad();
     $url = $file -> getFileURL();
 /*  places the image in the page using the variables assigned above if that image is a jpg  */
-if($_ARCHON->Security->userHasAdministrativeAccess())
-{
     echo "<a href='..?p=digitallibrary/digitalcontent&id=".$collection."'><img src='$url' height=250></a>";
     echo "<br>Sample images from this set: <a href='..?p=digitallibrary/digitalcontent&id=".$collection."'>".$title."</a>";
-}
-    
 }
 
 ?>
