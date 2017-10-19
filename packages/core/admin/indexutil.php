@@ -131,14 +131,14 @@ function explodeDates($term) {
   // Finds dates like 'YYYY (+ or - 2 years)'
   $plusOrMinusPattern = "/(\d{4})\/?(\d{0,2})\s?I{0,2}\s?\(\s?\+ or \- (\d) year[s]?\)/";
   // Finds first date range in the index field
-  $rangePattern = "/(\d{4})\s?[-\/]\s?(\d{2,})\b/";
+  $rangePattern = "/(\d{4})\s?[-\/]\s?(\d{2,})[^\w-\/]/";
   // Finds ;-delimited date ranges with Circa in front
   $circaPattern = "%Circa (\d{4}/?\d?\d?)(-(\d{4}/?\d?\d?))*;|$%";
   // Grabs four digit numbers to remove duplicates
   $numbersPattern = "%[,;] (\d{4})(?=(([,;])|^))%";
-  $noCommasPattern = "%, (?=[,;] )%";
+  $noCommasPattern = "%, ?(?=[,;] )%";
   $noCommasPattern2 = "%(?<=[,;] ), %";
-  $noSemiColonsPattern = "%; (?=; )%";
+  $noSemiColonsPattern = "%; ?(?=; )%";
 
   // Changes something like 'YYY5 (+ or - 2 years)' to 'YYY3-YYY7'
   if (preg_match($plusOrMinusPattern, $term, $plusOrMinus)) {
@@ -218,8 +218,11 @@ function explodeDates($term) {
 		}
 	}
 	$term=preg_replace($noCommasPattern,"",$term);
-    $term=preg_replace($noCommasPattern2,"",$term);
+    	$term=preg_replace($noCommasPattern2,"",$term);
 	$term=preg_replace($noSemiColonsPattern,"",$term);
+  }
+  while(preg_match($noSemiColonsPattern,$term)){
+    $term=preg_replace($noSemiColonsPattern,"",$term);
   }
   return $term;
 }
@@ -316,13 +319,25 @@ function getIndexFieldValues($id, $userFields, &$sessionStats) {
     runQuery("SET SESSION group_concat_max_len = 1024;",$sessionStats);
   }
 
+  //This is very hacky. I pull just the date part of indexfield to run explodedates on via str_replace.
+  $defaultValues=array('Date');
+  $selectDVs = " (SELECT Date AS IndexField FROM ";
+  $selectDVs .= "tblCollections_Content WHERE ID IN (" . $idListAsString . ")) ";
+  $daterows=runQuery($selectDVs, $sessionStats);
+  foreach ($daterows as $Date) {
+    $DateVal=$Date['IndexField'];
+    $DateVal=str_replace("'","''",$DateVal); //Escape apostrophes
+  }
+  
   // Put results into an array
   foreach ($rows as $item) {
     $sessionStats['numitems']++;
     $idxflds = $collectionTitle . "; " . $item['IndexField'];
     $idxflds = str_replace("'", "''", $idxflds); // Escape apostrophes
     if ($idxflds) {
-      $idxflds = explodeDates($idxflds, $item['ContentID']);
+      if($DateVal){
+        $idxflds = str_replace($DateVal,explodeDates($DateVal),$idxflds);
+      }
       $indexFieldVals[$item['ContentID']] = $idxflds;
     } else {
       $sessionStats['skipped']++;
