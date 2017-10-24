@@ -545,7 +545,7 @@ function research_exec()
       {
       	foreach($arrDetails as $RepositoryID => $details)
       	{
-         	$_ARCHON->sendEmail($_REQUEST['fromaddress'], $_REQUEST['message'], $_REQUEST['referer'], $_REQUEST['fromname'], $_REQUEST['subject'], $_REQUEST['fromphone'], $_REQUEST['details'] . '\n\n' . $details, $_REQUEST['detailsfunction'], $_REQUEST['detailsparams'], $RepositoryID);
+         	$_ARCHON->sendEmail($_REQUEST['fromaddress'], $_REQUEST['message'], $_REQUEST['referer'], $_REQUEST['fromname'], $_REQUEST['subject'], $_REQUEST['fromphone'], $_REQUEST['details'] . strip_tags($details), $_REQUEST['detailsfunction'], $_REQUEST['detailsparams'], $RepositoryID);
       	}
       }
       else
