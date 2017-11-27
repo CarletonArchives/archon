@@ -206,7 +206,7 @@ if(!empty($arrDigitalContent))
                     </a>
                 </div>
                 <div class="thumbnailcaption">
-                    <a href="?p=digitallibrary/digitalcontent&amp;id=<?php echo($objFile->DigitalContentID); ?>"><?php echo($in_MediaType); echo($objDigitalContent->getString('Title', 30)); ?></a>
+                    <a href="?p=digitallibrary/digitalcontent&amp;id=<?php echo($objFile->DigitalContentID); ?>"><?php echo($objDigitalContent->getString('Title', 30)); ?></a>
                     <?php
                     if(count($objDigitalContent->Files) > 1)
                     {

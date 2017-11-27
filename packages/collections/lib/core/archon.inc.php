@@ -1845,7 +1845,7 @@ abstract class Collections_Archon
       }
 
       // Run query to find content     
-      $query = "SELECT tblCollections_Content.*, tblCollections_Collections.ClassificationID as ClassificationID FROM tblCollections_Content JOIN tblCollections_Collections ON tblCollections_Collections.ID = tblCollections_Content.CollectionID JOIN tblCollections_LevelContainers ON tblCollections_LevelContainers.ID = tblCollections_Content.LevelContainerID LEFT JOIN (SELECT ContentID FROM tblCollections_UserFields WHERE $userfieldquery) AS tblCollections_UserFields ON tblCollections_UserFields.ContentID = tblCollections_Content.ID WHERE ($textquery OR NOT (tblCollections_UserFields.ContentID IS NULL)$idquery) $subquery $enabledquery ORDER BY tblCollections_Content.SortOrder";
+      $query = "SELECT tblCollections_Content.*, tblCollections_Collections.ClassificationID as ClassificationID FROM tblCollections_Content JOIN tblCollections_Collections ON tblCollections_Collections.ID = tblCollections_Content.CollectionID JOIN tblCollections_LevelContainers ON tblCollections_LevelContainers.ID = tblCollections_Content.LevelContainerID LEFT JOIN (SELECT DISTINCT ContentID FROM tblCollections_UserFields WHERE $userfieldquery) AS tblCollections_UserFields ON tblCollections_UserFields.ContentID = tblCollections_Content.ID WHERE ($textquery OR NOT (tblCollections_UserFields.ContentID IS NULL)$idquery) $subquery $enabledquery ORDER BY tblCollections_Content.SortOrder";
       call_user_func_array(array($this->mdb2, 'setLimit'), $limitparams);
       $prep = $this->mdb2->prepare($query, array_merge($userfieldtypes, $texttypes, $idtypes, $subtypes, $enabledtypes), MDB2_PREPARE_RESULT);
       $result = $prep->execute(array_merge($userfieldvars, $textvars, $idvars, $subvars, $enabledvars));
@@ -2222,7 +2222,7 @@ abstract class Collections_Archon
          }
 
          // Run query to find content         
-         $query = "SELECT tblCollections_Content.*, tblCollections_Collections.ClassificationID as ClassificationID FROM tblCollections_Content JOIN tblCollections_Collections ON tblCollections_Collections.ID = tblCollections_Content.CollectionID JOIN tblCollections_LevelContainers ON tblCollections_LevelContainers.ID = tblCollections_Content.LevelContainerID LEFT JOIN (SELECT ContentID FROM tblCollections_UserFields WHERE $userfieldquery) AS tblCollections_UserFields ON tblCollections_UserFields.ContentID = tblCollections_Content.ID WHERE ($textquery OR NOT (tblCollections_UserFields.ContentID IS NULL)) $subquery $enabledquery ORDER BY tblCollections_Content.SortOrder";
+         $query = "SELECT tblCollections_Content.*, tblCollections_Collections.ClassificationID as ClassificationID FROM tblCollections_Content JOIN tblCollections_Collections ON tblCollections_Collections.ID = tblCollections_Content.CollectionID JOIN tblCollections_LevelContainers ON tblCollections_LevelContainers.ID = tblCollections_Content.LevelContainerID LEFT JOIN (SELECT  DISTINCT ContentID FROM tblCollections_UserFields WHERE $userfieldquery) AS tblCollections_UserFields ON tblCollections_UserFields.ContentID = tblCollections_Content.ID WHERE ($textquery OR NOT (tblCollections_UserFields.ContentID IS NULL)) $subquery $enabledquery ORDER BY tblCollections_Content.SortOrder";
          $types = array_merge($userfieldtypes, $texttypes, $subtypes, $enabledtypes);
          $vars = array_merge($userfieldvars, $textvars, $subvars, $enabledvars);
 
@@ -2598,7 +2598,7 @@ abstract class Collections_Archon
          }
 
          // Run query to find content         
-         $query = "SELECT tblCollections_Content.*, tblCollections_Collections.ClassificationID as ClassificationID FROM tblCollections_Content JOIN tblCollections_Collections ON tblCollections_Collections.ID = tblCollections_Content.CollectionID JOIN tblCollections_LevelContainers ON tblCollections_LevelContainers.ID = tblCollections_Content.LevelContainerID LEFT JOIN (SELECT ContentID FROM tblCollections_UserFields WHERE $userfieldquery) AS tblCollections_UserFields ON tblCollections_UserFields.ContentID = tblCollections_Content.ID WHERE ($textquery OR NOT (tblCollections_UserFields.ContentID IS NULL)) $subquery $enabledquery ORDER BY tblCollections_Content.SortOrder";
+         $query = "SELECT tblCollections_Content.*, tblCollections_Collections.ClassificationID as ClassificationID FROM tblCollections_Content JOIN tblCollections_Collections ON tblCollections_Collections.ID = tblCollections_Content.CollectionID JOIN tblCollections_LevelContainers ON tblCollections_LevelContainers.ID = tblCollections_Content.LevelContainerID LEFT JOIN (SELECT  DISTINCT ContentID FROM tblCollections_UserFields WHERE $userfieldquery) AS tblCollections_UserFields ON tblCollections_UserFields.ContentID = tblCollections_Content.ID WHERE ($textquery OR NOT (tblCollections_UserFields.ContentID IS NULL)) $subquery $enabledquery ORDER BY tblCollections_Content.SortOrder";
          $types = array_merge($userfieldtypes, $texttypes, $subtypes, $enabledtypes);
          $vars = array_merge($userfieldvars, $textvars, $subvars, $enabledvars);
 
@@ -3002,7 +3002,7 @@ abstract class Collections_Archon
          }
 
          // Run query to find content        
-         $query = "SELECT tblCollections_Content.*, tblCollections_Collections.ClassificationID as ClassificationID FROM tblCollections_Content JOIN tblCollections_Collections ON tblCollections_Collections.ID = tblCollections_Content.CollectionID JOIN tblCollections_LevelContainers ON tblCollections_LevelContainers.ID = tblCollections_Content.LevelContainerID LEFT JOIN (SELECT ContentID FROM tblCollections_UserFields WHERE $userfieldquery) AS tblCollections_UserFields ON tblCollections_UserFields.ContentID = tblCollections_Content.ID WHERE ($textquery OR NOT (tblCollections_UserFields.ContentID IS NULL)) $subquery $enabledquery ORDER BY tblCollections_Content.SortOrder";
+         $query = "SELECT tblCollections_Content.*, tblCollections_Collections.ClassificationID as ClassificationID FROM tblCollections_Content JOIN tblCollections_Collections ON tblCollections_Collections.ID = tblCollections_Content.CollectionID JOIN tblCollections_LevelContainers ON tblCollections_LevelContainers.ID = tblCollections_Content.LevelContainerID LEFT JOIN (SELECT DISTINCT ContentID FROM tblCollections_UserFields WHERE $userfieldquery) AS tblCollections_UserFields ON tblCollections_UserFields.ContentID = tblCollections_Content.ID WHERE ($textquery OR NOT (tblCollections_UserFields.ContentID IS NULL)) $subquery $enabledquery ORDER BY tblCollections_Content.SortOrder";
          $types = array_merge($userfieldtypes, $texttypes, $subtypes, $enabledtypes);
          $vars = array_merge($userfieldvars, $textvars, $subvars, $enabledvars);
 
