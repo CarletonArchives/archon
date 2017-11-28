@@ -180,13 +180,15 @@ if(!empty($arrDigitalContent))
                 $content .= "Your browser does not support the audio element. </audio><a>";
             }
             elseif ($media == 'Video') {
-                $content = "<video class='videothumbnail' muted preload='metadata' onmouseover='this.play()' onmouseout='this.pause()'>";
-                // Remove the #t=8 if you want the page to load faster.
+                $content = "<video class='videothumbnail' muted preload='auto' onmouseover='this.setAttribute(\"src\",\"". $mediaURL ."#t=8\"); this.play()' onmouseout='this.setAttribute(\"src\",\"\");this.load()'>";
+                //Remove the #t=8 if you want the page to load faster.
                 $content .= "<source src='" . $mediaURL . "#t=8' />";
+
                 $content .= "<p>Your browser does not support the video tag.</p> </video>";
                 $content .= "<div class='videocaption'>";
                 $content .= "<img src='" . $_ARCHON->PublicInterface->ImagePath . "/thumbnail-icons/video.png' />";
                 $content .= "</div>";
+
             }
             elseif ($media == 'Document') {
                 $content = "<img class='digcontentfile' style='border:none' src='" . $_ARCHON->PublicInterface->ImagePath . "/thumbnail-icons/documenticon.png'/>";
@@ -267,7 +269,7 @@ if($in_ThumbnailPage > 1 || $_ARCHON->MoreThumbnailPages)
 $(document).ready(function(){
   var captions = $(".videocaption");
   $(".videothumbnail").each(function(i, vid) {
-    vid.addEventListener('loadedmetadata', function() {
+    vid.addEventListener('loadedmetadata', function getDuration() {
       var duration = '';
       var hours = Math.floor(vid.duration / 3600);
       var minutes = Math.floor(vid.duration / 60);
@@ -280,6 +282,21 @@ $(document).ready(function(){
       }
       duration += minutes + ":" + seconds;
       captions[i].innerHTML = "<span>" + duration + "</span>" + captions[i].innerHTML;
+      vid.removeEventListener('loadedmetadata', getDuration);
+    });
+    vid.addEventListener('seeked', function handler() {
+      var canvas = document.createElement("canvas");
+      canvas.width = vid.videoWidth;// * scale;
+      canvas.height = vid.videoHeight;// * scale;
+      canvas.getContext('2d').drawImage(vid, 0, 0, canvas.width, canvas.height);
+      vid.setAttribute("poster",canvas.toDataURL());
+      vid.setAttribute("preload","none");
+      vid.removeEventListener('seeked',handler);
+      vid.setAttribute("src","");
+      vid.load();
+      vid.style.display = "block";
+      //captions[i].innerHTML = "<span> Hello World!</span>" + captions[i].innerHTML;
+
     });
   });
 })
