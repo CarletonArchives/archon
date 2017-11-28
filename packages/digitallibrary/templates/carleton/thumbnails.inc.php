@@ -185,6 +185,7 @@ if(!empty($arrDigitalContent))
                 $content .= "<source src='" . $mediaURL . "#t=8' />";
 
                 $content .= "<p>Your browser does not support the video tag.</p> </video>";
+                $content .= "<img src='" . $_ARCHON->PublicInterface->ImagePath . "/thumbnail-icons/video.png' />";
                 $content .= "<div class='videocaption'>";
                 $content .= "<img src='" . $_ARCHON->PublicInterface->ImagePath . "/thumbnail-icons/video.png' />";
                 $content .= "</div>";
@@ -289,13 +290,17 @@ $(document).ready(function(){
       canvas.width = vid.videoWidth;// * scale;
       canvas.height = vid.videoHeight;// * scale;
       canvas.getContext('2d').drawImage(vid, 0, 0, canvas.width, canvas.height);
-      vid.setAttribute("poster",canvas.toDataURL());
+      //vid.setAttribute("poster",canvas.toDataURL());
       vid.setAttribute("preload","none");
       vid.removeEventListener('seeked',handler);
       vid.setAttribute("src","");
       vid.load();
-      vid.style.display = "block";
+      var img=vid.parentElement.getElementsByTagName('img')[0];
+      img.setAttribute("src",canvas.toDataURL());
+      vid.parentNode.removeChild(vid);
       //captions[i].innerHTML = "<span> Hello World!</span>" + captions[i].innerHTML;
+      //vid.style.display = "block";
+
 
     });
   });
