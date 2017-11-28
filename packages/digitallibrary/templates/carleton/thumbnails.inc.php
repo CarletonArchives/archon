@@ -180,9 +180,9 @@ if(!empty($arrDigitalContent))
                 $content .= "Your browser does not support the audio element. </audio><a>";
             }
             elseif ($media == 'Video') {
-                $content = "<video class='videothumbnail' muted preload='auto' onmouseover='this.setAttribute(\"src\",\"". $mediaURL ."\"); this.play()' onmouseout='this.setAttribute(\"src\",\"\");this.load()'>";
+                $content = "<video class='videothumbnail' muted preload='none' onmouseover='this.setAttribute(\"src\",\"". $mediaURL ."#t=8\"); this.play()' onmouseout='this.setAttribute(\"src\",\"\");this.load()'>";
                 //Remove the #t=8 if you want the page to load faster.
-                $content .= "<source src='" . $mediaURL . "' />";
+                $content .= "<source src='" . $mediaURL . "#t=8' />";
 
                 $content .= "<p>Your browser does not support the video tag.</p> </video>";
                 $content .= "<img src='" . $_ARCHON->PublicInterface->ImagePath . "/thumbnail-icons/video.png' />";
@@ -269,6 +269,7 @@ if($in_ThumbnailPage > 1 || $_ARCHON->MoreThumbnailPages)
 // Adds timestamp to the caption each video
 $(document).ready(function(){
   var captions = $(".videocaption");
+  var videos = $(".videothumbnail");
   $(".videothumbnail").each(function(i, vid) {
     vid.addEventListener('loadedmetadata', function getDuration() {
       var duration = '';
@@ -285,25 +286,28 @@ $(document).ready(function(){
       captions[i].innerHTML = "<span>" + duration + "</span>" + captions[i].innerHTML;
       vid.removeEventListener('loadedmetadata', getDuration);
     });
-    vid.addEventListener('loadeddata', function handler() {
+    vid.addEventListener('seeked', function handler() {
       var canvas = document.createElement("canvas");
-      canvas.width = vid.videoWidth;// * scale;
-      canvas.height = vid.videoHeight;// * scale;
+      canvas.setAttribute("width",vid.videoWidth);// * scale;
+      canvas.setAttribute("height",vid.videoHeight);// * scale;
       canvas.getContext('2d').drawImage(vid, 0, 0, canvas.width, canvas.height);
-      //vid.setAttribute("poster",canvas.toDataURL());
-      vid.setAttribute("preload","none");
-      vid.removeEventListener('loadeddata',handler);
+      vid.setAttribute("poster",canvas.toDataURL());
+      //vid.setAttribute("preload","none");
+      vid.removeEventListener('seeked',handler);
       vid.setAttribute("src","");
       vid.load();
       var img=vid.parentElement.getElementsByTagName('img')[0];
       img.setAttribute("src",canvas.toDataURL());
-      vid.parentNode.removeChild(vid);
-      //captions[i].innerHTML = "<span> Hello World!</span>" + captions[i].innerHTML;
-      //vid.style.display = "block";
-
-
+      //vid.parentNode.removeChild(vid);
+      if (i+1<videos.length){
+         videos[i+1].load();
+      }
+      captions[i].innerHTML = "<span> Hello World!</span>" + captions[i].innerHTML;
+      img.style.display = "none";
+      vid.style.display = "block";
     });
   });
+  videos[0].load();
 })
 
 // Plays the track associated with an audio play button when clicked
