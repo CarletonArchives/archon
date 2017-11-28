@@ -302,7 +302,7 @@ $(document).ready(function(){
       if (i+1<videos.length){
          videos[i+1].load();
       }
-      captions[i].innerHTML = "<span> Hello World!</span>" + captions[i].innerHTML;
+      //captions[i].innerHTML = "<span> Hello World!</span>" + captions[i].innerHTML;
       img.style.display = "none";
       vid.style.display = "block";
     });
