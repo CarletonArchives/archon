@@ -35,13 +35,13 @@ $objCollection->Repository = $objCollection->Repository ? $objCollection->Reposi
 session_start();
 
 //this gets which userfields are required for this collecion
-$userFieldsResult = mysql_query('SELECT DISTINCT u.Title FROM tblCollections_UserFields as u LEFT JOIN tblCollections_Content as c ON u.ContentID = c.ID WHERE c.CollectionID ='.$objCollection->getString('ID'));
+$userFieldsResult = $_ARCHON->mdb2->query('SELECT DISTINCT u.Title FROM tblCollections_UserFields as u LEFT JOIN tblCollections_Content as c ON u.ContentID = c.ID WHERE c.CollectionID ='.$objCollection->getString('ID'));
 $ufret = array();
-if($userFieldsResult)
+if(!PEAR::isError($userFieldsResult))
 {
    
-    while($row = mysql_fetch_object($userFieldsResult))
-	$ufret[] = $row->Title;   
+    while($row = $userFieldsResult->fetchRow(MDB2_FETCHMODE_OBJECT))
+	$ufret[] = $row->Title;
 }
 else {
     $ufret = array('ERROR IN USER DEFINED FIELDS');

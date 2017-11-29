@@ -24,12 +24,9 @@ $hiddenInfoArray = array();
 
 //Query to get information no contained within the $Content array
 //IF YOU DO NOT HAVE A DATEADDED FIELD REMOVE dateadded FROM THIS QUERY
-$hiddenInfoQuery = mysql_query('SELECT LevelContainerID, RootContentID, ContainsContent, SortOrder, dateadded FROM tblCollections_Content WHERE ID = '.$Content['ID']);
-if($hiddenInfoQuery)
-{
-    $hiddenInfoArray = mysql_fetch_array($hiddenInfoQuery);		
-}
-else {
+$res2 = $_ARCHON->mdb2->query('SELECT LevelContainerID, RootContentID, ContainsContent, SortOrder, dateadded FROM tblCollections_Content WHERE ID = '.$Content['ID']);
+if(PEAR::isError($res2)){
+echo("hi\n");
 $queries=array("ALTER TABLE `tblSubjects_Subjects` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
 "ALTER TABLE `tblCollections_Content` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
 "ALTER TABLE `tblAccessions_Accessions` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
@@ -44,19 +41,24 @@ $queries=array("ALTER TABLE `tblSubjects_Subjects` ADD `dateadded` TIMESTAMP NOT
                 }
             }
         }
-    $hiddenInfoQuery = mysql_query('SELECT LevelContainerID, RootContentID, ContainsContent, SortOrder, dateadded FROM tblCollections_Content WHERE ID = '.$Content['ID']);
-    if($hiddenInfoQuery){
+    $res2 = $_ARCHON->mdb2->query('SELECT LevelContainerID, RootContentID, ContainsContent, SortOrder, dateadded FROM tblCollections_Content WHERE ID = '.$Content['ID']);
+    if(PEAR::isError($res2)){
+        $hiddenInfoArray = array('ERROR','ERROR','ERROR','ERROR','ERROR');
     }
     else{
-    $hiddenInfoArray = array('ERROR','ERROR','ERROR','ERROR','ERROR');
+        $hiddenInfoArray = $res2->fetchRow(MDB2_FETCHMODE_ORDERED);
     }
 }
+else{
+    $hiddenInfoArray=$res2->fetchRow(MDB2_FETCHMODE_ORDERED);
+}
+
 
 //Query that gets all of the information relating to IDs for items that share a RootContentID with the current item.
-$parentIDQuery = mysql_query('SELECT ID, ParentID, LevelContainerIdentifier FROM  tblCollections_Content WHERE RootContentID = '.$hiddenInfoArray[1].' OR RootContentID = 0');
+$parentIDQuery = $_ARCHON->mdb2->query('SELECT ID, ParentID, LevelContainerIdentifier FROM  tblCollections_Content WHERE RootContentID = '.$hiddenInfoArray[1].' OR RootContentID = 0');
 $parentIDArray = array();
-if($parentIDQuery){
-    while($row = mysql_fetch_object($parentIDQuery)){
+if(!PEAR::isError($parentIDQuery)){
+    while($row = $parentIDQuery->fetchRow(MDB2_FETCHMODE_OBJECT)){
         $rowID = $row->ID;
         $parentIDArray[$rowID] = $row;
     }
