@@ -540,7 +540,7 @@ function database_ui_main()
     $res =$_ARCHON->mdb2->query($query);
 	if (!PEAR::isError($res)) {
       if(!$row=$res->fetchRow()){
-		$generalSection->insertRow('Mods')->insertHTML("<button type='button' class='adminformbutton' onclick='window.open(\"index.php?p=admin/core/reports&f=install\");'>Install Reports</button>");
+		$generalSection->insertRow('Mods')->insertHTML("<button type='button' class='adminformbutton' onclick='$.get(\"index.php?p=admin/core/reports&f=install\",function(){location.reload();});'>Install Reports</button>");
       } //Add an install button.
 	}
   }
@@ -678,7 +678,7 @@ function database_ui_main()
   }
   }
   else{
-    $generalSection->insertRow('Mods')->insertHTML("<button type='button' class='adminformbutton' onclick='window.open(\"index.php?p=admin/core/indexutil&f=install&num=102\");'>Install IndexUtil</button>");
+    $generalSection->insertRow('Mods')->insertHTML("<button type='button' class='adminformbutton' onclick='$.get(\"index.php?p=admin/core/indexutil&f=install&num=102\",function(){location.reload();});'>Install IndexUtil</button>");
 
   }
   // Index search mod END

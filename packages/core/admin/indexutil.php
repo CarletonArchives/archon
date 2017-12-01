@@ -13,7 +13,7 @@
 isset($_ARCHON) or die();
 
 if($_REQUEST['f']=='install'){
-	echo("Hi");
+$_ARCHON->sendMessage("This will install the index search mod, however it must still be enabled in the configuration.");
 $query="INSERT IGNORE INTO `tblCore_Phrases` (
 	`ID`, 
 	`PackageID`,
@@ -29,8 +29,16 @@ VALUES
 (NULL, 1, 11, 2081, 'collidnum', 'Collection ID Number', NULL, 5),
 (NULL, 1, 11, 2081, 'indexallitems', 'Index all items', NULL, 5);";
 $res=$_ARCHON->mdb2->query($query);
+if(pear_isError($res)){
+	$_ARCHON->declareError("Error in installation.");
+	die();
+}
 $query="INSERT IGNORE INTO `tblCore_Configuration` (`ID`, `PackageID`, `ModuleID`, `Directive`, `Value`, `InputType`, `PatternID`, `ReadOnly`, `Encrypted`, `ListDataSource`) VALUES (NULL, '1', '0', 'Enable Index Search', 0, 'radio', '3', '0', '0', NULL)";
 $res=$_ARCHON->mdb2->query($query);
+if(pear_isError($res)){
+	$_ARCHON->declareError("Error in installation.");
+	die();
+}
 }
 else{
 $sessionStats = array("updates" => 0,
