@@ -676,9 +676,17 @@ function database_ui_main()
   $generalSection->getRow('Index search')->insertHTML($button);
   $generalSection->getRow('Index search')->insertHTML($temp);
   }
+  else{
+    $generalSection->insertRow('IndexUtil')->insertHTML("IndexUtil is currently installed, but disabled. If you want to enable it, you can do so in Archon Configuration, under \"Enable Index Search\".");
+  }
   }
   else{
+    if(!$generalSection->getRow('Mods')){
     $generalSection->insertRow('Mods')->insertHTML("<button type='button' class='adminformbutton' onclick='$.get(\"index.php?p=admin/core/indexutil&f=install&num=102\",function(){location.reload();});'>Install IndexUtil</button>");
+    }
+    else{
+    $generalSection->getRow('Mods')->insertHTML("<button type='button' class='adminformbutton' onclick='$.get(\"index.php?p=admin/core/indexutil&f=install&num=102\",function(){location.reload();});'>Install IndexUtil</button>");
+    }
 
   }
   // Index search mod END
