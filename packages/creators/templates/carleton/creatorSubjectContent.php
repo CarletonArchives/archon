@@ -161,7 +161,7 @@ function collectioncontentSubjects($SubjectID,$_ARCHON)
 	}
         if ($colllist)
         {
-         while($row = mysql_fetch_object($colllist))
+         while($row = $colllist->fetchRow(FETCH_MODE_OBJECT))
          {
              $collectionarray[$row['CollectionID']][] = $row;
              $collectionarray[$row['CollectionID']]['CollectionID'][]=$row['CollectionID'];
@@ -173,7 +173,7 @@ function collectioncontentSubjects($SubjectID,$_ARCHON)
 	if($contentresult)
 	{ 
             	$Subjectcontent = array();
-		while($row = $contentresult->fetchRow())                    
+		while($row = $contentresult->fetchRow(FETCH_MODE_OBJECT))                    
                 {
                     $Subjectcontent[$row['CollectionID']][$row['ID']]=$row;
                     $Subjectcontent[$row['CollectionID']]['CollectionID']=$row['CollectionID'];
