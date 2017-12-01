@@ -1384,8 +1384,20 @@ max-width:60em;
   word-wrap: break-word;
 }
 
-.thumbnailimg img, .thumbnailimg video, .thumbnailimg embed, .thumbnailimg p {
+.thumbnailimg img, .thumbnailimg embed, .thumbnailimg p {
   display:block;
+  border:1px solid #000;
+  max-width:100px;
+  max-height:130px;
+  clear:both;
+  margin-left:auto;
+  margin-right:auto;
+  font-size: 11px;
+  text-align: center;
+}
+
+.thumbnailimg video {
+  display:none;
   border:1px solid #000;
   max-width:100px;
   max-height:130px;
