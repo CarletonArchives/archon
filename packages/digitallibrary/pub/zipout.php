@@ -7,6 +7,10 @@
 *
 */
 isset($_ARCHON) or die();
+#Set the headers first
+header('Content-Type: application/octet-stream');
+header('Content-Disposition: attachment; filename="'.$_REQUEST['id'].'.zip"');
+
 
 #Grab ID and prepare query.
 $collectionID=$_REQUEST['id'];
@@ -41,7 +45,7 @@ while(file_exists($outfilename . ".zip")){
 }
 if($zip->open($outfilename . ".zip",ZipArchive::CREATE)!==TRUE){
 	$_ARCHON->declareError("Error: Could not compile zip file");
-	die();
+	exit(1);
 }
 #Add metadata file
 $zip->addFromString("metadata.csv",$line);
@@ -125,7 +129,7 @@ function realFileSize($path)
 
 
 
-$size=realFileSize($outfilename.".zip");
+$size=fileSize($outfilename.".zip");
 if($size==false){
 	$_ARCHON->declareError("Error: Could not read zip file");
 	try{
@@ -135,9 +139,6 @@ if($size==false){
 	}
 	die();
 }
-#Set the headers first
-header('Content-Type: application/octet-stream');
-header('Content-Disposition: attachment; filename="'.$_REQUEST['id'].'.zip"');
 
 header("Content-Length: {$size}");
 #Output
