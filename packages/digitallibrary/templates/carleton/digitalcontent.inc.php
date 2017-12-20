@@ -88,7 +88,7 @@ if(!empty($objDigitalContent->Files))
    $index = -1;
    echo("<div id='digcontentwrapper'><div id='digcontentfiles' class='mdround'>\n");
    echo("Material presented here may only be samples from a larger set. Contact the <a href ='./index.php?p=core/index&f=contact'>Carleton Archives</a> to inquire about additional items.");
-   echo("<br/><br/><a href ='?p=digitallibrary/zipout&id=".$objDigitalContent->ID."'>Download These Files and Metadata</a><br/><br/>");
+   echo("<br/><br/><a href ='?p=digitallibrary/zipout&id=".$objDigitalContent->ID."'>Download Files under 10MB and Metadata</a><br/><br/>");
    foreach($objDigitalContent -> Files as $objFile)
    {
        
