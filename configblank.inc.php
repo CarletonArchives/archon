@@ -167,6 +167,8 @@
    
 // ***********************************************
 // * File Cache Configuration                    *
+// * Requires existence of directory             *
+// * packages/digitallibrary/files
 // ***********************************************
 
 //   $_ARCHON->config->CacheFiles = true;
