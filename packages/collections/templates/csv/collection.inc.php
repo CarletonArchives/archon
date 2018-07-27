@@ -52,6 +52,7 @@ $_SESSION['csvUserFields'] = $ufret;
 
 //creates the title line for the csv file. if you do not want a title row, you can remove this line
 //IF YOU DO NOT HAVE A DATEADDED FIELD REMOVE THAT FIELD FROM THIS LIST
+
 echo '"ArchonID","CollectionID","Hierarchy Root->Item","LevelContainerID","LevelContainerIdentifier","Title","PrivateTitle","Date","Description","RootContentID","ParentID","ContainsContent","SortOrder","Enabled","DateAdded","Creators",';
 //these are the userfields
 foreach ($ufret as $userFieldEntry) {
