@@ -24,7 +24,36 @@
  */
 isset($_ARCHON) or die();
 
+$hide=false;
+$search="/Previous Code|Additional Location Information|Confidential Note|UnitID|IndexField/";
+$tempquery="SELECT ISNULL(MAX(`Value`)),MAX(`Value`) FROM `tblCore_Configuration` WHERE `Directive`='Hidden Userfields' ";
+foreach($_ARCHON->memorycache['Objects']['Configuration'] as $key=>$val){
+    if($val=="Hidden Userfields"){
+        $hide=$_ARCHON->memorycache['Objects']['Configuration'][$key];
+    }
+}
+if($hide){
+    $hide=$hide->Value;
 
+    $search="/".str_replace(";","|",str_replace("|","\|",$hide))."/";
+}
+else{
+    $result = $_ARCHON -> mdb2 -> query($tempquery);
+    if(pear_isError($result)) {
+        $query="INSERT IGNORE INTO `tblCore_Configuration` (`ID`, `PackageID`, `ModuleID`, `Directive`, `Value`, `InputType`, `PatternID`, `ReadOnly`, `Encrypted`, `ListDataSource`) VALUES (NULL, '3', '0', 'Hidden Userfields', 'Previous Code;Additional Location Information;Confidential Note;UnitID;IndexField', 'textfield', '1', '0', '0', NULL)";
+        $ret=$_ARCHON->mdb2->query($query);
+    }
+    $rows = $result -> fetchAll();
+    foreach($rows as $row){
+        if($row[0]==1){
+            $query="INSERT IGNORE INTO `tblCore_Configuration` (`ID`, `PackageID`, `ModuleID`, `Directive`, `Value`, `InputType`, `PatternID`, `ReadOnly`, `Encrypted`, `ListDataSource`) VALUES (NULL, '3', '0', 'Hidden Userfields', 'Previous Code;Additional Location Information;Confidential Note;UnitID;IndexField', 'textfield', '1', '0', '0', NULL)";
+            $ret=$_ARCHON->mdb2->query($query);
+        }
+        else{
+            $hide=$row[1];
+        }
+    }
+}
 if($enabled)
 {
    ?>
@@ -47,13 +76,23 @@ if($enabled)
 
       foreach($Content['UserFields'] as $ID => $String)
       {
-         $strUserFields .= $String;
-
-         if($count != $last)
+         if (preg_match($search, $String))
          {
-            $strUserFields .= "</dd>\n<dd class='faitemcontent'>\n";
+            if($_ARCHON->Security->userHasAdministrativeAccess())
+            {
+               $strUserFields .= $String;
+               $strUserFields .= "</dd>\n<dd class='faitemcontent'>\n";
+            }
          }
-         $count++;
+         else
+         {
+            $strUserFields .= $String;
+            if($count != $last)
+            {
+               $strUserFields .= "</dd>\n<dd class='faitemcontent'>\n";
+            }
+            $count++;
+         }
       }
       echo("<dd class='faitemcontent'>" . $strUserFields . "</dd>\n");
    }
