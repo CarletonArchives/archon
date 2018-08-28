@@ -26,6 +26,7 @@ $hiddenInfoArray = array();
 //IF YOU DO NOT HAVE A DATEADDED FIELD REMOVE dateadded FROM THIS QUERY
 $res2 = $_ARCHON->mdb2->query('SELECT LevelContainerID, RootContentID, ContainsContent, SortOrder, dateadded FROM tblCollections_Content WHERE ID = '.$Content['ID']);
 if(PEAR::isError($res2)){
+echo("hi\n");
 $queries=array("ALTER TABLE `tblSubjects_Subjects` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
 "ALTER TABLE `tblCollections_Content` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
 "ALTER TABLE `tblAccessions_Accessions` ADD `dateadded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;",
@@ -53,27 +54,39 @@ else{
 }
 
 
-
-
-$tempObject=New CollectionContent($Content['ID']);
-$tempObject->ParentID=$Content['ParentID'];
-$tempObject->LevelContainerIdentifier=$Content['LevelContainerIdentifier'];
-$tempObject->dbLoadObjects(true);
-
-$parent=$tempObject;
-$hierarchyToPrint="";
-while(isset($parent)){
-    $hierarchyToPrint=$parent->LevelContainerIdentifier."/".$hierarchyToPrint;
-    $parent=$parent->Parent;
+//Query that gets all of the information relating to IDs for items that share a RootContentID with the current item.
+$parentIDQuery = $_ARCHON->mdb2->query('SELECT ID, ParentID, LevelContainerIdentifier FROM  tblCollections_Content WHERE RootContentID = '.$hiddenInfoArray[1].' OR RootContentID = 0');
+$parentIDArray = array();
+if(!PEAR::isError($parentIDQuery)){
+    while($row = $parentIDQuery->fetchRow(MDB2_FETCHMODE_OBJECT)){
+        $rowID = $row->ID;
+        $parentIDArray[$rowID] = $row;
+    }
 }
-$hierarchyToPrint=rtrim($hierarchyToPrint,'/');
+
+//Gets a hierarcy of the item's position in the collection, from the root Content ID to the current item. Will print the LevelContainerIdentiier
+$curID = $Content['ID'];
+$hierarchy = array();
+while($parentIDArray[$curID]->ParentID != ""){
+    $parent = $parentIDArray[$curID]->ParentID;
+    //if you want it to print the ID instead, remove this line, and change $parentlcid with $parent in the next line.
+    $parentlcid = $parentIDArray[$curID]->LevelContainerIdentifier;
+    array_push($hierarchy, $parentlcid);
+    $curID = $parent;
+}
+
+//turns the hierarchy array into a printable string with the hierarchy   
+while($hierarchy){
+    if ($hierarchyToPrint != ""){
+        $hierarchyToPrint = $hierarchyToPrint . "/";
+    }
+    $hierarchyToPrint = $hierarchyToPrint . array_pop($hierarchy);
+}
 
 //here we start printing to the csv file 
 
 echo '
 ';
-
-
 echo '"'.$Content['ID'].'",';
 echo '"'.$collectionID.'",';
 echo '"'.$hierarchyToPrint.'",';
@@ -114,4 +127,6 @@ foreach ($userfields as $fieldTitle) {
     }
     echo '",';
 }
+$parentIDQuery->free();
+$res2->free();
 ?>
