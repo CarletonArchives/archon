@@ -139,11 +139,12 @@ function explodeDates($term) {
   // Finds dates like 'YYYY (+ or - 2 years)'
   $plusOrMinusPattern = "/(\d{4})\/?(\d{0,2})\s?I{0,2}\s?\(\s?\+ or \- (\d) year[s]?\)/";
   // Finds first date range in the index field
-  $rangePattern = "/(\d{4})\s?[-\/]\s?(\d{2,})[^\w-\/]/";
+  $rangePattern = "/(\d{4})\s?([-\/])\s?(\d{2,})([^\w-\/]|$)/";
+  $academicYearPattern = "/(\d{4})\s?\/\s?(\d{2,})";
   // Finds ;-delimited date ranges with Circa in front
   $circaPattern = "%Circa (\d{4}/?\d?\d?)(-(\d{4}/?\d?\d?))*;|$%";
   // Grabs four digit numbers to remove duplicates
-  $numbersPattern = "%[,;] (\d{4})(?=(([,;])|^))%";
+  $numbersPattern = "%[,;] ((\d{4})|(\d{4}\+\d{2}))(?=(([,;])|^))%";
   $noCommasPattern = "%, ?(?=[,;] )%";
   $noCommasPattern2 = "%(?<=[,;] ), %";
   $noSemiColonsPattern = "%; ?(?=; )%";
@@ -187,7 +188,7 @@ function explodeDates($term) {
   // Explode each date range
   while (preg_match($rangePattern, $term, $matches)) {
     $startYear = $matches[1];
-    $endYear = $matches[2];
+    $endYear = $matches[3];
     $dateRange = '';
 
     // Check for YYYY-YY or YYYY-YYYY format
@@ -210,6 +211,9 @@ function explodeDates($term) {
       $dateRange .= "$year, ";
     }
     $dateRange .= "$endYear";
+    if(strcmp($matches[2],"/")==0){
+      $dateRange .= ", $startYear" . '+'.substr($endYear, 2, 4);
+    }
     $term = preg_replace($rangePattern, $dateRange, $term, 1);
   }
   if(preg_match_all($numbersPattern,$term,$numbers,PREG_SET_ORDER)){
@@ -221,7 +225,8 @@ function explodeDates($term) {
 			$start=$start+strlen($number[0]);
 			$tempString=substr($term,$start);
 			$replace=strpos($tempString,$number[1]);
-			$term=substr_replace($term,"",$replace+$start,4);
+			$term=substr_replace($term,"",$replace+$start,strlen($number[1]));
+
 			$counts[$number[1]]=$counts[$number[1]]-1;
 		}
 	}
@@ -232,6 +237,7 @@ function explodeDates($term) {
   while(preg_match($noSemiColonsPattern,$term)){
     $term=preg_replace($noSemiColonsPattern,"",$term);
   }
+  $term=preg_replace("%(?<=\d{4})\+(?=\d{2})%","/",$term);
   return $term;
 }
 
