@@ -335,16 +335,17 @@ function getIndexFieldValues($id, $userFields, &$sessionStats) {
 
   //This is very hacky. I pull just the date part of indexfield to run explodedates on via str_replace.
   $defaultValues=array('Date');
-  $selectDVs = " (SELECT Date AS IndexField FROM ";
-  $selectDVs .= "tblCollections_Content WHERE ID IN (" . $idListAsString . ")) ";
-  $daterows=runQuery($selectDVs, $sessionStats);
-  foreach ($daterows as $Date) {
-    $DateVal=$Date['IndexField'];
-    $DateVal=str_replace("'","''",$DateVal); //Escape apostrophes
-  }
   
   // Put results into an array
   foreach ($rows as $item) {
+    $selectDVs = "SELECT Date AS IndexField FROM ";
+    $selectDVs .= "tblCollections_Content WHERE ID = ".$item['ContentID'];
+    $daterows=runQuery($selectDVs, $sessionStats);
+    foreach ($daterows as $Date) {
+      $DateVal=$Date['IndexField'];
+      $DateVal=str_replace("'","''",$DateVal); //Escape apostrophes
+
+    }
     $sessionStats['numitems']++;
     $idxflds = $collectionTitle . "; " . $item['IndexField'];
     $idxflds = str_replace("'", "''", $idxflds); // Escape apostrophes
@@ -454,7 +455,6 @@ function indexCollection($collID, &$sessionStats) {
 
     $indexFieldValues = getIndexFieldValues($itemIDArray, $indexParams, $sessionStats);
     updateIndexField($indexFieldValues, $sessionStats);
-
     echo "Successfully indexed collection $collID (";
     echo $sessionStats["numitems"]." items).</font><br>";
     return true;
