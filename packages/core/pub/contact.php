@@ -16,6 +16,7 @@ if($_ARCHON->Security->isAuthenticated() && $_ARCHON->Security->userHasAdministr
 
 contact_initialize();
 
+
 function contact_initialize()
 {
 	if(!isset($_REQUEST['f']))
@@ -65,9 +66,9 @@ function contact_email()
     $_ARCHON->PublicInterface->Title = $strEmailTitle;
     $_ARCHON->PublicInterface->addNavigation($_ARCHON->PublicInterface->Title);
 
-    $in_referer = $_REQUEST['referer'] ? $_REQUEST['referer'] : urlencode($_REQUEST['HTTP_REFERER']);
+    $in_referer = $_REQUEST['referer'] ? htmlspecialchars($_REQUEST['referer']) : urlencode($_REQUEST['HTTP_REFERER']);
 
-    $repositoryid = $_REQUEST['repositoryid'] ? $_REQUEST['repositoryid'] : 0;
+    $repositoryid = $_REQUEST['repositoryid'] ? intval($_REQUEST['repositoryid']) : 0;
 
 
 
@@ -109,6 +110,7 @@ function contact_email()
 
 	print "<form action=\"index.php\" accept-charset=\"UTF-8\" method=\"post\">\n";
 
+	// $in_referer, $query_string, and $repositoryid are sanitized for XSS at assignment
 	$form = "<input type=\"hidden\" name=\"f\" value=\"sendemail\" />\n";
 	$form .= "<input type=\"hidden\" name=\"p\" value=\"core/contact\" />\n";
 	$form .= "<input type=\"hidden\" name=\"referer\" value=\"$in_referer\" />\n";
@@ -170,9 +172,6 @@ function contact_email()
 	print "</form>\n";
     include('footer.inc.php');
 }
-
-
-
 
 
 function contact_exec()
